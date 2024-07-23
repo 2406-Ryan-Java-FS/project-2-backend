@@ -1,27 +1,27 @@
-Student account:  
-As a student, I should be able to:  
-Register as a student. 
-Login using email and password. 
-Browse and search for courses and programs by keywords, and categories. 
-Enroll in courses and programs. 
-Pay the course fee using the payment gateway. 
-Receive confirmation emails.  
-View the course content. 
-Attempt quizzes assigned in the course. 
-Get quiz scores. 
-Participate in a discussion forum with other students and educators. – Nice to have 
-Cancel course enrollment within 5 days of course purchase. 
-Submit a review for the course. 
- 
-Educator account:  
-As an educator, I should be able to:  
-Register as an educator using email, password, and professional details. 
-Login using email and password. 
-Create and manage courses and program content. 
-Create an MCQ-based quiz for each course.  
-Set a timer for the quiz. 
-Set the number of attempts for the quiz. 
-Participate in a discussion forum with the students. – Nice to have 
-Submit a response to the student review. 
+Student account:  <br>
+As a student, I should be able to:  <br>
+Register as a student. <br>
+Login using email and password. <br>
+Browse and search for courses and programs by keywords, and categories. <br>
+Enroll in courses and programs. <br>
+Pay the course fee using the payment gateway. <br>
+Receive confirmation emails.  <br>
+View the course content. <br>
+Attempt quizzes assigned in the course. <br>
+Get quiz scores. <br>
+Participate in a discussion forum with other students and educators. – Nice to have <br>
+Cancel course enrollment within 5 days of course purchase. <br>
+Submit a review for the course. <br>
+ <br><br>
+Educator account:  <br>
+As an educator, I should be able to:  <br>
+Register as an educator using email, password, and professional details. <br>
+Login using email and password. <br>
+Create and manage courses and program content. <br>
+Create an MCQ-based quiz for each course.  <br>
+Set a timer for the quiz. <br>
+Set the number of attempts for the quiz. <br>
+Participate in a discussion forum with the students. – Nice to have <br>
+Submit a response to the student review. <br>
  
  
