@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS Users, Educators, Quizzes, Courses, Enrollments, QuizQuestions, QuizAttempts;
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts
 
 CREATE TYPE user_role AS ENUM('student', 'educator');
 CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
@@ -58,9 +58,15 @@ CREATE TABLE QuizQuestions (
 question_id SERIAL PRIMARY KEY,
 quiz_id INT,
 question_text TEXT NOT NULL,
-correct_answer VARCHAR(255) NOT NULL,
-answer_options TEXT,
 FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+);
+
+CREATE TABLE QuestionChoices (
+choice_id SERIAL PRIMARY KEY,
+question_id  INT,
+correct bool,
+text VARCHAR(255) NOT NULL,
+FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id)
 );
 
 CREATE TABLE QuizAttempts (
@@ -72,6 +78,13 @@ score NUMERIC(4,2),
 FOREIGN KEY (student_id) REFERENCES Users(user_id),
 FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
 );
+
+CREATE TABLE ChoiceSelections (
+choice_id int REFERENCES QuestionChoices(choice_id) NOT NULL,
+attempt_id int REFERENCES QuizAttempts (attempt_id) NOT NULL,
+PRIMARY KEY(choice_id, attempt_id)
+);
+
 
 -- Select statements
 select * from users;
