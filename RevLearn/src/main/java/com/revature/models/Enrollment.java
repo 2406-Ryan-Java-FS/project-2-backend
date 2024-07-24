@@ -1,6 +1,6 @@
 package com.revature.models;
 
-import java.sql.Date;
+import java.security.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -47,7 +47,7 @@ public class Enrollment {
 
     @Column(name = "enrollment_date")
     @JsonProperty(value = "enrollmentDate")
-    private Date enrollmentDate;
+    private Timestamp enrollmentDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
@@ -58,7 +58,7 @@ public class Enrollment {
     @JsonProperty(value = "courseReview")
     private String courseReview;
 
-    public Enrollment(Integer enrollmentId, Integer studentId, Integer courseId, Date enrollmentDate,
+    public Enrollment(Integer enrollmentId, Integer studentId, Integer courseId, Timestamp enrollmentDate,
             PayStatus paymentStatus, String courseReview) {
         this.enrollmentId = enrollmentId;
         this.studentId = studentId;
