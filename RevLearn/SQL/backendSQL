@@ -1,4 +1,7 @@
-DROP TABLE IF EXISTS Users, Educators, Quizzes, Courses, Enrollments, QuizQuestions, QuizAttempts
+-- Set the schema for the current session
+SET search_path TO project2;
+
+DROP TABLE IF EXISTS Users, Educators, Quizzes, Courses, Enrollments, QuizQuestions, QuizAttempts;
 
 CREATE TYPE user_role AS ENUM('student', 'educator');
 CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
