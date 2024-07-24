@@ -1,3 +1,7 @@
+Database Information:
+For Hibernate plase use validate
+Schema name is project2
+
 Student account:  <br>
 As a student, I should be able to:  <br>
 Register as a student. <br>
