@@ -1,6 +1,6 @@
-Database Information:
-For Hibernate plase use validate
-Schema name is project2
+Database Information: <br>
+For Hibernate plase use validate <br>
+Schema name is project2 <br>
 
 Student account:  <br>
 As a student, I should be able to:  <br>
