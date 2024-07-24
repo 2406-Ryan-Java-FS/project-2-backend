@@ -29,10 +29,20 @@ public class UserService {
      */
     public User addUser(User user) {
 
-        // TODO: check data constraints
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new BadRequestException("Email is required.");
+        }
 
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new BadRequestException("Password is required.");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new ConflictException("Email already exists.");
+        }
+
+        if (user.getRole() == null || !user.getRole().equals("educator")) {
+            user.setRole("student");
         }
 
         return userRepository.save(user);
@@ -65,14 +75,35 @@ public class UserService {
      */
     public User updateUser(Integer user_id, User user) {
 
-        // TODO: check data constraints and permissions
-
         User updatedUser = this.getUser(user_id);
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setFirst_name(user.getFirst_name());
-        updatedUser.setLast_name(user.getLast_name());
-        updatedUser.setPassword(user.getPassword());
-        updatedUser.setRole(user.getRole());
+
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            if (userRepository.existsByEmail(user.getEmail())) {
+                throw new ConflictException("Email already exists.");
+            }
+            updatedUser.setEmail(user.getEmail());
+        }
+
+        if (user.getFirst_name() != null && !user.getFirst_name().isEmpty()) {
+            updatedUser.setFirst_name(user.getFirst_name());
+        }
+
+        if (user.getLast_name() != null && !user.getLast_name().isEmpty()) {
+            updatedUser.setLast_name(user.getLast_name());
+        }
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            updatedUser.setPassword(user.getPassword());
+        }
+
+        if (user.getRole() != null && !user.getRole().isEmpty()) {
+
+            // may need some additional logic here to make sure current user is allowed to change roles,
+            // or maybe that should be tackled on frontend so this is usable when needed.
+
+            updatedUser.setRole(user.getRole());
+        }
+
         return userRepository.save(updatedUser);
     }
 
