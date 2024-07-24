@@ -24,4 +24,19 @@ Set the number of attempts for the quiz. <br>
 Participate in a discussion forum with the students. – Nice to have <br>
 Submit a response to the student review. <br>
  
- 
+## Models
+- Users
+ - Students
+ - Educators
+ - Admins
+Courses
+Enrollments
+Quizzes
+Quiz Questions
+Quiz Attempts
+Reviews
+Review Responses
+Discussion Threads
+Discussion Posts
+ - id
+ - 
