@@ -1,17 +1,19 @@
 package com.revature.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Data;
 
+@Entity
+@Table(name = "educators", schema = "project2")
+@Data
 public class Educators {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private int id;
-    private String degreeLevel;
-    private String degreeMajor;
-    private String almaMater;
+    private int educator_id;
+    private String degree_level;
+    private String degree_major;
+    private String alma_mater;
     private String year;
 }

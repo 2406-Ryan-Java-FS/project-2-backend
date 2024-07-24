@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "users", schema = "project2")
 @Data
 public class User {
 
@@ -19,6 +19,6 @@ public class User {
     private String email;
     private String password;
     private String role;
-    private Date registrationDate;
+    private Date registration_date;
 
 }
