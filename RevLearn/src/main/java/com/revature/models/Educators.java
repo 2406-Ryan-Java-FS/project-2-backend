@@ -9,8 +9,6 @@ import lombok.Data;
 public class Educators {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private int educator_id;
     private String degree_level;
     private String degree_major;
