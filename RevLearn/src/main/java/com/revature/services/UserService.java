@@ -24,7 +24,7 @@ public class UserService {
      * Persists a User to the repository.
      *
      * @param user The User to be added.
-     * @return The persisted User including its newly assigned user_id.
+     * @return The persisted User including its newly assigned userId.
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
@@ -49,33 +49,33 @@ public class UserService {
     }
 
     /**
-     * Retrieves a User from the repository given its user_id.
+     * Retrieves a User from the repository given its userId.
      *
-     * @param user_id The user_id of a User.
+     * @param userId The userId of a User.
      * @return The associated User object.
-     * @throws BadRequestException if the user_id is invalid.
+     * @throws BadRequestException if the userId is invalid.
      */
-    public User getUser(Integer user_id) {
+    public User getUser(Integer userId) {
 
-        if (user_id == null || !userRepository.existsById(user_id)) {
+        if (userId == null || !userRepository.existsById(userId)) {
             throw new BadRequestException("User Id is invalid.");
         }
-        return userRepository.findByUserId(user_id);
+        return userRepository.findByUserId(userId);
     }
 
     /**
-     * Updates a User in the repository given its user_id.
+     * Updates a User in the repository given its userId.
      *
-     * @param user_id The user_id of the User to be updated.
+     * @param userId The userId of the User to be updated.
      * @param user    User object containing updated information.
      * @return The updated User object.
      * @throws BadRequestException   if there's an issue with the client's request.
      * @throws UnauthorizedException if trying to change roles without sufficient privileges.
      * @throws ConflictException     if there's already a User with the given email.
      */
-    public User updateUser(Integer user_id, User user) {
+    public User updateUser(Integer userId, User user) {
 
-        User updatedUser = this.getUser(user_id);
+        User updatedUser = this.getUser(userId);
 
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
             if (userRepository.existsByEmail(user.getEmail())) {
@@ -84,12 +84,12 @@ public class UserService {
             updatedUser.setEmail(user.getEmail());
         }
 
-        if (user.getFirst_name() != null && !user.getFirst_name().isEmpty()) {
-            updatedUser.setFirst_name(user.getFirst_name());
+        if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
+            updatedUser.setFirstName(user.getFirstName());
         }
 
-        if (user.getLast_name() != null && !user.getLast_name().isEmpty()) {
-            updatedUser.setLast_name(user.getLast_name());
+        if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+            updatedUser.setLastName(user.getLastName());
         }
 
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -108,17 +108,17 @@ public class UserService {
     }
 
     /**
-     * Deletes a User with the given user_id.
+     * Deletes a User with the given userId.
      *
-     * @param user_id The user_id of the User to be deleted.
-     * @throws BadRequestException if the user_id is invalid.
+     * @param userId The userId of the User to be deleted.
+     * @throws BadRequestException if the userId is invalid.
      */
-    public boolean deleteUser(Integer user_id) {
+    public boolean deleteUser(Integer userId) {
 
-        if (user_id == null || !userRepository.existsById(user_id)) {
+        if (userId == null || !userRepository.existsById(userId)) {
             throw new BadRequestException("User Id is invalid.");
         }
-        userRepository.deleteById(user_id);
+        userRepository.deleteById(userId);
         return true;
     }
 
