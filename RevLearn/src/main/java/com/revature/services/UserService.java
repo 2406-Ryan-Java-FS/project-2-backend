@@ -31,9 +31,9 @@ public class UserService {
 
         // TODO: check data constraints
 
-//        if (userRepository.findByEmail(user.getEmail()) != null) {
-//            throw new ConflictException("Email already exists.");
-//        }
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new ConflictException("Email already exists.");
+        }
 
         return userRepository.save(user);
     }
@@ -65,9 +65,15 @@ public class UserService {
      */
     public User updateUser(Integer user_id, User user) {
 
-        // TODO: check data constraints
+        // TODO: check data constraints and permissions
 
-        return userRepository.save(user);
+        User updatedUser = this.getUser(user_id);
+        updatedUser.setEmail(user.getEmail());
+        updatedUser.setFirst_name(user.getFirst_name());
+        updatedUser.setLast_name(user.getLast_name());
+        updatedUser.setPassword(user.getPassword());
+        updatedUser.setRole(user.getRole());
+        return userRepository.save(updatedUser);
     }
 
     /**
