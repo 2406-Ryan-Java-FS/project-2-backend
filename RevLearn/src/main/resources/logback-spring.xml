@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+<!--    This site explains logging patterns in great detail-->
+<!--    https://logging.apache.org/log4j/2.x/manual/layouts.html-->
+<!--    %30.30logger Makes the package and class name 30 characters wide to indent everything the same way-->
+<!--    %rEx{7} will show the first 7 lines of a stack trace instead of a dozen pages-->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss} %-5level %30.30logger: %msg%rEx{7}%n" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
