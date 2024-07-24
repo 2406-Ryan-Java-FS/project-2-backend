@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS Users, Educators, Quizzes, Courses, Enrollments, QuizQuestions, QuizAttempts
+DROP TABLE IF EXISTS Users, Educators, Quizzes, Courses, Enrollments, QuizQuestions, QuizAttempts;
 
 CREATE TYPE user_role AS ENUM('student', 'educator');
 CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
