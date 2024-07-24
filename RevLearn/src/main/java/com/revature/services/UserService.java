@@ -67,7 +67,7 @@ public class UserService {
      * Updates a User in the repository given its userId.
      *
      * @param userId The userId of the User to be updated.
-     * @param user    User object containing updated information.
+     * @param user   User object containing updated information.
      * @return The updated User object.
      * @throws BadRequestException   if there's an issue with the client's request.
      * @throws UnauthorizedException if trying to change roles without sufficient privileges.
@@ -97,10 +97,6 @@ public class UserService {
         }
 
         if (user.getRole() != null && !user.getRole().isEmpty()) {
-
-            // may need some additional logic here to make sure current user is allowed to change roles,
-            // or maybe that should be tackled on frontend so this is usable when needed.
-
             updatedUser.setRole(user.getRole());
         }
 
