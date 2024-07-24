@@ -67,7 +67,7 @@ public class UserService {
      * Updates a User in the repository given its user_id.
      *
      * @param user_id The user_id of the User to be updated.
-     * @param user   User object containing updated information.
+     * @param user    User object containing updated information.
      * @return The updated User object.
      * @throws BadRequestException   if there's an issue with the client's request.
      * @throws UnauthorizedException if trying to change roles without sufficient privileges.
