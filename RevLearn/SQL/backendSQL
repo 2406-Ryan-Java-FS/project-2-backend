@@ -72,3 +72,12 @@ score NUMERIC(4,2),
 FOREIGN KEY (student_id) REFERENCES Users(user_id),
 FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
 );
+
+-- Select statements
+select * from users;
+select * from educators;
+select * from courses;
+select * from enrollments;
+select * from quizzes;
+select * from quizattempts;
+select * from quizquestions;
