@@ -19,12 +19,23 @@ public class CourseServiceImpl implements CourseService{
         this.courseRepository = courseRepository;
     }
 
+    /**
+     *  This method returns a list of all courses
+     *  
+     * @return List
+     */
     @Override
     public List<Course> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
         return courses;
     }
 
+    /**
+     *  This method takes in a new course oject and adds it into the course table
+     * 
+     * @param 
+     * @return object
+     */
     @Override
     public Course addCourse(Course newCourse) {
         
