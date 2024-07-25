@@ -4,6 +4,7 @@ import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.User;
+import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ public class UserService {
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
-
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
         }
@@ -41,8 +41,8 @@ public class UserService {
             throw new ConflictException("Email already exists.");
         }
 
-        if (user.getRole() == null || !user.getRole().equals("educator")) {
-            user.setRole("student");
+        if (user.getRole() == null || !user.getRole().equals(Role.educator)) {
+            user.setRole(Role.student);
         }
 
         return userRepository.save(user);
@@ -95,6 +95,7 @@ public class UserService {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             updatedUser.setPassword(user.getPassword());
         }
+
 
         if (user.getRole() != null && !user.getRole().isEmpty()) {
             updatedUser.setRole(user.getRole());
