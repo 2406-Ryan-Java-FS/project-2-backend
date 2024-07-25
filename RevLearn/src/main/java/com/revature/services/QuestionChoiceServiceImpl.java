@@ -62,12 +62,6 @@ public class QuestionChoiceServiceImpl implements QuestionChoiceService {
         return qcr.findByQuestionId(questionId);
     }
 
-//    @Override
-//    public QuestionChoice getCorrectAnswer(int questionId) {
-//        // TODO Auto-generated method stub
-//        throw new UnsupportedOperationException("Unimplemented method 'getCorrectAnswer'");
-//    }
-
      @Override
      public QuestionChoice getCorrectAnswer(int questionId) {
          List<QuestionChoice> correctAnswer = qcr.findByQuestionIdAndCorrect(questionId, true);
