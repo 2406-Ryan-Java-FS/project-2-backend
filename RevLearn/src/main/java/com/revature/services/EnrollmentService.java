@@ -11,7 +11,7 @@ public interface EnrollmentService {
     // Fidel
     List<Enrollment> getAllEnrollments();
     // Jason
-    Enrollment registerEnrollment();
+    Enrollment registerEnrollment(Enrollment newEnrollment);
     // Chase
     Enrollment getEnrollmentById(Integer theEnrollmentId);      // getting an enrollment object with a specific id
     // Alex
