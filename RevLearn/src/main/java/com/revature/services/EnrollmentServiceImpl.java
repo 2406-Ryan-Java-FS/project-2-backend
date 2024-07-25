@@ -26,8 +26,9 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     @Override
     public Enrollment registerEnrollment(Enrollment newEnrollment) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'registerEnrollment'");
+        
+        
+
         Enrollment dbEnrollment = enrollmentRepository.save(newEnrollment);
         return dbEnrollment;
         
