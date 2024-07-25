@@ -4,12 +4,23 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "quizzes",schema = "project2")
+@Table(name = "Quizzes", schema = "project2")
 @Data
 public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer quiz_id;
+    @Column(name = "quiz_id")
+    private int quizId;
+    
+    @Column(name = "course_id")
+    private int courseId;
+
+    private String title;
+
+    private int timer;
+
+    private int attemptsAllowed;
 
 }
+

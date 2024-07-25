@@ -1,0 +1,104 @@
+-- Set the schema for the current session
+SET search_path TO project2;
+
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts;
+
+-- Drop existing types if they exist
+DROP TYPE IF EXISTS user_role;
+DROP TYPE IF EXISTS pay_status;
+
+-- Create types
+CREATE TYPE user_role AS ENUM('student', 'educator');
+CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
+
+-- Create tables
+CREATE TABLE Users (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    role user_role NOT NULL
+);
+
+CREATE TABLE Educators (
+    educator_id INT PRIMARY KEY,
+    degree_level VARCHAR(255),
+    degree_major VARCHAR(255),
+    alma_mater VARCHAR(255),
+    year VARCHAR(255),
+    FOREIGN KEY (educator_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Courses (
+    course_id SERIAL PRIMARY KEY,
+    educator_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    price NUMERIC(10, 2),
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (educator_id) REFERENCES Educators(educator_id) ON DELETE SET NULL
+);
+
+CREATE TABLE Enrollments (
+    enrollment_id SERIAL PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_status pay_status NOT NULL,
+    course_review VARCHAR(255),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE SET NULL
+);
+
+CREATE TABLE Quizzes (
+    quiz_id SERIAL PRIMARY KEY,
+    course_id INT,
+    title VARCHAR(255) NOT NULL,
+    timer INT,
+    attempts_allowed INT,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+CREATE TABLE QuizQuestions (
+    question_id SERIAL PRIMARY KEY,
+    quiz_id INT,
+    question_text TEXT NOT NULL,
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+);
+
+CREATE TABLE QuestionChoices (
+    choice_id SERIAL PRIMARY KEY,
+    question_id  INT,
+    correct bool,
+    text VARCHAR(255) NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id)
+);
+
+CREATE TABLE QuizAttempts (
+    attempt_id SERIAL PRIMARY KEY,
+    student_id INT,
+    quiz_id INT,
+    attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    score NUMERIC(4,2),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id),
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+);
+
+CREATE TABLE ChoiceSelections (
+        choice_id int REFERENCES QuestionChoices(choice_id) NOT NULL,
+        attempt_id int REFERENCES QuizAttempts (attempt_id) NOT NULL,
+        PRIMARY KEY(choice_id, attempt_id)
+);
+
+
+-- Select statements
+select * from users;
+select * from educators;
+select * from courses;
+select * from enrollments;
+select * from quizzes;
+select * from quizattempts;
+select * from quizquestions;

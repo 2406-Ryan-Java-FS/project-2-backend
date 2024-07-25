@@ -1,27 +1,36 @@
 package com.revature.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.revature.models.User;
+import com.revature.services.JwtServiceImpl;
+import com.revature.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-/*
-    July 25
-    Pinging this to do various things during development
-    Future: may clear database tables during testing on local machine or server
- */
-@Profile("h2")
 @RestController
-@RequestMapping("/development")
 public class TestController {
+    @Autowired
+    JwtServiceImpl js;
 
-    private static final Logger logger= LoggerFactory.getLogger(TestController.class);
+    @Autowired
+    UserService us;
 
-    @GetMapping()
-    public String slash(){
-        logger.info("Reached this endpoint");
-        return "This is an endpoint";
+    @PostMapping("/signup")
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        return ResponseEntity.status(200).body(us.addUser(user));
     }
+
+
+    @PostMapping("/signin")
+    public ResponseEntity<String> signInUser(@RequestBody User user) {
+        User u = us.getUser(user.getUserId());
+        String jwt = js.generateJwt(u.getUserId());
+        return ResponseEntity.status(200).body(jwt);
+    }
+
+    @GetMapping("/token")
+    public ResponseEntity<User> checkToken(@RequestHeader(name = "Authorization") String token) {
+        return ResponseEntity.status(200).body(js.getUserFromToken(token));
+    }
+
 }
