@@ -11,26 +11,24 @@ import java.util.Date;
 @Table(name="QuizAttempts")
 @Data
 public class QuizAttempts {
-
-	
 	
 	@Id 
 	@GeneratedValue (strategy = GenerationType.AUTO)
-	@Column (name="quizAttempt_id", nullable = false)
-	@ManyToOne
-    private Integer quizAttempt_id;
+	@Column (name="attempt_id", nullable = false)
+    private Integer attempt_id;
 	
-	@Column(name="student_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name="student_id", referencedColumnName = "user_id", nullable = false)
 	private User student;
 	
-	@Column (name="quiz_id", nullable = false, columnDefinition = "int")
 	@ManyToOne
+	@JoinColumn (name="quiz_id", nullable = false, columnDefinition = "int")
     private Quiz quiz;
 	
 	@Column(name="attempt_date", nullable = false, columnDefinition = "timestamp")
 	private Date attempt_date;
 	
-	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2")
+	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2)")
 	private double score;
 	
 	public QuizAttempts(User student, Quiz quiz, Double score) 
