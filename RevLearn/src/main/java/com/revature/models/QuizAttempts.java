@@ -8,22 +8,20 @@ import java.time.Instant;
 import java.util.Date;
 
 @Entity
-@Table(name="QuizAttempts")
+@Table(name="quizattempts", schema = "project2")
 @Data
 public class QuizAttempts {
 
-	
-	
 	@Id 
-	@GeneratedValue (strategy = GenerationType.AUTO)
-	@Column (name="quizAttempt_id", nullable = false)
-	@ManyToOne
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
+	@Column (name="attempt_id", nullable = false)
     private Integer quizAttempt_id;
-	
-	@Column(name="student_id", nullable = false)
+
+	@ManyToOne
+	@JoinColumn(name="student_id", nullable = false)
 	private User student;
 	
-	@Column (name="quiz_id", nullable = false, columnDefinition = "int")
+	@JoinColumn (name="quiz_id", nullable = false, columnDefinition = "int")
 	@ManyToOne
     private Quiz quiz;
 	
