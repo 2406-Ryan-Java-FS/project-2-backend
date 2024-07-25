@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CourseServiceImpl implements CourseService{
