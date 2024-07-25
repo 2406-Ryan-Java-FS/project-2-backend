@@ -1,7 +1,5 @@
 package com.revature.models;
 
-
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
