@@ -1,3 +1,9 @@
+Database Information: <br>
+For Hibernate plase use validate <br>
+Schema name is project2 <br>
+At the end of your spring.datasource.url please add /postgres?currentSchema=project2 <br>
+ 
+
 Student account:  <br>
 As a student, I should be able to:  <br>
 Register as a student. <br>
