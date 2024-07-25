@@ -96,7 +96,8 @@ public class UserService {
             updatedUser.setPassword(user.getPassword());
         }
 
-        if (user.getRole() != null) {
+
+        if (user.getRole() != null && !user.getRole().isEmpty()) {
             updatedUser.setRole(user.getRole());
         }
 
