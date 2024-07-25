@@ -1,24 +1,46 @@
 package com.revature.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "users", schema = "project2")
 @Data
+@JsonPropertyOrder({"userId","firstName","lastName","email","password","role","registrationDate"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  int user_id;
+    @Column(name = "user_id")
+    @JsonProperty(value = "userId")
+    private  int userId;
 
-    private String first_name;
-    private String last_name;
+    @Column(name = "first_name")
+    @JsonProperty(value = "firstName")
+    private String firstName;
+
+    @Column(name = "last_name")
+    @JsonProperty(value = "lastName")
+    private String lastName;
+
+    @Column(name = "email")
+    @JsonProperty(value = "email")
     private String email;
+
+    @Column(name = "password")
+    @JsonProperty(value = "password")
     private String password;
+
+    @Column(name = "role")
+    @JsonProperty(value = "role")
     private String role;
+
+    @Column(name = "registration_date")
+    @JsonProperty(value = "registrationDate")
     private Date registrationDate;
 
 }
