@@ -49,6 +49,7 @@ CREATE TABLE Enrollments (
     course_id INT,
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_status pay_status NOT NULL,
+    enrollment_status BOOLEAN NOT NULL DEFAULT FALSE,
     course_review VARCHAR(255),
     enrollment_status BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE SET NULL,
