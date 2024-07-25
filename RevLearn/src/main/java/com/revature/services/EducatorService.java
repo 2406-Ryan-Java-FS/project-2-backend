@@ -1,10 +1,7 @@
 package com.revature.services;
 
 import com.revature.exceptions.BadRequestException;
-import com.revature.exceptions.ConflictException;
-import com.revature.exceptions.NotFoundException;
 import com.revature.models.Educator;
-import com.revature.models.User;
 import com.revature.repositories.EducatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
