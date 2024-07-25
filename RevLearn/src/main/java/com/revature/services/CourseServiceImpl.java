@@ -2,16 +2,15 @@ package com.revature.services;
 
 import java.util.List;
 
-import com.revature.models.Enrollment;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
 
+@Service
 public class CourseServiceImpl implements CourseService{
     CourseRepository courseRepository;
 
-    @Autowired
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }

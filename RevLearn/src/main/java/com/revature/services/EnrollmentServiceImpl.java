@@ -3,25 +3,37 @@ package com.revature.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
 
+@Service
 public class EnrollmentServiceImpl implements EnrollmentService  {
 
     EnrollmentRepository enrollmentRepository;
 
-    @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
     }
 
+    /**
+     * retrieves all enrollments from the repository.
+     * @return List<Enrollment> - a list of all Enrollment entities.
+     * @throws RuntimeExcepton - if the retrieval operation fails.
+     */
     @Override
     public List<Enrollment> getAllEnrollments() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllEnrollments'");
+        try 
+        {
+            List<Enrollment> allEnrollments = enrollmentRepository.findAll();
+            return allEnrollments;
+        } 
+        catch (Exception e) 
+        {
+            throw new RuntimeException("Error fetching enrollments: " + e.getMessage());
+        }
     }
 
     @Override
@@ -54,6 +66,13 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
         else return null;
     }
 
+    /**
+     * allows a student to update or put a review for their enrolled course
+     * @param theEnrollmentId the id of the enrollment that we want to update
+     * @param theCourseReview the review of that paticular course for that particular enrollment
+     * @return Enrollment - the updated Enrollment object if the update is successful
+     * @throws InvalidItemException if the item update does not succeed
+     */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview) {
         // TODO Auto-generated method stub
@@ -65,5 +84,4 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteEnrollment'");
     }
-    
 }
