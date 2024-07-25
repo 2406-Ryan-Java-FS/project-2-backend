@@ -5,7 +5,7 @@ import java.util.List;
 import com.revature.models.Enrollment;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.revature.exceptions.InvalidException;
+import com.revature.exceptions.BadRequestException;
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
 
@@ -27,7 +27,7 @@ public class CourseServiceImpl implements CourseService{
     public Course addCourse(Course newCourse) {
         
         if(newCourse.getTitle() == null){
-            throw new InvalidException("Please give the new course a title.");
+            throw new BadRequestException("Please give the new course a title.");
         }
 
         Course dbCourse = courseRepository.save(newCourse);
