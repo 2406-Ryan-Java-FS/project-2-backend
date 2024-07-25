@@ -77,9 +77,9 @@ public class JwtServiceImpl implements JwtService{
      * Verify JWT token
      *
      * @param token the jwt token from request
-     * @return 0 = Auth failed (token is not valid)
-     *        -1 = expired token
-     *        1+ = id of user
+     * @return 0  = Auth failed (token is not valid)
+     *        -1  = expired token
+     *         1+ = id of user
      */
     @Override
     public int verifyJwt(String token) {
