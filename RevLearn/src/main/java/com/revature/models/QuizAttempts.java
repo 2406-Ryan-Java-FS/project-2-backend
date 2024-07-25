@@ -28,7 +28,7 @@ public class QuizAttempts {
 	@Column(name="attempt_date", nullable = false, columnDefinition = "timestamp")
 	private Date attempt_date;
 	
-	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2")
+	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2)")
 	private double score;
 	
 	public QuizAttempts(User student, Quiz quiz, Double score) 
