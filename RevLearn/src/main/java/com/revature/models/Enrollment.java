@@ -1,6 +1,6 @@
 package com.revature.models;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,21 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-
-enum PayStatus{
-    pending,
-    completed,
-    cancelled,
-}
 
 @Entity
 @Table (name = "Enrollments", schema = "project2")
-@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "courseReview"})
+@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "enrolled", "courseReview"})
+@Data
 @Getter @Setter @NoArgsConstructor @ToString
 public class Enrollment {
 
@@ -43,7 +35,7 @@ public class Enrollment {
 
     @Column(name = "course_id ")
     @JsonProperty(value = "courseId")
-    private Integer courseId ;
+    private Integer courseId;
 
     @Column(name = "enrollment_date")
     @JsonProperty(value = "enrollmentDate")
@@ -53,6 +45,10 @@ public class Enrollment {
     @Column(name = "payment_status")
     @JsonProperty(value = "paymentStatus")
     private PayStatus paymentStatus;
+
+    @Column(name = "enrollment_status")
+    @JsonProperty(value = "enrolled")
+    private Boolean enrolled;
 
     @Column(name = "course_review")
     @JsonProperty(value = "courseReview")
