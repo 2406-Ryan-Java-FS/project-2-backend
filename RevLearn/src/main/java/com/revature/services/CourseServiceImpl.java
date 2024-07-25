@@ -5,6 +5,7 @@ import java.util.List;
 import com.revature.models.Enrollment;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.revature.exceptions.InvalidException;
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
 import org.springframework.stereotype.Service;
@@ -20,16 +21,17 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<Course> getAllCourses() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'getAllCourses'");
         List<Course> courses = courseRepository.findAll();
         return courses;
     }
 
     @Override
     public Course addCourse(Course newCourse) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'addCourse'");
+        
+        if(newCourse.getTitle() == null){
+            throw new InvalidException("Please give the new course a title.");
+        }
+
         Course dbCourse = courseRepository.save(newCourse);
         return dbCourse;
     }
