@@ -8,19 +8,19 @@ import java.time.Instant;
 import java.util.Date;
 
 @Entity
-@Table(name="QuizAttempts")
+@Table(name="quizattempts", schema = "project2")
 @Data
 public class QuizAttempts {
-	
+
 	@Id 
-	@GeneratedValue (strategy = GenerationType.AUTO)
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	@Column (name="attempt_id", nullable = false)
-    private Integer attempt_id;
-	
+    private Integer quizAttempt_id;
+
 	@ManyToOne
 	@JoinColumn(name="student_id", referencedColumnName = "user_id", nullable = false)
 	private User student;
-	
+
 	@ManyToOne
 	@JoinColumn (name="quiz_id", nullable = false, columnDefinition = "int")
     private Quiz quiz;

@@ -13,4 +13,3 @@ public interface QuizAttemptsRepository extends JpaRepository<QuizAttempts,Integ
 
 
 
-	
