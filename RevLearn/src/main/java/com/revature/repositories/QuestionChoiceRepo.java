@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface QuestionChoiceRepo extends JpaRepository<QuestionChoice, Integer>{
     List<QuestionChoice> findByQuestionId(int questionId);
+    // List<QuestionChoice> findByQuestionIdAndCorrect(int questionId, boolean correct);
 }
