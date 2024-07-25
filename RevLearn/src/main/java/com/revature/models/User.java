@@ -38,9 +38,4 @@ public class User {
     @Column(name = "role")
     @JsonProperty(value = "role")
     private String role;
-
-    @Column(name = "registration_date")
-    @JsonProperty(value = "registrationDate")
-    private Date registrationDate;
-
 }
