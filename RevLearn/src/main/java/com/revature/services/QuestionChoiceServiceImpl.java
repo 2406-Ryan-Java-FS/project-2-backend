@@ -11,8 +11,13 @@ import java.util.List;
 @Service
 public class QuestionChoiceServiceImpl implements QuestionChoiceService {
 
-    @Autowired
+    
     QuestionChoiceRepo qcr;
+
+    @Autowired
+    public QuestionChoiceServiceImpl(QuestionChoiceRepo qcr) {
+        this.qcr = qcr;
+    }
 
     @Override
     public QuestionChoice addChoice(QuestionChoice c) {
@@ -59,11 +64,17 @@ public class QuestionChoiceServiceImpl implements QuestionChoiceService {
 
     @Override
     public QuestionChoice getCorrectAnswer(int questionId) {
-        List<QuestionChoice> correctAnswer = qcr.findByQuestionIdAndCorrect(questionId, true);
-        if (!correctAnswer.isEmpty()) {
-            return correctAnswer.get(0);
-        } else {
-            return new QuestionChoice();
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCorrectAnswer'");
     }
+
+    // @Override
+    // public QuestionChoice getCorrectAnswer(int questionId) {
+    //     List<QuestionChoice> correctAnswer = qcr.findByQuestionIdAndCorrect(questionId, true);
+    //     if (!correctAnswer.isEmpty()) {
+    //         return correctAnswer.get(0);
+    //     } else {
+    //         return new QuestionChoice();
+    //     }
+    // }
 }

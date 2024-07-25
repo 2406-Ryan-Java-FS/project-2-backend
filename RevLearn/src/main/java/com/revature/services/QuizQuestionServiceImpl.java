@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class QuizQuestionServiceImpl implements QuizQuestionService {
 
-    @Autowired
+    
     QuizQuestionRepo qr;
+
+    public QuizQuestionServiceImpl(QuizQuestionRepo qr) {
+        this.qr = qr;
+    }
 
     @Override
     public QuizQuestion addQuestion(QuizQuestion q) {
