@@ -15,7 +15,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
-public class JwtServiceImpl {
+public class JwtServiceImpl implements JwtService{
     public static final long EXPIRATION = 12 * 60 * 60 * 1000;          // expiration = 12 hours
 
     @Autowired
@@ -31,6 +31,7 @@ public class JwtServiceImpl {
      * @param id The userId of a User.
      * @return jwt token as String.
      */
+    @Override
     public String generateJwt(Integer id) {
         return generateJwtHelper(id);
     }
@@ -58,6 +59,7 @@ public class JwtServiceImpl {
      * @param token the jwt token from request
      * @return User if exists or null if not.
      */
+    @Override
     public User getUserFromToken(String token){
         int id = verifyJwt(token);
         if(id == 0){
@@ -79,6 +81,7 @@ public class JwtServiceImpl {
      *        -1 = expired token
      *        1+ = id of user
      */
+    @Override
     public int verifyJwt(String token) {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));   // create key from app.yml
         token = token.split(" ")[1].trim();                                      //remove "Bearer" from token header
