@@ -22,7 +22,7 @@ public class EducatorController {
      * Endpoint for registering a new Educator.
      *
      * @param educator The Educator to be registered.
-     * @return The persisted Educator with its newly assigned educatorId.
+     * @return The persisted Educator.
      */
     @PostMapping
     public ResponseEntity<Educator> addEducator(@RequestBody Educator educator) {
