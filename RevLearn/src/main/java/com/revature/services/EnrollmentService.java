@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 
-@Service
 public interface EnrollmentService {
     // Fidel
     List<Enrollment> getAllEnrollments();

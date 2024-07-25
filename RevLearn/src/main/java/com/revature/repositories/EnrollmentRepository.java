@@ -17,6 +17,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     //method to update paymentStatus field in Enrollment
     @Modifying
     @Query("update Enrollment e set e.paymentStatus = :thePaymentStatus where e.enrollmentId = :theEnrollmentId")
-    int updateEnrollmentPaymentStatusById(@Param("theEnrollmentId") int theEnrollmentId, @Param("thePaymentStatus")PayStatus thePaymentStatus);
+    int updateEnrollmentPaymentStatusById(@Param("theEnrollmentId") Integer theEnrollmentId, @Param("thePaymentStatus")PayStatus thePaymentStatus);
 
 }
