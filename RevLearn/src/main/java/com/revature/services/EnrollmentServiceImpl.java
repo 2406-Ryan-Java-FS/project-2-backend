@@ -3,6 +3,7 @@ package com.revature.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import com.revature.models.Enrollment;
@@ -75,8 +76,20 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
      */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateEnrollmentById'");
+        Enrollment theNewEnrollment = null;
+
+        // check if the enrollment already exists in the database
+        Optional<Enrollment> dBEnrollmentOptional = enrollmentRepository.findById(theEnrollmentId);
+
+        if(!dBEnrollmentOptional.isPresent())
+        {
+            throw new BadRequestException()
+        }
+
+        // since it exists, please get the enrollment
+        Enrollment dBEnrollment = dBEnrollmentOptional.get();
+
+        return dBEnrollment;
     }
 
     @Override
