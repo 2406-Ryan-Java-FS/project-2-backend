@@ -143,15 +143,15 @@ public class UserService {
      * Verifies a User login.
      *
      * @param user User object containing the email and password to verify.
-     * @return The verified User.
+     * @return The userId of the verified User.
      * @throws UnauthorizedException if the email and/or password are invalid.
      */
-    public boolean verifyUser(User user) {
+    public Integer verifyUser(User user) {
 
         User existingUser = userRepository.findByEmail(user.getEmail());
 
         if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return true;
+            return existingUser.getUserId();
         } else {
             throw new UnauthorizedException("Invalid login credentials");
         }

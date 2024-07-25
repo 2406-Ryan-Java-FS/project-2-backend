@@ -1,6 +1,8 @@
 package com.revature.controllers;
 
+import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.User;
+import com.revature.services.JwtService;
 import com.revature.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,10 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     UserService userService;
+    JwtService jwtService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -48,14 +52,16 @@ public class UserController {
      * Endpoint for verifying a User login.
      *
      * @param user A User containing a email/password combination to be verified.
-     * @return The verified account object.
+     * @return A JWT Token as a string.
      */
     @PostMapping("/login")
     public ResponseEntity<Object> loginUser(@RequestBody User user) {
 
-        if (userService.verifyUser(user)) {
-            return new ResponseEntity<>(true, HttpStatus.OK);
+        try {
+            Integer validUserId = userService.verifyUser(user);
+            return new ResponseEntity<>(jwtService.generateJwt(validUserId), HttpStatus.OK);
+        } catch (UnauthorizedException ue) {
+            return new ResponseEntity<>(ue.getMessage(), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
     }
 }
