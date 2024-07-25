@@ -6,14 +6,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "educators", schema = "project2")
+@Table(name = "Educator", schema = "project2")
 @Data
-@JsonPropertyOrder({"educatorId", "degreeLevel", "degreeMajor", "almaMater", "year"})
+//@JsonPropertyOrder({"educatorId", "degreeLevel", "degreeMajor", "almaMater", "year"})
 public class Educator {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "educator_id")
-    @JsonProperty(value = "educatorId")
     private int educatorId;
 
     @Column(name = "degree_level")

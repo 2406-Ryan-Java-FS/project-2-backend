@@ -1,5 +1,6 @@
 package com.revature.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -32,7 +33,7 @@ public class User {
     private String email;
 
     @Column(name = "password")
-    @JsonProperty(value = "password")
+    @JsonProperty(value = "password",access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "role")
