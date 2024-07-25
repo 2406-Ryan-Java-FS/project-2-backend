@@ -1,6 +1,6 @@
 package com.revature.controllers;
 
-public class QuizAttemptsController {
+public interface QuizAttemptsController {
 	// To be implemented later.
 	
 	// probable endpoints:

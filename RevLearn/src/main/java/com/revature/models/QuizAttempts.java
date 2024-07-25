@@ -18,11 +18,11 @@ public class QuizAttempts {
     private Integer quizAttempt_id;
 
 	@ManyToOne
-	@JoinColumn(name="student_id", nullable = false)
+	@JoinColumn(name="student_id", referencedColumnName = "user_id", nullable = false)
 	private User student;
-	
-	@JoinColumn (name="quiz_id", nullable = false, columnDefinition = "int")
+
 	@ManyToOne
+	@JoinColumn (name="quiz_id", nullable = false, columnDefinition = "int")
     private Quiz quiz;
 	
 	@Column(name="attempt_date", nullable = false, columnDefinition = "timestamp")
