@@ -25,9 +25,13 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
     }
 
     @Override
-    public Enrollment registerEnrollment() {
-        // TODO Auto-generated method stub
+    public Enrollment registerEnrollment(Enrollment newEnrollment) {
+//        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'registerEnrollment'");
+//        if(newEnrollment.getStudentId()){
+//
+//        }
+//        newEnrollment.getStudentId();
     }
 
     @Override

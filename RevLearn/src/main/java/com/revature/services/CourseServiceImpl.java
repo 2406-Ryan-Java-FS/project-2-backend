@@ -17,14 +17,15 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<Course> getAllCourses() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllCourses'");
+        List<Course> courses = courseRepository.findAll();
+        return courses;
     }
 
     @Override
-    public Course addCourse() {
+    public Course addCourse(Course newCourse) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addCourse'");
+
     }
 
     @Override
