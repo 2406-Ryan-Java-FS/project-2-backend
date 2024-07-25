@@ -67,7 +67,7 @@ public class UserService {
      * Updates a User in the repository given its userId.
      *
      * @param userId The userId of the User to be updated.
-     * @param user    User object containing updated information.
+     * @param user   User object containing updated information.
      * @return The updated User object.
      * @throws BadRequestException   if there's an issue with the client's request.
      * @throws UnauthorizedException if trying to change roles without sufficient privileges.
@@ -97,10 +97,6 @@ public class UserService {
         }
 
         if (user.getRole() != null && !user.getRole().isEmpty()) {
-
-            // may need some additional logic here to make sure current user is allowed to change roles,
-            // or maybe that should be tackled on frontend so this is usable when needed.
-
             updatedUser.setRole(user.getRole());
         }
 
@@ -130,5 +126,34 @@ public class UserService {
     public List<User> getAllUsers() {
 
         return userRepository.findAll();
+    }
+
+    /**
+     * Checks if a user with the given userId exists in the repository.
+     *
+     * @param userId the userId of the User to check.
+     * @return true if a User with the given userId exists, false otherwise.
+     */
+    public boolean isUser(Integer userId) {
+
+        return userRepository.existsById(userId);
+    }
+
+    /**
+     * Verifies a User login.
+     *
+     * @param user User object containing the email and password to verify.
+     * @return The verified User.
+     * @throws UnauthorizedException if the email and/or password are invalid.
+     */
+    public boolean verifyUser(User user) {
+
+        User existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            return true;
+        } else {
+            throw new UnauthorizedException("Invalid login credentials");
+        }
     }
 }
