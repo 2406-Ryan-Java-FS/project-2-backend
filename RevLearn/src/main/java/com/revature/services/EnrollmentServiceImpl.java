@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.revature.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.revature.exceptions.BadRequestException;
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
@@ -32,7 +33,9 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
     @Override
     public Enrollment registerEnrollment(Enrollment newEnrollment) {
         
-        
+        if(newEnrollment.getPaymentStatus() == null){
+            throw new BadRequestException("Please enter either 'pending', 'completed', or 'conselled' for payment status.");
+        }
 
         Enrollment dbEnrollment = enrollmentRepository.save(newEnrollment);
         return dbEnrollment;
