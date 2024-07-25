@@ -127,4 +127,15 @@ public class UserService {
 
         return userRepository.findAll();
     }
+
+    /**
+     * Checks if a user with the given userId exists in the repository.
+     *
+     * @param userId the userId of the User to check.
+     * @return true if a User with the given userId exists, false otherwise.
+     */
+    public boolean isUser(Integer userId) {
+
+        return userRepository.existsById(userId);
+    }
 }

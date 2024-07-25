@@ -2,6 +2,7 @@ package com.revature.services;
 
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
+import com.revature.exceptions.NotFoundException;
 import com.revature.models.Educator;
 import com.revature.models.User;
 import com.revature.repositories.EducatorRepository;
@@ -26,14 +27,14 @@ public class EducatorService {
      * Persists an Educator to the repository.
      *
      * @param educator The Educator to be added.
-     * @return The persisted Educator including its newly assigned EducatorId.
-     * @throws ConflictException if there's already a User with the given email.
+     * @return The persisted Educator
+     * @throws BadRequestException if the educatorId doesn't match an existing User.
      */
-    public Educator addEducator(User user, Educator educator) {
+    public Educator addEducator(Educator educator) {
 
-        User addedUser = userService.addUser(user);
-
-        educator.setEducatorId(addedUser.getUserId());
+        if (!userService.isUser(educator.getEducatorId())) {
+            throw new BadRequestException("Educator Id doesn't match an existing User.");
+        }
 
         return educatorRepository.save(educator);
     }
