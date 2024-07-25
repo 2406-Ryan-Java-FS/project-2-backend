@@ -8,15 +8,20 @@ import java.time.Instant;
 import java.util.Date;
 
 @Entity
-@Table(name="QuizAttempt")
+@Table(name="QuizAttempts")
 @Data
-public class QuizAttempt {
+public class QuizAttempts {
 
+	
+	
 	@Id 
 	@GeneratedValue (strategy = GenerationType.AUTO)
-	@Column (name="user_id", nullable = false)
+	@Column (name="quizAttempt_id", nullable = false)
 	@ManyToOne
-    private User student;
+    private Integer quizAttempt_id;
+	
+	@Column(name="student_id", nullable = false)
+	private User student;
 	
 	@Column (name="quiz_id", nullable = false, columnDefinition = "int")
 	@ManyToOne
@@ -28,7 +33,7 @@ public class QuizAttempt {
 	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2")
 	private double score;
 	
-	public QuizAttempt(User student, Quiz quiz, Double score) 
+	public QuizAttempts(User student, Quiz quiz, Double score) 
 	{
 		super();
 		this.student = student;
