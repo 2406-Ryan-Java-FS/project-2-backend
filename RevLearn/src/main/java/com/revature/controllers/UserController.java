@@ -50,7 +50,7 @@ public class UserController {
      * @param user A User containing a email/password combination to be verified.
      * @return The verified account object.
      */
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<Object> loginUser(@RequestBody User user) {
 
         if (userService.verifyUser(user)) {
