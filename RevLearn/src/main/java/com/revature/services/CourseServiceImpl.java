@@ -31,7 +31,8 @@ public class CourseServiceImpl implements CourseService{
     }
 
     /**
-     *  This method takes in a new course oject and adds it into the course table
+     *  This method takes in a new course oject 
+     * returns the new course object
      * 
      * @param 
      * @return object

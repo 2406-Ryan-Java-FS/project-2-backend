@@ -30,6 +30,13 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
         throw new UnsupportedOperationException("Unimplemented method 'getAllEnrollments'");
     }
 
+    /**
+     *  This method takes in a new enrollment oject
+     * returns the new enrollment object
+     * 
+     * @param 
+     * @return object
+     */
     @Override
     public Enrollment registerEnrollment(Enrollment newEnrollment) {
         
