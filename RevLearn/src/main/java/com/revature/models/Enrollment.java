@@ -19,15 +19,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-enum PayStatus{
-    pending,
-    completed,
-    cancelled,
-}
-
 @Entity
 @Table (name = "Enrollments", schema = "project2")
-@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "courseReview"})
+@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "enrolled", "courseReview"})
 @Getter @Setter @NoArgsConstructor @ToString
 public class Enrollment {
 
@@ -43,7 +37,7 @@ public class Enrollment {
 
     @Column(name = "course_id ")
     @JsonProperty(value = "courseId")
-    private Integer courseId ;
+    private Integer courseId;
 
     @Column(name = "enrollment_date")
     @JsonProperty(value = "enrollmentDate")
@@ -53,6 +47,10 @@ public class Enrollment {
     @Column(name = "payment_status")
     @JsonProperty(value = "paymentStatus")
     private PayStatus paymentStatus;
+
+    @Column(name = "enrollment_status")
+    @JsonProperty(value = "enrolled")
+    private Boolean enrolled;
 
     @Column(name = "course_review")
     @JsonProperty(value = "courseReview")
