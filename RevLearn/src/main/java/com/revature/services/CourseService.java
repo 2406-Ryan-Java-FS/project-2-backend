@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revature.models.Course;
 
+
 public interface CourseService {
     // Jason
     List<Course> getAllCourses();
