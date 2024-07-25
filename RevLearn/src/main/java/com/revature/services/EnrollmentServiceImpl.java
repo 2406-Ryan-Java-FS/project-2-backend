@@ -2,10 +2,20 @@ package com.revature.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
+import com.revature.repositories.EnrollmentRepository;
 
 public class EnrollmentServiceImpl implements EnrollmentService  {
+
+    EnrollmentRepository enrollmentRepository;
+
+    @Autowired
+    public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
+        this.enrollmentRepository = enrollmentRepository;
+    }
 
     @Override
     public List<Enrollment> getAllEnrollments() {

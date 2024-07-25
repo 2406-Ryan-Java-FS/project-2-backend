@@ -2,9 +2,18 @@ package com.revature.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.revature.models.Course;
+import com.revature.repositories.CourseRepository;
 
 public class CourseServiceImpl implements CourseService{
+    CourseRepository courseRepository;
+
+    @Autowired
+    public CourseServiceImpl(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
 
     @Override
     public List<Course> getAllCourses() {
