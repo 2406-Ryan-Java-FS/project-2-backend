@@ -1,52 +1,71 @@
 package com.revature.controllers;
 
-import com.revature.models.SignUpRequest;
-import com.revature.models.Student;
-import com.revature.models.Educator;
+
+import com.revature.models.dto.*;
+import com.revature.repositories.EducatorRepository;
+import com.revature.repositories.StudentRepository;
+import com.revature.models.Users;
 import com.revature.services.UserService;
-import com.revature.services.util.JwtUtil;
+import com.revature.services.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.javatuples.Pair;
+
+
+@Validated
+@RestController
+public class UserController {
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    JwtService jwtService;
+
+  
+    /*
+     * test endpoints.
+     */
 
 public class AuthenticationandRegistration {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private EducatorRepository educatorRepository;
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
    
     @PostMapping("/register")
     
-    public String registerUser(@RequestBody SignUpRequest signUpRequest) {
-        String encodedPassword = passwordEncoder.encode(signUpRequest.getPassword());
-        String role = signUpRequest.getRole();
+    public String registerUser(@RequestBody Users user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        String role = user.getRole();
 
         if (role.equalsIgnoreCase("student")) {
-            Student student = new Student();
-            student.setEmail(signUpRequest.getEmail());
+            Users student = new Users();
+            student.setEmail(user.getEmail());
             student.setPassword(encodedPassword);
-            student.setLastName(signUpRequest.getLastName());
-            studentRepository.save(student);
+            student.setLastName(user.getLastName());
+            ((CrudRepository<Users, Integer>) studentRepository).save(student);
             return "Student registered successfully";
         } else if (role.equalsIgnoreCase("educator")) {
-            Educator educator = new Educator();
-            educator.setEmail(signUpRequest.getEmail());
+            Users educator = new Users();
+            educator.setEmail(user.getEmail());
             educator.setPassword(encodedPassword);
-            educator.setLastName(signUpRequest.getLastName());
-            educator.setProfessionalDetails(signUpRequest.getProfessionalDetails());
-            educatorRepository.save(educator);
+            educator.setLastName(user.getLastName());
+            educator.setProfessionalDetails(user.getProfessionalDetails());
+            ((CrudRepository<Users, Integer>) educatorRepository).save(educator);
             return "Educator registered successfully";
         } else {
             throw new IllegalArgumentException("Invalid role");
@@ -54,19 +73,23 @@ public class AuthenticationandRegistration {
     }
 
     
-    @PostMapping("/authenticate")
-    public SignInResponse createAuthenticationToken(@RequestBody SignInRequest signInRequest) throws Exception {
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInRequest.getUsername(), signInRequest.getPassword())
-        );
-
-        final User user = userService
-                .loadUserByUsername(signInRequest.getUsername());
-
-        final String jwt = jwtUtil.generateToken(user.getUsername(), user.getAuthorities().iterator().next().getAuthority());
-
-        return new SignInResponse(jwt);
-    }
+    
+@PostMapping("users/signup")
+public ResponseEntity<SignUpOutput> signUpUser(@RequestBody Users user)
+{
+  
+    return ResponseEntity.status(200).body(userService.signUpUser(user));
 }
+
+@PostMapping("users/signin")
+public ResponseEntity<String> signInUser(@RequestBody @Valid SignInInput signInInput)
+{
+  
+    Pair<Integer, String> response = userService.signInUser(signInInput);
+	return ResponseEntity.status(response.getValue0()).body(response.getValue1());
+}
+}
+}
+
+
 
