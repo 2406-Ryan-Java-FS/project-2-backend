@@ -46,6 +46,4 @@ public class QuizService {
     public List<Quiz> getAllQuizzesByCourse(int courseId){
         return qr.findAllByCourseId(courseId);
     }
-
-
 }
