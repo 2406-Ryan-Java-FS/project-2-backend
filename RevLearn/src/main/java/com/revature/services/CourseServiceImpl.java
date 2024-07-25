@@ -2,6 +2,7 @@ package com.revature.services;
 
 import java.util.List;
 
+import com.revature.models.Enrollment;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.models.Course;
@@ -33,10 +34,17 @@ public class CourseServiceImpl implements CourseService{
         throw new UnsupportedOperationException("Unimplemented method 'getCourseById'");
     }
 
+
+    /**
+     *  This method takes in an int to query the Courses in the database and return a list of all courses with the matching
+     *  id
+     * @param theEducatorId
+     * @return List
+     */
     @Override
     public List<Course> getCoursesByEducatorId(Integer theEducatorId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCoursesByEducatorId'");
+
+        return courseRepository.findByEducatorId(theEducatorId);
     }
 
     @Override
