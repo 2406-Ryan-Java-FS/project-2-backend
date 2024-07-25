@@ -1,6 +1,8 @@
 package com.revature.models;
 
-import java.security.Timestamp;
+
+import java.sql.Time;
+import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,15 +15,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 
 @Entity
 @Table (name = "Enrollments", schema = "project2")
 @JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "enrolled", "courseReview"})
+@Data
 @Getter @Setter @NoArgsConstructor @ToString
 public class Enrollment {
 
