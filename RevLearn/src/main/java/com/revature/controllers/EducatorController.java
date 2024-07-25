@@ -37,7 +37,7 @@ public class EducatorController {
      * @param educatorId The educatorId of the Educator to retrieve.
      * @return The Educator along with a 200 status code.
      */
-    @GetMapping("/{userId}")
+    @GetMapping("/{educatorId}")
     public ResponseEntity<Educator> getEducator(@PathVariable Integer educatorId) {
 
         Educator existingEducator = educatorService.getEducator(educatorId);
