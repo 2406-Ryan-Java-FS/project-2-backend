@@ -13,8 +13,7 @@ public class Quiz {
     @Column(name = "quiz_id")
     private int quizId;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
+    @Column(name = "course_id")
     private int courseId;
 
     private String title;
