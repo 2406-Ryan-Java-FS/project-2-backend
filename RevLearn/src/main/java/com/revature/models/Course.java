@@ -1,7 +1,7 @@
 package com.revature.models;
 
-import java.security.Timestamp;
-import java.sql.Date;
+import java.sql.Timestamp;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -39,13 +39,13 @@ public class Course {
 
     @Column(name = "description")
     @JsonProperty(value = "description")
-    private Date description;
+    private String description;
 
     @Column(name = "category")
     @JsonProperty(value = "category")
     private String category;
 
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "NUMERIC(10, 2)")
     @JsonProperty(value = "price")
     private double price;
 

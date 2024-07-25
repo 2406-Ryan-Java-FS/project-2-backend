@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,7 +33,10 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
     @Override
     public Enrollment getEnrollmentById(Integer theEnrollmentId) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEnrollmentById'");
+        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findById(theEnrollmentId);
+
+        if(optionalEnrollment.isPresent()) return optionalEnrollment.get();
+        else return null;
     }
 
     @Override
@@ -43,8 +47,11 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateEnrollmentById'");
+
+        int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
+
+        if(rowsUpdated == 1) return this.getEnrollmentById(theEnrollmentId);
+        else return null;
     }
 
     @Override
