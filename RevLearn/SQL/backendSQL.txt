@@ -2,7 +2,7 @@
 SET search_path TO project2;
 
 -- Drop existing tables if they exist
-DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts;
 
 -- Drop existing types if they exist
 DROP TYPE IF EXISTS user_role;
@@ -19,8 +19,7 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    role user_role NOT NULL,
-    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    role user_role NOT NULL
 );
 
 CREATE TABLE Educators (
@@ -38,7 +37,7 @@ CREATE TABLE Courses (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     category VARCHAR(100),
-    price DECIMAL(10, 2),
+    price NUMERIC(10, 2),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (educator_id) REFERENCES Educators(educator_id) ON DELETE SET NULL
 );
