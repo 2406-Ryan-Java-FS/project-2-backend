@@ -2,7 +2,6 @@ package com.revature.controllers;
 
 import com.revature.DTO.UserEducatorDTO;
 import com.revature.exceptions.CustomHttpException;
-import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Educator;
 import com.revature.models.User;
 import com.revature.models.enums.Role;
