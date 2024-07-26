@@ -1,8 +1,10 @@
 package com.revature.services;
 
+import com.revature.DTO.UserEducatorDTO;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
 import com.revature.exceptions.UnauthorizedException;
+import com.revature.models.Educator;
 import com.revature.models.User;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
@@ -89,5 +91,27 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UnauthorizedException("Invalid login credentials");
         }
+    }
+
+    /**
+     * Combines data from User and Educator entities into a UserEducatorDTO.
+     *
+     * @param user     the User entity
+     * @param educator the Educator entity
+     * @return a UserEducatorDTO containing combined data from both entities
+     */
+    public UserEducatorDTO combineUserAndEducator(User user, Educator educator) {
+        UserEducatorDTO dto = new UserEducatorDTO();
+        dto.setUserId(user.getUserId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setRole(user.getRole());
+        dto.setDegreeLevel(educator.getDegreeLevel());
+        dto.setDegreeMajor(educator.getDegreeMajor());
+        dto.setAlmaMater(educator.getAlmaMater());
+        dto.setYear(educator.getYear());
+        return dto;
     }
 }
