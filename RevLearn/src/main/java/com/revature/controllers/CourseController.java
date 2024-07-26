@@ -56,6 +56,8 @@ public class CourseController {
             return ResponseEntity.ok(course);
         }catch (BadRequestException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 
     /**
      * handler to get a course by id
