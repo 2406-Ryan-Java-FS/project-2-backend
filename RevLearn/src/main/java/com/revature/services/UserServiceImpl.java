@@ -1,11 +1,11 @@
 package com.revature.services;
 
-import com.revature.DTO.UserEducatorDTO;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Educator;
 import com.revature.models.User;
+import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +100,8 @@ public class UserServiceImpl implements UserService {
      * @param educator the Educator entity
      * @return a UserEducatorDTO containing combined data from both entities
      */
-    public UserEducatorDTO combineUserAndEducator(User user, Educator educator) {
-        UserEducatorDTO dto = new UserEducatorDTO();
+    public UserEducator combineUserAndEducator(User user, Educator educator) {
+        UserEducator dto = new UserEducator();
         dto.setUserId(user.getUserId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());

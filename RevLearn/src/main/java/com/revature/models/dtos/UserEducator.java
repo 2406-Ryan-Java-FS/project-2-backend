@@ -1,4 +1,4 @@
-package com.revature.DTO;
+package com.revature.models.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @JsonPropertyOrder({"userId", "firstName", "lastName", "email", "password", "role", "degreeLevel", "degreeMajor", "almaMater", "year"})
-public class UserEducatorDTO {
+public class UserEducator {
 
     @JsonProperty(value = "userId")
     private int userId;

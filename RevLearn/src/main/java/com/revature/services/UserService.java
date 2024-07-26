@@ -1,8 +1,8 @@
 package com.revature.services;
 
-import com.revature.DTO.UserEducatorDTO;
 import com.revature.models.Educator;
 import com.revature.models.User;
+import com.revature.models.dtos.UserEducator;
 
 public interface UserService {
     User addUser(User user);
@@ -13,5 +13,5 @@ public interface UserService {
 
     Integer verifyUser(User user);
 
-    UserEducatorDTO combineUserAndEducator(User user, Educator educator);
+    UserEducator combineUserAndEducator(User user, Educator educator);
 }
