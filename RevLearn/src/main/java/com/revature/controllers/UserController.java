@@ -66,15 +66,15 @@ public class UserController {
     }
 
     /**
-     * Endpoint for retrieving the currently logged-in User given a valid JWT token.
+     * Endpoint for retrieving the currently logged-in User given a valid JWT authorization.
      *
-     * @param token The JWT token of the currently logged-in User.
+     * @param authorization The JWT authorization of the currently logged-in User.
      * @return The User along with a 200 status code.
      */
     @GetMapping
-    public ResponseEntity<User> getCurrentUser(@PathVariable String token) {
+    public ResponseEntity<User> getCurrentUser(@RequestHeader String authorization) {
 
-        User currentUser = jwtService.getUserFromToken(token);
+        User currentUser = jwtService.getUserFromToken(authorization);
         return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
 }

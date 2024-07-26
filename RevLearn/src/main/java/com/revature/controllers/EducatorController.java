@@ -49,15 +49,15 @@ public class EducatorController {
 //    }
 
     /**
-     * Endpoint for retrieving the currently logged-in Educator given a valid JWT token.
+     * Endpoint for retrieving the currently logged-in Educator given a valid JWT authorization.
      *
-     * @param token The JWT token of the currently logged-in Educator.
+     * @param authorization The JWT authorization of the currently logged-in Educator.
      * @return The Educator along with a 200 status code.
      */
     @GetMapping
-    public ResponseEntity<Educator> getCurrentEducator(@PathVariable String token) {
+    public ResponseEntity<Educator> getCurrentEducator(@RequestHeader String authorization) {
 
-        User currentUser = jwtService.getUserFromToken(token);
+        User currentUser = jwtService.getUserFromToken(authorization);
         Educator currentEducator = educatorService.getEducator(currentUser.getUserId());
         return new ResponseEntity<>(currentEducator, HttpStatus.OK);
     }
