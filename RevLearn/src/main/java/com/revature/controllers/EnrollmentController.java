@@ -50,6 +50,11 @@ public class EnrollmentController {
         }
     }
 
+
+
+
+
+
     /**
      * handler to update any information for an existing user in the database
      * 
@@ -73,6 +78,7 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 
     @GetMapping("/enrollments/{id}")
     public ResponseEntity<?> getEnrollmentById(@PathVariable("id") Integer theEnrollmentId) {
@@ -108,6 +114,17 @@ public class EnrollmentController {
             throw new BadRequestException("Please enter 'pending', 'completed', or 'cancelled'");
         }
     }
+
+    @PostMapping("/enrollments")
+    public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment){
+        try{
+            Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment);
+            return ResponseEntity.ok(enrollment);
+        }catch (BadRequestException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+}
 
     @GetMapping("/enrollments/{studentId}")
     public ResponseEntity<List<Enrollment>> getEnrollmentByStudentId(@PathVariable("studentId") Integer theStudentId) {

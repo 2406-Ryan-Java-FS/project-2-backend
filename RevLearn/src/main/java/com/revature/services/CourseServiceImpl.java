@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
@@ -21,16 +23,33 @@ public class CourseServiceImpl implements CourseService {
         this.courseRepository = courseRepository;
     }
 
+    /**
+     *  This method returns a list of all courses
+     *  
+     * @return List
+     */
     @Override
     public List<Course> getAllCourses() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllCourses'");
+        List<Course> courses = courseRepository.findAll();
+        return courses;
     }
 
+    /**
+     *  This method takes in a new course oject 
+     * returns the new course object
+     * 
+     * @param 
+     * @return object
+     */
     @Override
-    public Course addCourse() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addCourse'");
+    public Course addCourse(Course newCourse) {
+        
+        if(newCourse.getTitle() == null){
+            throw new BadRequestException("Please give the new course a title.");
+        }
+
+        Course dbCourse = courseRepository.save(newCourse);
+        return dbCourse;
     }
 
     /**
