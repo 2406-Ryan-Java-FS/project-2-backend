@@ -56,8 +56,8 @@ public class UserController {
     /**
      * Endpoint for verifying a User login.
      *
-     * @param user A User containing an email/password combination to be verified.
-     * @return A ResponseEntity containing a JWT Token as a string along with a 200 status code on success, or an error message and appropriate status code on failure.
+     * @param user A User object containing an email/password combination to be verified.
+     * @return A ResponseEntity containing a UserToken object on success, which includes a JWT Token as a string and User details, along with a 200 status code. If the login fails, it returns an error message and an appropriate status code.
      */
     @PostMapping("/login")
     public ResponseEntity<Object> loginUser(@RequestBody User user) {
