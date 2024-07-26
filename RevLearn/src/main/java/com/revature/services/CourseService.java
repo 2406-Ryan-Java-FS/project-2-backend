@@ -2,16 +2,15 @@ package com.revature.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
 
 import com.revature.models.Course;
 
-@Service
+
 public interface CourseService {
     // Jason
     List<Course> getAllCourses();
     // Jason
-    Course addCourse();
+    Course addCourse(Course newCourse);
     // Fidel
     Course getCourseById(Integer theCourseId);
     // Chase  
@@ -19,5 +18,5 @@ public interface CourseService {
     // Alex
     Course updateCourseById(Integer theCourseId, Course theCourse);
     // Fidel
-    Integer deleteCourse(Integer theCourseId);  // admin specific function
+    Integer deleteCourseById(Integer theCourseId);  // admin specific function
 }
