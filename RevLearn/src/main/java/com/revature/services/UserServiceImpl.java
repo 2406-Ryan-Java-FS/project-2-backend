@@ -1,5 +1,6 @@
 package com.revature.services;
 
+import com.revature.controllers.UserController;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
 import com.revature.exceptions.UnauthorizedException;
@@ -8,11 +9,16 @@ import com.revature.models.User;
 import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
+import com.revature.util.Help;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger= LoggerFactory.getLogger(UserServiceImpl.class);
 
     UserRepository userRepository;
 
@@ -84,7 +90,9 @@ public class UserServiceImpl implements UserService {
      */
     public Integer verifyUser(User user) {
 
+        logger.info("incoming user="+ Help.json(user,true,false));
         User existingUser = userRepository.findByEmail(user.getEmail());
+        logger.info("existingUser="+Help.json(existingUser,true,false));
 
         if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
             return existingUser.getUserId();

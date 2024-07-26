@@ -4,8 +4,9 @@
 <!--    https://logging.apache.org/log4j/2.x/manual/layouts.html-->
 <!--    %30.30logger Makes the package and class name 30 characters wide to indent everything the same way-->
 <!--    %rEx{7} will show the first 7 lines of a stack trace instead of a dozen pages-->
+<!--    %L prints the line number. 4.4 makes sure it is always 4 characters wide-->
     <property name="LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss} %-5level %30.30logger: %msg%rEx{7}%n" />
+              value="%d{yyyy-MM-dd HH:mm:ss} %-5level %30.30logger %4.4L: %msg%rEx{7}%n" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

@@ -45,11 +45,6 @@ public class TestController {
         return ResponseEntity.status(200).body(js.getUserFromToken(token));
     }
 
-    @DeleteMapping("/delete/{userIdToDelete}")
-    public ResponseEntity<String> clear(@PathVariable("userIdToDelete") Integer userIdToDelete){
-        return ResponseEntity.status(200).body(us.deleteUser(userIdToDelete)?"User was deleted":"User was NOT deleted somehow");
-    }
-
     @Profile("h2")
     @DeleteMapping("/clear-all")
     public ResponseEntity<String> clear(){
