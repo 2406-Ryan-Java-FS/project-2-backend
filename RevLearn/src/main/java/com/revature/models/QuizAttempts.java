@@ -15,7 +15,7 @@ public class QuizAttempts {
 	@Id 
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	@Column (name="attempt_id", nullable = false)
-    private Integer quizAttempt_id;
+    private Integer quizAttempts_id;
 
 	@ManyToOne
 	@JoinColumn(name="student_id", referencedColumnName = "user_id", nullable = false)
@@ -29,7 +29,9 @@ public class QuizAttempts {
 	private Date attempt_date;
 	
 	@Column(name="score", nullable = false, columnDefinition = "numeric(4,2)")
-	private double score;
+	private Double score;
+	
+	
 	
 	public QuizAttempts(User student, Quiz quiz, Double score) 
 	{
@@ -39,6 +41,18 @@ public class QuizAttempts {
 		this.attempt_date = Timestamp.from(Instant.now());
 		this.score = score;
 	}
+
+
+
+	public QuizAttempts(Integer quizAttempts_id, User student, Quiz quiz, Date attempt_date, Double score) {
+		super();
+		this.quizAttempts_id = quizAttempts_id;
+		this.student = student;
+		this.quiz = quiz;
+		this.attempt_date = attempt_date;
+		this.score = score;
+	}
+
 	
 }
 
