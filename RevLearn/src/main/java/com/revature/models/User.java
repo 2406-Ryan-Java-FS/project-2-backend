@@ -2,6 +2,7 @@ package com.revature.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.revature.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -37,10 +38,11 @@ public class User {
 
     @Column(name = "role")
     @JsonProperty(value = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @Column(name = "registration_date")
-    @JsonProperty(value = "registrationDate")
-    private Date registrationDate;
+    //@Column(name = "registration_date")
+    //@JsonProperty(value = "registrationDate")
+    //private Date registrationDate;
 
 }
