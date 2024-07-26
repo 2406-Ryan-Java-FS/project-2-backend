@@ -97,7 +97,8 @@ public class EnrollmentController {
      * Patch request handler that searches for the record with the passed enrollmentId and updates the pay status field from that record
      * @param theEnrollmentId - primary key value to update a single row in table
      * @param payStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
-     * @return returns the updated record from the table or throws a custom BadRequestException
+     * @return returns the updated record from the table
+     * @throws BadRequestException
      */
     @PatchMapping("/enrollments/{theEnrollmentId}")
     public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("theEnrollmentId") Integer theEnrollmentId,
