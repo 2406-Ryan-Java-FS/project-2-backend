@@ -12,14 +12,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table (name = "Courses", schema = "project2")
 @JsonPropertyOrder({"courseId", "educatorId", "title", "description", "category", "price", "creationDate"})
+@Data
 @Getter @Setter @NoArgsConstructor @ToString
 public class Course {
 

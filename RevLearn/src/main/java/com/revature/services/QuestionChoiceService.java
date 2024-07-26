@@ -1,8 +1,6 @@
 package com.revature.services;
 
 import com.revature.models.QuestionChoice;
-import com.revature.models.QuizQuestion;
-
 import java.util.List;
 
 public interface QuestionChoiceService {
