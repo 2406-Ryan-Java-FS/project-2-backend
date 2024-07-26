@@ -52,7 +52,7 @@ public class EducatorController {
      * Endpoint for retrieving the currently logged-in Educator given a valid JWT token.
      *
      * @param token The JWT token of the currently logged-in Educator.
-     * @return The User along with a 200 status code.
+     * @return The Educator along with a 200 status code.
      */
     @GetMapping
     public ResponseEntity<Educator> getCurrentEducator(@PathVariable String token) {
