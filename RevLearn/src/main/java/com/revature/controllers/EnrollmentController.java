@@ -61,8 +61,8 @@ public class EnrollmentController {
      * @return a response entity containing the updated course or exception messages
      *         upon failure
      */
-    @PatchMapping("/enrollments/{theEnrollmentId}")
-    public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
+    @PatchMapping("/enrollments/{theEnrollmentIdCR}")
+    public ResponseEntity<?> updateEnrollmentById(@PathVariable("theEnrollmentIdCR") Integer theEnrollmentId,
             @RequestBody String theCourseReview) {
         try {
             Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theCourseReview);
@@ -82,8 +82,8 @@ public class EnrollmentController {
      * @return returns an OK response entity with type of Enrollment if record exists in the table
      * returns a NOT_FOUND response entity with a String type displaying that it could not be found
      */
-    @GetMapping("/enrollments/{theEnrollmentId}")
-    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentId") Integer theEnrollmentId) {
+    @GetMapping("/enrollments/{theEnrollmentIdPS}")
+    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentIdPS") Integer theEnrollmentId) {
 
 
         try {
