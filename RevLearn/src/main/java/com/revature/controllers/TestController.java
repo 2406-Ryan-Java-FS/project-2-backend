@@ -31,10 +31,13 @@ public class TestController {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signInUser(@RequestBody User user) {
-        User u = us.getUser(user.getUserId());
-        String jwt = js.generateJwt(u.getUserId());
-        return ResponseEntity.status(200).body(jwt);
+    public ResponseEntity<User> signInUser(
+        @RequestHeader("email") String email,
+        @RequestHeader("password") String password)
+    {
+        User loggedInUser = new User();//us.getUser(email,password);
+        //loggedInUser.setJwt(js.generateJwt(loggedInUser.getUserId()));
+        return ResponseEntity.status(200).body(loggedInUser);
     }
 
     @GetMapping("/token")
