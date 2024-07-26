@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.revature.models.Enrollment;
 
+import java.util.List;
+
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>{
 
@@ -19,4 +21,5 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     @Query("update Enrollment e set e.paymentStatus = :thePaymentStatus where e.enrollmentId = :theEnrollmentId")
     int updateEnrollmentPaymentStatusById(@Param("theEnrollmentId") int theEnrollmentId, @Param("thePaymentStatus")PayStatus thePaymentStatus);
 
+    List<Enrollment> findByStudentId(Integer studentId);
 }

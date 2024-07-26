@@ -1,12 +1,16 @@
 package com.revature.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CourseServiceImpl implements CourseService{
     CourseRepository courseRepository;
 
@@ -41,8 +45,25 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public Course updateCourseById(Integer theCourseId, Course theCourse) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateCourseById'");
+            try {
+                if (!courseRepository.existsById(theCourse.getEducatorId())) {
+                    throw new IllegalArgumentException("Educator ID " + theCourse.getEducatorId() + " does not exist.");
+                }
+                Optional<Course> optionalCourse = courseRepository.findById(theCourseId);
+                if (optionalCourse.isPresent()) {
+                    Course existingCourse = optionalCourse.get();
+                    existingCourse.setTitle(theCourse.getTitle());
+                    existingCourse.setDescription(theCourse.getDescription());
+                    existingCourse.setCategory(theCourse.getCategory());
+                    existingCourse.setPrice(theCourse.getPrice());
+                    existingCourse.setEducatorId(theCourse.getEducatorId());
+                    return courseRepository.save(existingCourse);
+                }
+                return null;
+            } catch (Exception e) {
+                System.err.println("Exception occurred while updating course: " + e.getMessage());
+                return null;
+            }
     }
 
     @Override

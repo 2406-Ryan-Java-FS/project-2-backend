@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EnrollmentServiceImpl implements EnrollmentService  {
 
     EnrollmentRepository enrollmentRepository;
@@ -41,8 +43,7 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     @Override
     public List<Enrollment> getEnrollmentByStudentId(Integer theStudentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEnrollmentByStudentId'");
+        return enrollmentRepository.findByStudentId(theStudentId);
     }
 
     @Override
@@ -62,8 +63,12 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     @Override
     public Integer deleteEnrollment(Integer theEnrollmentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteEnrollment'");
-    }
+        try {
+            enrollmentRepository.deleteById(theEnrollmentId);
+            return 1;
+        } catch (Exception e) {
+            System.err.println("Exception occurred while deleting enrollment: " + e.getMessage());
+            return 0;
+        }}
     
 }
