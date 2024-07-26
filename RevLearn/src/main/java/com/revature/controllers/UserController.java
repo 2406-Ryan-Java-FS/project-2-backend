@@ -35,19 +35,6 @@ public class UserController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
-//    /**
-//     * Endpoint for retrieving a User given its userId.
-//     *
-//     * @param userId The userId of the User to retrieve.
-//     * @return The User along with a 200 status code.
-//     */
-//    @GetMapping("/{userId}")
-//    public ResponseEntity<User> getUser(@PathVariable int userId) {
-//
-//        User existingUser = userService.getUser(userId);
-//        return new ResponseEntity<>(existingUser, HttpStatus.OK);
-//    }
-
     /**
      * Endpoint for verifying a User login.
      *

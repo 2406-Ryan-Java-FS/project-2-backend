@@ -35,19 +35,6 @@ public class EducatorController {
         return new ResponseEntity<>(newEducator, HttpStatus.CREATED);
     }
 
-//    /**
-//     * Endpoint for retrieving an Educator given its educatorId.
-//     *
-//     * @param educatorId The educatorId of the Educator to retrieve.
-//     * @return The Educator along with a 200 status code.
-//     */
-//    @GetMapping("/{educatorId}")
-//    public ResponseEntity<Educator> getEducator(@PathVariable Integer educatorId) {
-//
-//        Educator existingEducator = educatorService.getEducator(educatorId);
-//        return new ResponseEntity<>(existingEducator, HttpStatus.OK);
-//    }
-
     /**
      * Endpoint for retrieving the currently logged-in Educator given a valid JWT authorization.
      *
