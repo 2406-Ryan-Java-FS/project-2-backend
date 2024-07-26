@@ -7,5 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRepository extends JpaRepository<Users,Integer> {
 
-    Users findFirstByUserEmail(String userEmail);
+    Users findByUserId(int newUserId);
+    static Users findByEmail(String newEmail) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

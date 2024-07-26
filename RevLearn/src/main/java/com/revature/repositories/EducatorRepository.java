@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EducatorRepository extends JpaRepository<Users,Integer> {
 
-    Users findFirstByUserEmail(String userEmail);
+	Users findByUserId(int userId);
+	Users findByEmail(String newEmail);
 }

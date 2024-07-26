@@ -6,6 +6,7 @@ import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.dto.*;
 import com.revature.services.hashutil.PasswordEncrypter;
 import com.revature.models.Users;
+import com.revature.repositories.EducatorRepository;
 import com.revature.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,20 @@ public class UserService {
     JwtService js;
 
     @Autowired
-    StudentRepository userRepository;
+    StudentRepository studentRepository;
+    @Autowired
+    EducatorRepository educatorRepository;
 
        
     public SignUpOutput signUpUser(Users user) {
         boolean signUpStatus = true;
         String signUpStatusMessage = "";
 
-        String newEmail = user.getEmail();
+        int newUserId = user.getUserId();
+        String newEmail =user.getEmail();
+        String role = user.getRole();
         
-
+        if (role.equalsIgnoreCase("student")) {
         if(newEmail==null)
         {
             signUpStatus = false;
@@ -39,7 +44,7 @@ public class UserService {
             return new SignUpOutput(signUpStatus,signUpStatusMessage);
         }
 
-        Users existingUser = userRepository.findFirstByUserEmail(newEmail);
+        Users existingUser = studentRepository.findByUserId(newUserId);
         
   
         if(existingUser!=null)
@@ -54,7 +59,7 @@ public class UserService {
             String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
             user.setPassword(encryptedPassword);
            
-            userRepository.save(user);
+            studentRepository.save(user);
 
             signUpStatusMessage = "New Customer Registered";
             return new SignUpOutput(signUpStatus,signUpStatusMessage);
@@ -64,7 +69,37 @@ public class UserService {
             signUpStatus = false;
             return new SignUpOutput(signUpStatus,signUpStatusMessage);
 
+        }}
+        
+        else if (role.equalsIgnoreCase("educator")) {
+        
+        Users existingUser = educatorRepository.findByUserId(newUserId);
+        
+        
+        if(existingUser!=null)
+        {
+            signUpStatus = false;
+            signUpStatusMessage = "Email already Registered";
+
+            return new SignUpOutput(signUpStatus,signUpStatusMessage);
         }
+        try
+        {
+            String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
+            user.setPassword(encryptedPassword);
+           
+            educatorRepository.save(user);
+
+            signUpStatusMessage = "New User Registered";
+            return new SignUpOutput(signUpStatus,signUpStatusMessage);
+        }
+        catch (Exception e){
+            signUpStatusMessage = "Internal error occurred during sign up";
+            signUpStatus = false;
+            return new SignUpOutput(signUpStatus,signUpStatusMessage);
+
+        }}
+		return null;
 
     }
 
@@ -82,7 +117,7 @@ public class UserService {
         }
 
 
-        Users existingUser = userRepository.findFirstByUserEmail(signInInput.getEmail());
+        Users existingUser = StudentRepository.findByEmail(signInInput.getEmail());
 
         if(existingUser==null)
         {
@@ -101,7 +136,7 @@ public class UserService {
                 
           
                 signInStatusMessage = "Signed In Successfully";
-                String jwt = js.generateJwt(existingUser.getUserId() , existingUser.getEmail(), existingUser.getRole());
+                String jwt = js.generateJwt(existingUser.getUserId());
                 JsonObject jwtjson = new JsonObject();
                 jwtjson.addProperty("jwt",jwt);
                 return new Pair<>(200,jwtjson.toString());        //return created jwt to user
@@ -122,7 +157,12 @@ public class UserService {
            
         }
     }
-    public Users findFirstByUserEmail(String email) {
-        return userRepository.findFirstByUserEmail(email);
+    
+    public Users getUserId(Integer userId) {
+
+        if (userId == null || !studentRepository.existsById(userId)) {
+            throw new BadRequestException("User Id is invalid.");
+        }
+        return studentRepository.findByUserId(userId);
     }
 }

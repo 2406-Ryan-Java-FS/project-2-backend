@@ -12,5 +12,8 @@ public class RevLearnApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RevLearnApplication.class, args);
+        System.out.println("\n------------------------------------");
+        System.out.println("    Welcome to RevLearn");
+        System.out.println("------------------------------------");
 	}
 }
