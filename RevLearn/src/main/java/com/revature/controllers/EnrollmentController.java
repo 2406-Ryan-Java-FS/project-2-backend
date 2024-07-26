@@ -13,13 +13,9 @@ import com.revature.models.PayStatus;
 import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.web.bind.annotation.*;
+
 
 import com.revature.exceptions.NotFoundException;
 
@@ -65,8 +61,8 @@ public class EnrollmentController {
      * @return a response entity containing the updated course or exception messages
      *         upon failure
      */
-    @PatchMapping("/enrollments/{theEnrollmentId}")
-    public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
+    @PatchMapping("/enrollments/{theEnrollmentIdCR}")
+    public ResponseEntity<?> updateEnrollmentById(@PathVariable("theEnrollmentIdCR") Integer theEnrollmentId,
             @RequestBody String theCourseReview) {
         try {
             Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theCourseReview);
@@ -80,9 +76,15 @@ public class EnrollmentController {
         }
     }
 
+    /**
+     *  GET request handler method that will find a record in the Enrollments table with the specified enrollmentId
+     * @param theEnrollmentId
+     * @return returns an OK response entity with type of Enrollment if record exists in the table
+     * returns a NOT_FOUND response entity with a String type displaying that it could not be found
+     */
+    @GetMapping("/enrollments/{theEnrollmentIdPS}")
+    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentIdPS") Integer theEnrollmentId) {
 
-    @GetMapping("/enrollments/{id}")
-    public ResponseEntity<?> getEnrollmentById(@PathVariable("id") Integer theEnrollmentId) {
 
         try {
             Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId);
@@ -94,8 +96,15 @@ public class EnrollmentController {
 
     }
 
-    @PatchMapping("/enrollments/{id}")
-    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("id") Integer theEnrollmentId,
+    /**
+     * Patch request handler that searches for the record with the passed enrollmentId and updates the pay status field from that record
+     * @param theEnrollmentId - primary key value to update a single row in table
+     * @param payStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
+     * @return returns the updated record from the table
+     * @throws BadRequestException
+     */
+    @PatchMapping("/enrollments/{theEnrollmentId}")
+    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("theEnrollmentId") Integer theEnrollmentId,
             @RequestBody String payStatus) {
 
         try {
