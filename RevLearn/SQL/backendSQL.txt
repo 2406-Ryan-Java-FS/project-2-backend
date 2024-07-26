@@ -1,16 +1,22 @@
 -- Set the schema for the current session
 SET search_path TO project2;
-
+ 
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts;
-
+ 
+-- Drop existing casts if they exist
+drop cast if exists (varchar AS user_role);
+ 
 -- Drop existing types if they exist
 DROP TYPE IF EXISTS user_role;
 DROP TYPE IF EXISTS pay_status;
-
+ 
 -- Create types
 CREATE TYPE user_role AS ENUM('student', 'educator');
 CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
+ 
+-- Create cast for types
+CREATE CAST (varchar AS user_role) WITH INOUT AS implicit;
 
 -- Create tables
 CREATE TABLE Users (
