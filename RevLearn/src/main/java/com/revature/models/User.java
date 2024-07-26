@@ -6,8 +6,6 @@ import com.revature.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "users", schema = "project2")
 @Data
@@ -40,4 +38,9 @@ public class User {
     @JsonProperty(value = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    //@Column(name = "registration_date")
+    //@JsonProperty(value = "registrationDate")
+    //private Date registrationDate;
+
 }
