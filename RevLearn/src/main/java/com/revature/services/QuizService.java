@@ -2,7 +2,6 @@ package com.revature.services;
 
 import com.revature.models.Quiz;
 import com.revature.repositories.QuizRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +11,6 @@ public class QuizService {
 
     QuizRepository qr;
 
-    @Autowired
     public QuizService(QuizRepository quizRepository){
         this.qr = quizRepository;
     }
