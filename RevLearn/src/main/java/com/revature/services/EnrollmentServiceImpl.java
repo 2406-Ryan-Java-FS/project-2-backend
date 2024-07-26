@@ -32,7 +32,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      * retrieves all enrollments from the repository.
      * 
      * @return List<Enrollment> - a list of all Enrollment entities.
-     * @throws RuntimeExcepton - if the retrieval operation fails.
+     * @throws RuntimeException - if the retrieval operation fails.
      */
     @Override
     public List<Enrollment> getAllEnrollments() {
@@ -64,12 +64,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     /**
-     * Queries the Enrollment table and returns the record with the matching
-     * enrollmentId
-     * Returns null if id does not exist
-     * 
+     *  Service layer method that will find a record in the Enrollments table with the specified enrollmentId
      * @param theEnrollmentId
-     * @return Enrollment
+     * @return returns an Enrollment object if record exists in the table
+     * @throws BadRequestException
      */
     @Override
     public Enrollment getEnrollmentById(Integer theEnrollmentId) {
@@ -86,6 +84,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         return enrollmentRepository.findByStudentId(theStudentId);
     }
 
+    /**
+     * Service Layer method that searches for the record with the passed enrollmentId and updates the pay status field from that record
+     * @param theEnrollmentId - primary key value to update a single row in table
+     * @param thePaymentStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
+     * @return returns the updated record from the table
+     * @throws BadRequestException if there are no rows updated
+     */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
 
@@ -94,7 +99,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (rowsUpdated == 1)
             return this.getEnrollmentById(theEnrollmentId);
         else
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update Payment Status");
+            throw new BadRequestException("Could not update Payment Status");
     }
 
     /**

@@ -72,12 +72,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     /**
-     * This method takes in an int to query the Courses in the database and return a
-     * list of all courses with the matching
-     * id
-     * 
-     * @param theEducatorId
-     * @return List
+     * service layer method that takes an educator id and returns a list of all records from the Courses table with the educatorId
+     * @param theEducatorId - id that is being used to query the database Courses table to find all records with the same educator_id value
+     * @return returns a List of Courses that have the passed theEducatorId
      */
     @Override
     public List<Course> getCoursesByEducatorId(Integer theEducatorId) {
