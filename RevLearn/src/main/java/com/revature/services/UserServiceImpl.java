@@ -94,24 +94,17 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Combines data from User and Educator entities into a UserEducatorDTO.
+     * Merges data from User and Educator entities into a UserEducatorDTO.
      *
-     * @param user     the User entity
-     * @param educator the Educator entity
-     * @return a UserEducatorDTO containing combined data from both entities
+     * @param user     the User entity to be combined
+     * @param educator the Educator entity to be combined
+     * @return a UserEducatorDTO that combines data from both the User and Educator entities
      */
     public UserEducator combineUserAndEducator(User user, Educator educator) {
         UserEducator dto = new UserEducator();
-        dto.setUserId(user.getUserId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setRole(user.getRole());
-        dto.setDegreeLevel(educator.getDegreeLevel());
-        dto.setDegreeMajor(educator.getDegreeMajor());
-        dto.setAlmaMater(educator.getAlmaMater());
-        dto.setYear(educator.getYear());
+        dto.setUser(user);
+        educator.setEducatorId(user.getUserId());
+        dto.setEducator(educator);
         return dto;
     }
 }
