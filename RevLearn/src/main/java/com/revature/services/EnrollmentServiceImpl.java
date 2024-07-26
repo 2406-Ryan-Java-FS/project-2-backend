@@ -8,6 +8,7 @@ import com.revature.exceptions.NotFoundException;
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
+import org.springframework.stereotype.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class EnrollmentServiceImpl implements EnrollmentService  {
+public class EnrollmentServiceImpl implements EnrollmentService {
 
     EnrollmentRepository enrollmentRepository;
 
@@ -26,18 +27,16 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     /**
      * retrieves all enrollments from the repository.
+     * 
      * @return List<Enrollment> - a list of all Enrollment entities.
-     * @throws RuntimeExcepton - if the retrieval operation fails.
+     * @throws RuntimeException - if the retrieval operation fails.
      */
     @Override
     public List<Enrollment> getAllEnrollments() {
-        try 
-        {
+        try {
             List<Enrollment> allEnrollments = enrollmentRepository.findAll();
             return allEnrollments;
-        } 
-        catch (Exception e) 
-        {
+        } catch (Exception e) {
             throw new RuntimeException("Error fetching enrollments: " + e.getMessage());
         }
     }
@@ -52,44 +51,50 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
      *  Service layer method that will find a record in the Enrollments table with the specified enrollmentId
      * @param theEnrollmentId
      * @return returns an Enrollment object if record exists in the table
-     * throws a NotFoundException with a message saying that it could not be found
+     * @throws BadRequestException
      */
     @Override
     public Enrollment getEnrollmentById(Integer theEnrollmentId) {
         Optional<Enrollment> optionalEnrollment = enrollmentRepository.findById(theEnrollmentId);
 
-        if(optionalEnrollment.isPresent()) return optionalEnrollment.get();
-        else throw new BadRequestException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+        if (optionalEnrollment.isPresent())
+            return optionalEnrollment.get();
+        else
+            throw new BadRequestException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
     }
 
     @Override
     public List<Enrollment> getEnrollmentByStudentId(Integer theStudentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEnrollmentByStudentId'");
+        return enrollmentRepository.findByStudentId(theStudentId);
     }
 
     /**
      * Service Layer method that searches for the record with the passed enrollmentId and updates the pay status field from that record
      * @param theEnrollmentId - primary key value to update a single row in table
      * @param thePaymentStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
-     * @return returns the updated record from the table or throws a custom BadRequestException
+     * @return returns the updated record from the table
+     * @throws BadRequestException if there are no rows updated
      */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
 
         int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
 
-        if(rowsUpdated == 1) return this.getEnrollmentById(theEnrollmentId);
-        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not update Payment Status");
+        if (rowsUpdated == 1)
+            return this.getEnrollmentById(theEnrollmentId);
+        else
+            throw new BadRequestException("Could not update Payment Status");
     }
 
     /**
      * updates an existing item
+     * 
      * @param theEnrollmentId - the id of the enrollment we want to update
-     * @param theCourseReview - the review of the course for that particular enrollment 
+     * @param theCourseReview - the review of the course for that particular
+     *                        enrollment
      * @return Enrollment - the updated enrollment object
      * @throws IllegalArgumentException - if the provided parameters are invalid
-     * @throws RuntimeException - if the update fails
+     * @throws RuntimeException         - if the update fails
      */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview) {
@@ -101,7 +106,7 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
         // check if the enrollment already exists in the database
         Optional<Enrollment> dBEnrollmentOptional = enrollmentRepository.findById(theEnrollmentId);
 
-        if(!dBEnrollmentOptional.isPresent()) {
+        if (!dBEnrollmentOptional.isPresent()) {
             throw new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
         }
 
@@ -116,13 +121,21 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
         } catch (Exception e) {
             // throw new exception with original as cause
-            throw new RuntimeException(String.format("Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Review: %s", theEnrollmentId, theCourseReview), e);
+            throw new RuntimeException(
+                    String.format("Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Review: %s",
+                            theEnrollmentId, theCourseReview),
+                    e);
         }
     }
 
     @Override
     public Integer deleteEnrollment(Integer theEnrollmentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteEnrollment'");
+        try {
+            enrollmentRepository.deleteById(theEnrollmentId);
+            return 1;
+        } catch (Exception e) {
+            System.err.println("Exception occurred while deleting enrollment: " + e.getMessage());
+            return 0;
+        }
     }
 }
