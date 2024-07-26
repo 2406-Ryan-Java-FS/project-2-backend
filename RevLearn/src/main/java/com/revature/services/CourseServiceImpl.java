@@ -3,6 +3,7 @@ package com.revature.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.revature.exceptions.NotFoundException;
@@ -13,6 +14,7 @@ import com.revature.repositories.CourseRepository;
 public class CourseServiceImpl implements CourseService{
     CourseRepository courseRepository;
 
+    @Autowired
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }

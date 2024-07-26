@@ -9,6 +9,7 @@ import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     EnrollmentRepository enrollmentRepository;
 
+    @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
     }
