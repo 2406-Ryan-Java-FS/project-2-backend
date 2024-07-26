@@ -10,7 +10,7 @@ public interface CourseService {
     // Jason
     List<Course> getAllCourses();
     // Jason
-    Course addCourse();
+    Course addCourse(Course newCourse);
     // Fidel
     Course getCourseById(Integer theCourseId);
     // Chase  

@@ -1,13 +1,19 @@
 package com.revature.controllers;
 
+
+import java.util.List;
+import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.services.CourseService;
+import io.micrometer.core.ipc.http.HttpSender.Response;
+// import org.hibernate.mapping.List;
 import com.revature.services.CourseServiceImpl;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +29,33 @@ public class CourseController {
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
+
+
+    /**
+     * handler to get all courses
+     * 
+     * @return a response entity containing all the course 
+     */  
+    @GetMapping("/course")
+    public ResponseEntity<?> getAllCourses(){
+        List<Course> allCourses = courseService.getAllCourses();
+        return ResponseEntity.ok(allCourses);
+    }
+
+    /**
+     * handler to add a new course
+     * 
+     * @param newCourse - course object that contains all fields
+     * @return a response entity containing the new course or a Bad Request
+     *         error message if not null entitrys are not filled out
+     */
+    @PostMapping("/course")
+    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse){
+        try{
+            Course course = courseService.addCourse(newCourse);
+            return ResponseEntity.ok(course);
+        }catch (BadRequestException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 
     /**
      * handler to get a course by id
@@ -57,6 +90,7 @@ public class CourseController {
             return ResponseEntity.ok(rowsAffected + " course deleted.");
         } else {
             return ResponseEntity.ok(rowsAffected + " course deleted.");
+
         }
     }
 

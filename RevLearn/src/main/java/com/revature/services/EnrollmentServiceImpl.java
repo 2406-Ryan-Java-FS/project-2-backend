@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.revature.exceptions.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Enrollment;
 import com.revature.models.PayStatus;
@@ -41,10 +44,23 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
     }
 
+    /**
+     *  This method takes in a new enrollment oject
+     * returns the new enrollment object
+     * 
+     * @param 
+     * @return object
+     */
     @Override
-    public Enrollment registerEnrollment() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerEnrollment'");
+    public Enrollment registerEnrollment(Enrollment newEnrollment) {
+        
+        if(newEnrollment.getPaymentStatus() == null){
+            throw new BadRequestException("Please enter either 'pending', 'completed', or 'conselled' for payment status.");
+        }
+
+        Enrollment dbEnrollment = enrollmentRepository.save(newEnrollment);
+        return dbEnrollment;
+        
     }
 
     /**
