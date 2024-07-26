@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "users", schema = "project2")
 @Data
@@ -38,7 +36,4 @@ public class User {
     @Column(name = "role")
     @JsonProperty(value = "role")
     private String role;
-
-
-
 }

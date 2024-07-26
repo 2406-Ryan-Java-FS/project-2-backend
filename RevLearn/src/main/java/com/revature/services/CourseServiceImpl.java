@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.repositories.CourseRepository;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
@@ -31,16 +33,36 @@ public class CourseServiceImpl implements CourseService{
         throw new UnsupportedOperationException("Unimplemented method 'addCourse'");
     }
 
+    /**
+     * retrieves a course entitiy from the repository
+     * @param theCourseId - the id of the course we want to find
+     * @return Course - a course object if it exists in the database
+     * @throws NotFoundException - if the course does not exist
+     */
     @Override
     public Course getCourseById(Integer theCourseId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCourseById'");
+
+        Optional<Course> dBCourse = courseRepository.findById(theCourseId);
+
+        if (dBCourse.isPresent()) 
+        {
+            return dBCourse.get();
+        } 
+        else 
+        {
+            throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);
+        }
     }
 
+    /**
+     *  This method takes in an int to query the Courses in the database and return a list of all courses with the matching
+     *  id
+     * @param theEducatorId
+     * @return List
+     */
     @Override
     public List<Course> getCoursesByEducatorId(Integer theEducatorId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCoursesByEducatorId'");
+        return courseRepository.findByEducatorId(theEducatorId);
     }
 
     @Override
@@ -66,9 +88,22 @@ public class CourseServiceImpl implements CourseService{
             }
     }
 
+    /**
+     * deletes a trainer from the repository
+     * @param theCourseId - the id of the course data that we want to delete
+     * @return 1 or 0 - the number of affected table rows
+     */
     @Override
-    public Integer deleteCourse(Integer theCourseId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCourse'");
-    } 
+    public Integer deleteCourseById(Integer theCourseId) {
+        // if the account doesn't exist
+        if(courseRepository.findById(theCourseId).isPresent())
+        {
+            courseRepository.deleteById(theCourseId);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }
