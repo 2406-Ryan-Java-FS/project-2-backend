@@ -35,18 +35,18 @@ public class UserController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
-    /**
-     * Endpoint for retrieving a User given its userId.
-     *
-     * @param userId The userId of the User to retrieve.
-     * @return The User along with a 200 status code.
-     */
-    @GetMapping("/{userId}")
-    public ResponseEntity<User> getUser(@PathVariable int userId) {
-
-        User existingUser = userService.getUser(userId);
-        return new ResponseEntity<>(existingUser, HttpStatus.OK);
-    }
+//    /**
+//     * Endpoint for retrieving a User given its userId.
+//     *
+//     * @param userId The userId of the User to retrieve.
+//     * @return The User along with a 200 status code.
+//     */
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<User> getUser(@PathVariable int userId) {
+//
+//        User existingUser = userService.getUser(userId);
+//        return new ResponseEntity<>(existingUser, HttpStatus.OK);
+//    }
 
     /**
      * Endpoint for verifying a User login.
@@ -63,5 +63,18 @@ public class UserController {
         } catch (UnauthorizedException ue) {
             return new ResponseEntity<>(ue.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    /**
+     * Endpoint for retrieving the currently logged-in User given a valid JWT token.
+     *
+     * @param token The JWT token of the currently logged-in User.
+     * @return The User along with a 200 status code.
+     */
+    @GetMapping
+    public ResponseEntity<User> getCurrentUser(@PathVariable String token) {
+
+        User currentUser = jwtService.getUserFromToken(token);
+        return new ResponseEntity<>(currentUser, HttpStatus.OK);
     }
 }
