@@ -6,7 +6,6 @@ import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.User;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +15,6 @@ public class UserService {
 
     UserRepository userRepository;
 
-    @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -97,7 +95,7 @@ public class UserService {
         }
 
 
-        if (user.getRole() != null && !user.getRole().isEmpty()) {
+        if (user.getRole() != null) {
             updatedUser.setRole(user.getRole());
         }
 

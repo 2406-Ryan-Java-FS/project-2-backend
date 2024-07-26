@@ -6,8 +6,6 @@ import com.revature.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "users", schema = "project2")
 @Data
