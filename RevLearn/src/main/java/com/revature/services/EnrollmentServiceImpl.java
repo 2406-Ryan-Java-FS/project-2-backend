@@ -49,10 +49,10 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
     }
 
     /**
-     * Queries the Enrollment table and returns the record with the matching enrollmentId
-     * Returns null if id does not exist
+     *  Service layer method that will find a record in the Enrollments table with the specified enrollmentId
      * @param theEnrollmentId
-     * @return Enrollment
+     * @return returns an Enrollment object if record exists in the table
+     * throws a NotFoundException with a message saying that it could not be found
      */
     @Override
     public Enrollment getEnrollmentById(Integer theEnrollmentId) {
@@ -68,6 +68,12 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
         throw new UnsupportedOperationException("Unimplemented method 'getEnrollmentByStudentId'");
     }
 
+    /**
+     * Service Layer method that searches for the record with the passed enrollmentId and updates the pay status field from that record
+     * @param theEnrollmentId - primary key value to update a single row in table
+     * @param thePaymentStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
+     * @return returns the updated record from the table or throws a custom BadRequestException
+     */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
 

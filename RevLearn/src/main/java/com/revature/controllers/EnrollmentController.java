@@ -73,8 +73,14 @@ public class EnrollmentController {
         }
     }
 
-    @GetMapping("/enrollments/{id}")
-    public ResponseEntity<?> getEnrollmentById(@PathVariable("id") Integer theEnrollmentId) {
+    /**
+     *  GET request handler method that will find a record in the Enrollments table with the specified enrollmentId
+     * @param theEnrollmentId
+     * @return returns an OK response entity with type of Enrollment if record exists in the table
+     * returns a NOT_FOUND response entity with a String type displaying that it could not be found
+     */
+    @GetMapping("/enrollments/{theEnrollmentId}")
+    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentId") Integer theEnrollmentId) {
 
         try {
             Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId);
@@ -86,8 +92,14 @@ public class EnrollmentController {
 
     }
 
-    @PatchMapping("/enrollments/{id}")
-    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("id") Integer theEnrollmentId,
+    /**
+     * Patch request handler that searches for the record with the passed enrollmentId and updates the pay status field from that record
+     * @param theEnrollmentId - primary key value to update a single row in table
+     * @param payStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
+     * @return returns the updated record from the table or throws a custom BadRequestException
+     */
+    @PatchMapping("/enrollments/{theEnrollmentId}")
+    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("theEnrollmentId") Integer theEnrollmentId,
             @RequestBody String payStatus) {
 
         try {
