@@ -3,6 +3,14 @@ package com.revature.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.exceptions.BadRequestException;
+import com.revature.models.Enrollment;
+import com.revature.models.PayStatus;
+import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,10 +19,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Enrollment;
 import com.revature.services.EnrollmentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.models.PayStatus;
+
 
 @RestController
 public class EnrollmentController {
@@ -79,5 +96,26 @@ public class EnrollmentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    @PatchMapping("/enrollments/{id}")
+    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("id") Integer theEnrollmentId, @RequestBody String payStatus){
+
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(payStatus);
+            String payStatusString = jsonNode.get("payStatus").asText();
+
+            PayStatus status = PayStatus.valueOf(payStatusString);
+
+            return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status));
+
+        } catch (JsonMappingException e) {
+            throw new BadRequestException("Could not complete update request");
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException("Could not complete update request");
+        } catch (IllegalArgumentException e){
+            throw new BadRequestException("Please enter 'pending', 'completed', or 'cancelled'");
+        }
     }
 }
