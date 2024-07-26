@@ -31,9 +31,9 @@ public class CourseServiceImpl implements CourseService{
 
     /**
      * retrieves a course entitiy from the repository
-     * @param theCourseId the id of the course we want to find
-     * @return a course object if it exists in the database
-     * @throws NotFoundException if the course does not exist
+     * @param theCourseId - the id of the course we want to find
+     * @return Course - a course object if it exists in the database
+     * @throws NotFoundException - if the course does not exist
      */
     @Override
     public Course getCourseById(Integer theCourseId) {
@@ -67,9 +67,22 @@ public class CourseServiceImpl implements CourseService{
         throw new UnsupportedOperationException("Unimplemented method 'updateCourseById'");
     }
 
+    /**
+     * deletes a trainer from the repository
+     * @param theCourseId - the id of the course data that we want to delete
+     * @return 1 or 0 - the number of affected table rows
+     */
     @Override
-    public Integer deleteCourse(Integer theCourseId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCourse'");
-    } 
+    public Integer deleteCourseById(Integer theCourseId) {
+        // if the account doesn't exist
+        if(courseRepository.findById(theCourseId).isPresent())
+        {
+            courseRepository.deleteById(theCourseId);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }

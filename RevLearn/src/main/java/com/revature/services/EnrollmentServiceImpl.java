@@ -77,11 +77,11 @@ public class EnrollmentServiceImpl implements EnrollmentService  {
 
     /**
      * updates an existing item
-     * @param theEnrollmentId the id of the enrollment we want to update
-     * @param theCourseReview the review of the course for that particular enrollment 
+     * @param theEnrollmentId - the id of the enrollment we want to update
+     * @param theCourseReview - the review of the course for that particular enrollment 
      * @return Enrollment - the updated enrollment object
-     * @throws IllegalArgumentException if the provided parameters are invalid
-     * @throws RuntimeException if the update fails
+     * @throws IllegalArgumentException - if the provided parameters are invalid
+     * @throws RuntimeException - if the update fails
      */
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview) {

@@ -18,5 +18,5 @@ public interface CourseService {
     // Alex
     Course updateCourseById(Integer theCourseId, Course theCourse);
     // Fidel
-    Integer deleteCourse(Integer theCourseId);  // admin specific function
+    Integer deleteCourseById(Integer theCourseId);  // admin specific function
 }
