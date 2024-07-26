@@ -13,6 +13,7 @@ import com.revature.models.PayStatus;
 import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -121,6 +122,27 @@ public class EnrollmentController {
             return ResponseEntity.ok(enrollment);
         }catch (BadRequestException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+}
+
+    @GetMapping("/enrollments/{studentId}")
+    public ResponseEntity<List<Enrollment>> getEnrollmentByStudentId(@PathVariable("studentId") Integer theStudentId) {
+        List<Enrollment> enrollments = enrollmentService.getEnrollmentByStudentId(theStudentId);
+        if (enrollments != null && !enrollments.isEmpty()) {
+            return ResponseEntity.ok(enrollments);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @DeleteMapping("/enrollments/{id}")
+    public ResponseEntity<Integer> deleteEnrollment(@PathVariable("id") Integer theEnrollmentId) {
+        Integer result = enrollmentService.deleteEnrollment(theEnrollmentId);
+        if (result == 1) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(500).body(result);
         }
     }
 }

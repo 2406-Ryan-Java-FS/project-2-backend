@@ -6,10 +6,9 @@ import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.services.CourseService;
-
 import io.micrometer.core.ipc.http.HttpSender.Response;
-
 // import org.hibernate.mapping.List;
+import com.revature.services.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 public class CourseController {
 
     CourseService courseService;
@@ -92,6 +91,25 @@ public class CourseController {
         } else {
             return ResponseEntity.ok(rowsAffected + " course deleted.");
 
+        }
+    }
+
+    @PutMapping("/courses/{id}")
+    public ResponseEntity<Course> updateCourseById(
+            @PathVariable("id") Integer theCourseId,
+            @RequestBody Course theCourse) {
+        try {
+            Course updatedCourse = courseService.updateCourseById(theCourseId, theCourse);
+            if (updatedCourse != null) {
+                return ResponseEntity.ok(updatedCourse);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            // Handle invalid educator ID error
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            System.err.println("Exception occurred while updating course: " + e.getMessage());
+            return ResponseEntity.status(500).build();
         }
     }
 }
