@@ -4,6 +4,7 @@ import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.User;
+import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,6 @@ public class UserService {
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
-
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
         }
@@ -39,8 +39,8 @@ public class UserService {
             throw new ConflictException("Email already exists.");
         }
 
-        if (user.getRole() == null || !user.getRole().equals("educator")) {
-            user.setRole("student");
+        if (user.getRole() == null || !user.getRole().equals(Role.educator)) {
+            user.setRole(Role.student);
         }
 
         return userRepository.save(user);
@@ -65,7 +65,7 @@ public class UserService {
      * Updates a User in the repository given its userId.
      *
      * @param userId The userId of the User to be updated.
-     * @param user    User object containing updated information.
+     * @param user   User object containing updated information.
      * @return The updated User object.
      * @throws BadRequestException   if there's an issue with the client's request.
      * @throws UnauthorizedException if trying to change roles without sufficient privileges.
@@ -94,11 +94,8 @@ public class UserService {
             updatedUser.setPassword(user.getPassword());
         }
 
-        if (user.getRole() != null && !user.getRole().isEmpty()) {
 
-            // may need some additional logic here to make sure current user is allowed to change roles,
-            // or maybe that should be tackled on frontend so this is usable when needed.
-
+        if (user.getRole() != null) {
             updatedUser.setRole(user.getRole());
         }
 
@@ -128,5 +125,34 @@ public class UserService {
     public List<User> getAllUsers() {
 
         return userRepository.findAll();
+    }
+
+    /**
+     * Checks if a user with the given userId exists in the repository.
+     *
+     * @param userId the userId of the User to check.
+     * @return true if a User with the given userId exists, false otherwise.
+     */
+    public boolean isUser(Integer userId) {
+
+        return userRepository.existsById(userId);
+    }
+
+    /**
+     * Verifies a User login.
+     *
+     * @param user User object containing the email and password to verify.
+     * @return The verified User.
+     * @throws UnauthorizedException if the email and/or password are invalid.
+     */
+    public boolean verifyUser(User user) {
+
+        User existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            return true;
+        } else {
+            throw new UnauthorizedException("Invalid login credentials");
+        }
     }
 }
