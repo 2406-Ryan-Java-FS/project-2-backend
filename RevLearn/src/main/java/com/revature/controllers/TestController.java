@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Profile("h2")
+@Profile({"h2","awstest"})
 @RestController
 public class TestController {
 
@@ -22,6 +22,12 @@ public class TestController {
     @Autowired JwtServiceImpl js;
     @Autowired UserService us;
     @Autowired UserRepository ur;
+
+    @DeleteMapping("/clear-all")
+    public ResponseEntity<String> clear(){
+        ur.deleteAll();
+        return ResponseEntity.status(200).body("Cleared all database tables");
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@RequestBody User user){
@@ -43,12 +49,5 @@ public class TestController {
     @GetMapping("/token")
     public ResponseEntity<User> checkToken(@RequestHeader(name = "Authorization") String token) {
         return ResponseEntity.status(200).body(js.getUserFromToken(token));
-    }
-
-    @Profile("h2")
-    @DeleteMapping("/clear-all")
-    public ResponseEntity<String> clear(){
-        ur.deleteAll();
-        return ResponseEntity.status(200).body("Cleared all database tables");
     }
 }

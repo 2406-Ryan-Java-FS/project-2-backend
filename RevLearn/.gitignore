@@ -1,3 +1,6 @@
+
+application-awstest.properties
+application-aws.properties
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar

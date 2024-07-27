@@ -21,7 +21,7 @@ public class JwtServiceImpl implements JwtService{
     @Autowired
     UserService us;
 
-    @Value("${jwt.secret}")
+    @Value("${spring.jwt.secret}")
     private String secretKey;                                           // get secretkey from application.yml
 
 
