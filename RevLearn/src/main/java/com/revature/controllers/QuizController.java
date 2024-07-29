@@ -56,7 +56,7 @@ public class QuizController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteQuiz(@PathVariable int id) {
-        boolean wasDeleted = qs.deleteQuiz(id);
+        boolean wasDeleted = qs.deleteQuizById(id);
         return new ResponseEntity<>(wasDeleted? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
     }
 
