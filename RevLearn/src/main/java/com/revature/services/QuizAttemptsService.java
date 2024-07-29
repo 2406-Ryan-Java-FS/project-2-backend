@@ -2,8 +2,8 @@ package com.revature.services;
 
 import java.util.List;
 import com.revature.exceptions.*;
-import com.revature.DTO.QuizAttemptsDTO;
 import com.revature.models.QuizAttempts;
+import com.revature.models.dtos.QuizAttemptsDTO;
 
 public interface QuizAttemptsService {
 	

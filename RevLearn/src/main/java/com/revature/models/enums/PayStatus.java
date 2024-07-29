@@ -1,4 +1,4 @@
-package com.revature.models;
+package com.revature.models.enums;
 
 public enum PayStatus{
     pending,
