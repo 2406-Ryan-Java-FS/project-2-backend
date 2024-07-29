@@ -74,6 +74,11 @@ public class QuizQuestionController {
         return qs.getQuizQuestions(id);
     }
 
+    @GetMapping("/choices")
+    public List<QuestionChoice> getAllChoices() {
+        return qcs.getAllChoices();
+    }
+
     @PostMapping("/choices")
     public ResponseEntity<QuestionChoice> addChoice(@RequestBody QuestionChoice c) {
         c = qcs.addChoice(c);
