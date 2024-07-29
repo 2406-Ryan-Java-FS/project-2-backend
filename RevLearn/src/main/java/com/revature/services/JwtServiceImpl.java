@@ -1,7 +1,6 @@
 package com.revature.services;
 
-import com.revature.exceptions.AuthenticationFailedException;
-import com.revature.exceptions.BadRequestException;
+import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -64,9 +63,9 @@ public class JwtServiceImpl implements JwtService{
     public User getUserFromToken(String token){
         int id = verifyJwt(token);
         if(id == 0){
-            throw new AuthenticationFailedException("Authentication Failed");
+            throw new UnauthorizedException("Authentication Failed");
         } else if(id == -1) {
-            throw new AuthenticationFailedException("Token Expired");
+            throw new UnauthorizedException("Token Expired");
         } else{
             return us.getUser(id);
         }
