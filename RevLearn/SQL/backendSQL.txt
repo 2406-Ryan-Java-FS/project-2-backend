@@ -2,7 +2,7 @@
 SET search_path TO project2;
  
 -- Drop existing tables if they exist
-DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts;
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts CASCADE;
  
 -- Drop existing casts if they exist
 drop cast if exists (varchar AS user_role);
@@ -90,7 +90,7 @@ CREATE TABLE QuizAttempts (
     student_id INT,
     quiz_id INT,
     attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    score NUMERIC(4,2),
+    score NUMERIC(5,2) check (score <= 100),
     FOREIGN KEY (student_id) REFERENCES Users(user_id),
     FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
 );
