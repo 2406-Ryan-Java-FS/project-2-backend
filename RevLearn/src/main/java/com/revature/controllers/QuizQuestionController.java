@@ -1,7 +1,9 @@
 package com.revature.controllers;
 
+import com.revature.models.ChoiceSelection;
 import com.revature.models.QuestionChoice;
 import com.revature.models.QuizQuestion;
+import com.revature.services.ChoiceSelectionService;
 import com.revature.services.QuestionChoiceService;
 import com.revature.services.QuizQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +18,13 @@ public class QuizQuestionController {
 
     QuizQuestionService qs;
     QuestionChoiceService qcs;
+    ChoiceSelectionService cs;
 
     @Autowired
-    public QuizQuestionController(QuizQuestionService qs, QuestionChoiceService qcs) {
+    public QuizQuestionController(QuizQuestionService qs, QuestionChoiceService qcs, ChoiceSelectionService cs) {
         this.qs = qs;
         this.qcs = qcs;
+        this.cs = cs;
     }
 
     @GetMapping("/questions")
@@ -110,6 +114,27 @@ public class QuizQuestionController {
         } else {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("selections")
+    public ResponseEntity<ChoiceSelection> addSelection(@RequestBody ChoiceSelection s) {
+        s = cs.addSelection(s);
+        if (s != null) {
+            return new ResponseEntity<>(s, HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("selections")
+    public List<ChoiceSelection> getAllSelections() {
+        return cs.getAllSelections();
+    }
+
+    @GetMapping("attempts/{id}/selections")
+    public List<ChoiceSelection> getAttemptSelections(@PathVariable int id) {
+        return cs.getAttemptSelections(id);
     }
 
 }
