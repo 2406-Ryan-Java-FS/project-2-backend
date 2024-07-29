@@ -1,6 +1,7 @@
 package com.revature.controllers;
 
 import com.revature.models.User;
+import com.revature.models.dtos.UserToken;
 import com.revature.services.JwtServiceImpl;
 import com.revature.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,13 @@ public class TestController {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signInUser(@RequestBody User user) {
+    public ResponseEntity<UserToken> signInUser(@RequestBody User user) {
         User u = us.getUser(user.getUserId());
         String jwt = js.generateJwt(u.getUserId());
-        return ResponseEntity.status(200).body(jwt);
+
+        UserToken response = new UserToken(jwt,u);
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping("/token")
