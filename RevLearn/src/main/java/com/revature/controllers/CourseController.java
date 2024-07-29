@@ -36,7 +36,7 @@ public class CourseController {
      * 
      * @return a response entity containing all the course 
      */  
-    @GetMapping("/course")
+    @GetMapping("/courses")
     public ResponseEntity<?> getAllCourses(){
         List<Course> allCourses = courseService.getAllCourses();
         return ResponseEntity.ok(allCourses);
