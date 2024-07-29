@@ -69,6 +69,12 @@ public class QuizQuestionController {
         }
     }
 
+    @DeleteMapping("/questions/{id}")
+    public ResponseEntity<Boolean> deleteQuestion(@PathVariable int id) {
+        boolean wasDeleted = qs.deleteQuestion(id);
+        return new ResponseEntity<>(wasDeleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping("/quizzes/{id}/questions")
     public List<QuizQuestion> getQuestions(@PathVariable int id) {
         return qs.getQuizQuestions(id);
@@ -104,6 +110,12 @@ public class QuizQuestionController {
         } else {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @DeleteMapping("/choices/{id}")
+    public ResponseEntity<Boolean> deleteChoice(@PathVariable int id) {
+        boolean wasDeleted = qcs.deleteChoice(id);
+        return new ResponseEntity<>(wasDeleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("questions/{id}/choices")
