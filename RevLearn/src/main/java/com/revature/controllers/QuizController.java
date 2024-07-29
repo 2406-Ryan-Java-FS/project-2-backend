@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/quizzes")
 public class QuizController {
 
     QuizServiceImpl qs;
@@ -20,28 +19,28 @@ public class QuizController {
         this.qs = quizService;
     }
 
-    @GetMapping
+    @GetMapping("/quizzes")
     public List<Quiz> getAllQuizzes(){
         return qs.getAllQuizzes();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/quizzes/{id}")
     public Quiz getQuizById(@PathVariable int id){
         return qs.getQuizById(id);
     }
 
-    @GetMapping("/{courseId}")
-    public List<Quiz> getQuizByCourseId(@PathVariable int id){
-        return qs.getAllQuizzesByCourse(id);
+    @GetMapping("/course/{courseId}/quizzes")
+    public List<Quiz> getQuizByCourseId(@PathVariable int courseId){
+        return qs.getAllQuizzesByCourse(courseId);
     }
 
-    @PostMapping
+    @PostMapping("/quizzes")
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz q){
         Quiz createdQuiz = qs.addQuiz(q);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/quizzes/{id}")
     public ResponseEntity<Quiz> updateQuiz(@PathVariable int id, @RequestBody Quiz updateQuiz){
         updateQuiz.setQuizId(id);
         Quiz q = qs.getQuizById(id);
@@ -53,7 +52,7 @@ public class QuizController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/quizzes/{id}")
     public ResponseEntity<Boolean> deleteQuiz(@PathVariable int id) {
         boolean wasDeleted = qs.deleteQuizById(id);
         return new ResponseEntity<>(wasDeleted? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
