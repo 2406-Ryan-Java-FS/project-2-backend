@@ -18,7 +18,7 @@ import lombok.*;
 @Table (name = "Courses", schema = "project2")
 @JsonPropertyOrder({"courseId", "educatorId", "title", "description", "category", "price", "imgUrl", "creationDate"})
 @Data
-@Getter @Setter @NoArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
 public class Course {
 
     @Id
