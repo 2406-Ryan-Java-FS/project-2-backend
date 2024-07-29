@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 public class CourseController {
 
     CourseService courseService;
@@ -36,7 +37,7 @@ public class CourseController {
      * 
      * @return a response entity containing all the course 
      */  
-    @GetMapping("/course")
+    @GetMapping("/courses")
     public ResponseEntity<?> getAllCourses(){
         List<Course> allCourses = courseService.getAllCourses();
         return ResponseEntity.ok(allCourses);
@@ -49,7 +50,7 @@ public class CourseController {
      * @return a response entity containing the new course or a Bad Request
      *         error message if not null entitrys are not filled out
      */
-    @PostMapping("/course")
+    @PostMapping("/courses")
     public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse){
         try{
             Course course = courseService.addCourse(newCourse);
@@ -67,7 +68,7 @@ public class CourseController {
      *         error message if not found
      */
     @GetMapping("/courses/{theCourseId}")
-    ResponseEntity<?> getCourseByIdgetCourseById(@PathVariable Integer theCourseId) {
+    ResponseEntity<?> getCourseById(@PathVariable Integer theCourseId) {
         try {
             Course dBCourse = courseService.getCourseById(theCourseId);
             return ResponseEntity.ok(dBCourse);
@@ -75,6 +76,12 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/courses/educators/{educatorId}")
+    public ResponseEntity<List<Course>> getCoursesWithEducatorId(@PathVariable("educatorId") Integer educatorId){
+        return ResponseEntity.ok(courseService.getCoursesByEducatorId(educatorId));
+    }
+
 
     /**
      * handler to delete course data
