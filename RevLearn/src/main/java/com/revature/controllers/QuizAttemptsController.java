@@ -17,11 +17,11 @@ import org.springframework.stereotype.Controller;
 //Local
 import com.revature.models.QuizAttempts;
 import com.revature.models.User;
+import com.revature.models.dtos.QuizAttemptsDTO;
 import com.revature.repositories.UserRepository;
 import com.revature.services.JwtServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
 import com.revature.services.UserService;
-import com.revature.DTO.QuizAttemptsDTO;
 import com.revature.exceptions.*;
 
 //-----------------CRUD-----------------//
