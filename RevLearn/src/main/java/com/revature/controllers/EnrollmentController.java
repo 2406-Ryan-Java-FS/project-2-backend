@@ -55,7 +55,7 @@ public class EnrollmentController {
      * @return a response entity containing the updated course or exception messages
      *         upon failure
      */
-    @PatchMapping("/enrollments/{theEnrollmentIdCR}")
+    @PatchMapping("/enrollments/review/{theEnrollmentId}")
     public ResponseEntity<?> updateEnrollmentById(@PathVariable("theEnrollmentIdCR") Integer theEnrollmentId,
             @RequestBody String theCourseReview) {
         try {
@@ -80,15 +80,15 @@ public class EnrollmentController {
      *         returns a NOT_FOUND response entity with a String type displaying
      *         that it could not be found
      */
-    @GetMapping("/enrollments/{theEnrollmentIdPS}")
-    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentIdPS") Integer theEnrollmentId) {
+    @GetMapping("/enrollments/{theEnrollmentId}")
+    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentId") Integer theEnrollmentId) {
 
         try {
             Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId);
 
             return ResponseEntity.ok(theEnrollment);
-        } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
 
     }
@@ -159,7 +159,7 @@ public class EnrollmentController {
      * @return returns the updated record from the table
      * @throws BadRequestException
      */
-    @PatchMapping("/enrollments/{theEnrollmentId}")
+    @PatchMapping("/enrollments/payStatus/{theEnrollmentId}")
     public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("theEnrollmentId") Integer theEnrollmentId,
             @RequestBody String payStatus) {
 
@@ -191,7 +191,7 @@ public class EnrollmentController {
         }
     }
 
-    @GetMapping("/enrollments/{studentId}")
+    @GetMapping("/enrollments/students/{studentId}")
     public ResponseEntity<List<Enrollment>> getEnrollmentByStudentId(@PathVariable("studentId") Integer theStudentId) {
         List<Enrollment> enrollments = enrollmentService.getEnrollmentByStudentId(theStudentId);
         if (enrollments != null && !enrollments.isEmpty()) {
