@@ -8,8 +8,8 @@ import lombok.Data;
 @Entity
 @Table(name = "educators", schema = "project2")
 @Data
-@JsonPropertyOrder({"educatorId","degreeLevel","degreeMajor","almaMater","year"})
-public class Educators {
+@JsonPropertyOrder({"educatorId", "degreeLevel", "degreeMajor", "almaMater", "year"})
+public class Educator {
 
     @Id
     @Column(name = "educator_id")

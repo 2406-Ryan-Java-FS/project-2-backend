@@ -1,9 +1,8 @@
 package com.revature.services;
 
 import java.util.List;
-
-import org.apache.coyote.BadRequestException;
-
+import com.revature.exceptions.*;
+import com.revature.DTO.QuizAttemptsDTO;
 import com.revature.models.QuizAttempts;
 
 public interface QuizAttemptsService {
@@ -11,7 +10,7 @@ public interface QuizAttemptsService {
 	// Basic CRUD
 	
 	// Add an entry to the database, where the id will be autmatically incrememnted.
-	QuizAttempts create(QuizAttempts newEntry) throws BadRequestException;
+	QuizAttempts create(QuizAttemptsDTO newEntry) throws BadRequestException;
 	
 	// Get all QuizAttempts
 	List<QuizAttempts> getAll();
@@ -20,8 +19,8 @@ public interface QuizAttemptsService {
 	QuizAttempts getById(int quizAttempts_id) throws BadRequestException;
 	
 	// Update a quizAttempt based on a quizAttempt id
-	QuizAttempts updateById(int quizAttempts_id, QuizAttempts newData) throws BadRequestException;
-	
+	QuizAttempts updateByIdNoTime(int quizAttempts_id, QuizAttemptsDTO newData) throws BadRequestException;
+	QuizAttempts updateByIdWithTime(int quizAttempts_id, QuizAttemptsDTO newData) throws BadRequestException;
 	// Delete a quizAttempt base on a quizAttempt id;
 	Integer deleteById(int quizAttempts_id);
 	

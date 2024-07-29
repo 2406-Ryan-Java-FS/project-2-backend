@@ -1,3 +1,5 @@
+// Steven Ray Coronel
+
 package com.revature.controllers;
 
 //Core Libraries
@@ -14,7 +16,12 @@ import org.springframework.stereotype.Controller;
 
 //Local
 import com.revature.models.QuizAttempts;
+import com.revature.models.User;
+import com.revature.repositories.UserRepository;
+import com.revature.services.JwtServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
+import com.revature.services.UserService;
+import com.revature.DTO.QuizAttemptsDTO;
 import com.revature.exceptions.*;
 
 //-----------------CRUD-----------------//
@@ -32,7 +39,13 @@ public class QuizAttemptsController {
 	@Autowired
 	QuizAttemptsServiceImpl attemptsServ;
 	
-
+	@Autowired
+	JwtServiceImpl jwtServ;
+	
+	// for authentication. This may be later updated to UserServiceImpl, but
+	//		UserServiceImpl currently doesn't exist on my system. Only UserService.
+	@Autowired
+	UserRepository userServ;
 	
 	////////////////////////////
 	//---------Create---------//
@@ -41,12 +54,13 @@ public class QuizAttemptsController {
 	/// Create new entry
 	@PostMapping(value = "/newQuizAttempts")    
 	@ResponseStatus( HttpStatus.CREATED)
-	public @ResponseBody  QuizAttempts createQuizAttempts(@RequestBody QuizAttempts newEntry) //, @RequestHeader(name = "Authorization") String token)
-	throws BadRequestException//, UnauthorizedUserException
+	public @ResponseBody  QuizAttempts createQuizAttempts(@RequestBody QuizAttemptsDTO newEntry, @RequestHeader(name = "Authorization") String token)
+	throws BadRequestException, UnauthorizedException
 	{
-		
-        // REQUIRES AUTHENTICATION
-		
+		User user = jwtServ.getUserFromToken(token);
+		if(!user.getRole().name().equals("educator"))
+			throw new UnauthorizedException("Educator level access required to create a quiz attempt.");
+
 		return attemptsServ.create(newEntry);
 	}
 	
@@ -73,12 +87,17 @@ public class QuizAttemptsController {
 	////////////////////////////
 	
     @PatchMapping(value = "/quizAttempts/{quizAttempts_id}")
-    public @ResponseBody QuizAttempts updateQuizAttempts(@PathVariable Integer quizAttempts_id, @RequestBody QuizAttempts newData)//, @RequestHeader(name = "Authorization") String token) 
-    throws BadRequestException//, UnauthorizedUserException
+    public @ResponseBody QuizAttempts updateQuizAttempts(@PathVariable Integer quizAttempts_id, @RequestBody QuizAttemptsDTO newData, @RequestHeader(name = "Authorization") String token) 
+    throws BadRequestException, UnauthorizedException
     {
-    	// REQUIRES AUTHENTICATION
+		User user = jwtServ.getUserFromToken(token);
+		if(!user.getRole().name().equals("educator"))
+			throw new UnauthorizedException("Educator level access required to create a quiz attempt.");
 
-        return attemptsServ.updateById(quizAttempts_id, newData);
+    	if(newData.getAttempt_date() == null)
+    		return attemptsServ.updateByIdNoTime(quizAttempts_id, newData);
+    	else
+    		return attemptsServ.updateByIdWithTime(quizAttempts_id, newData);
     }
     
 	////////////////////////////
@@ -87,12 +106,14 @@ public class QuizAttemptsController {
 	
     @DeleteMapping(value = "/quizAttempts/{quizAttempts_id}") 
     @ResponseStatus( HttpStatus.NO_CONTENT )
-    public @ResponseBody Integer deleteQuizAttemptsById(@PathVariable Integer quizAttemp_id)//, @RequestHeader(name = "Authorization") String token)
-    //throws UnauthorizedUserException
+    public @ResponseBody Integer deleteQuizAttemptsById(@PathVariable Integer quizAttempts_id, @RequestHeader(name = "Authorization") String token)
+    throws UnauthorizedException
     {
-    	//  REQUIRES AUTHENTICATION
+		User user = jwtServ.getUserFromToken(token);
+		if(!user.getRole().name().equals("educator"))
+			throw new UnauthorizedException("Educator level access required to create a quiz attempt.");
 
-        return attemptsServ.deleteById(quizAttemp_id);
+        return attemptsServ.deleteById(quizAttempts_id);
     }
     
 	//for later consideration:
@@ -111,7 +132,7 @@ public class QuizAttemptsController {
 	// - For deleting all attempts for a user (probably student):
 	// DELETE  on /quizAttemptsFromUser/{user_id}
 	
-	// Anything more, Please Ask Steven Coronel
+	// For anything more past the comments above, Please Ask Steven Coronel
 	
 
 	

@@ -31,3 +31,4 @@ public class Quiz {
     private int attemptsAllowed;
 
 }
+
