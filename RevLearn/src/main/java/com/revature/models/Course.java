@@ -47,6 +47,10 @@ public class Course {
     @JsonProperty(value = "price")
     private double price;
 
+    @Column(name = "img_url")
+    @JsonProperty("imgUrl")
+    private String imgUrl;
+
     @Column(name = "creation_date")
     @JsonProperty(value = "creationDate")
     private Timestamp creationDate;
