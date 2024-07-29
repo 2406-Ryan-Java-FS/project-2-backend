@@ -30,19 +30,19 @@ public class UserController {
     }
 
     /**
-     * Endpoint for registering a new User.
+     * Registers a new User with optional Educator details.
      *
-     * @param userEducator Data containing User fields and optionally Educator fields to be registered.
-     * @return A ResponseEntity containing the userId of the newly persisted User, or the educatorId if the User is an Educator, along with a 201 status code on success, or an error message and appropriate status code on failure.
+     * @param userEducator an object containing User fields and optional Educator fields to be registered
+     * @return a ResponseEntity containing the userId of the newly created User, or the educatorId if the User is an Educator, with a 201 status code on success. Returns an error message and appropriate status code on failure.
      */
     @PostMapping
     public ResponseEntity<Object> addUser(@RequestBody UserEducator userEducator) {
 
         try {
-            User newUser = userService.addUser(userEducator.extractUser());
+            User newUser = userService.addUser(userEducator.getUser());
 
             if (newUser.getRole().equals(Role.educator)) {
-                Educator extractedEducator = userEducator.extractEducator();
+                Educator extractedEducator = userEducator.getEducator();
                 extractedEducator.setEducatorId(newUser.getUserId());
                 Educator newEducator = educatorService.addEducator(extractedEducator);
                 return new ResponseEntity<>(newEducator.getEducatorId(), HttpStatus.CREATED);
