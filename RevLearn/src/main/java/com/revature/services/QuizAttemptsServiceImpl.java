@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 // Local
 import com.revature.models.QuizAttempts;
-import com.revature.DTO.QuizAttemptsDTO;
+import com.revature.models.dtos.QuizAttemptsDTO;
 import com.revature.repositories.QuizAttemptsRepository;
 import com.revature.repositories.QuizRepository;
 import com.revature.repositories.UserRepository;

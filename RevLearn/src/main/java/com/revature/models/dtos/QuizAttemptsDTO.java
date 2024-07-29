@@ -1,7 +1,6 @@
-package com.revature.DTO;
+package com.revature.models.dtos;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import lombok.Data;
 
 @Data

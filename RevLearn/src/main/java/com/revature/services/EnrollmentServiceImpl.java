@@ -6,17 +6,11 @@ import java.util.Optional;
 import com.revature.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Enrollment;
-import com.revature.models.PayStatus;
+import com.revature.models.enums.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
 import org.springframework.stereotype.Service;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class EnrollmentServiceImpl implements EnrollmentService {
@@ -45,26 +39,29 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     /**
-     *  This method takes in a new enrollment oject
+     * This method takes in a new enrollment oject
      * returns the new enrollment object
      * 
-     * @param 
+     * @param
      * @return object
      */
     @Override
     public Enrollment registerEnrollment(Enrollment newEnrollment) {
-        
-        if(newEnrollment.getPaymentStatus() == null){
-            throw new BadRequestException("Please enter either 'pending', 'completed', or 'conselled' for payment status.");
+
+        if (newEnrollment.getPaymentStatus() == null) {
+            throw new BadRequestException(
+                    "Please enter either 'pending', 'completed', or 'conselled' for payment status.");
         }
 
         Enrollment dbEnrollment = enrollmentRepository.save(newEnrollment);
         return dbEnrollment;
-        
+
     }
 
     /**
-     *  Service layer method that will find a record in the Enrollments table with the specified enrollmentId
+     * Service layer method that will find a record in the Enrollments table with
+     * the specified enrollmentId
+     * 
      * @param theEnrollmentId
      * @return returns an Enrollment object if record exists in the table
      * @throws BadRequestException
@@ -85,9 +82,55 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     /**
-     * Service Layer method that searches for the record with the passed enrollmentId and updates the pay status field from that record
-     * @param theEnrollmentId - primary key value to update a single row in table
-     * @param thePaymentStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
+     * Service method that will find all records in the database with the specified
+     * courseId
+     * 
+     * @param theCourseId - courseId value used as condition to query the database
+     * @return A List of all Enrollments in the database with the specified courseId
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId) {
+        return enrollmentRepository.findByCourseId(theCourseId);
+    }
+
+    /**
+     * Service method that will find all records in the database with the specified
+     * studentId and payment status
+     * 
+     * @param theStudentId     - studentId value being used as a condition to query
+     *                         the database
+     * @param thePaymentStatus - payment status value used as condition to query the
+     *                         database
+     * @return A List of all Enrollments in the database with the specified
+     *         studentId and payment status
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId,
+            PayStatus thePaymentStatus) {
+        return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
+    }
+
+    /**
+     * Service method that will find all records in the database with the specified
+     * payment status
+     * 
+     * @param thePaymentStatus - payment status value used as condition to query the
+     *                         database
+     * @return A List of all Enrollments in the database with the specified payment
+     *         status
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus) {
+        return enrollmentRepository.findByPaymentStatus(thePaymentStatus);
+    }
+
+    /**
+     * Service Layer method that searches for the record with the passed
+     * enrollmentId and updates the pay status field from that record
+     * 
+     * @param theEnrollmentId  - primary key value to update a single row in table
+     * @param thePaymentStatus - value to be updated must be string type and value
+     *                         must be 'pending', 'cancelled', or 'completed'
      * @return returns the updated record from the table
      * @throws BadRequestException if there are no rows updated
      */
@@ -144,6 +187,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
     }
 
+    /**
+     * deletes an enrollment from the repository
+     * @param theEnrollmentId - the id of the enrollment we want to delete
+     * @return 1 upon successful deletion or 0 if nothing was deleted
+     */
     @Override
     public Integer deleteEnrollment(Integer theEnrollmentId) {
         try {
