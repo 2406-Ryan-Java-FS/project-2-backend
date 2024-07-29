@@ -1,23 +1,22 @@
 package com.revature.controllers;
 
 import com.revature.models.Quiz;
-import com.revature.services.QuizService;
+import com.revature.services.QuizServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/quizzes")
 public class QuizController {
 
-    QuizService qs;
+    QuizServiceImpl qs;
 
     @Autowired
-    public QuizController(QuizService quizService){
+    public QuizController(QuizServiceImpl quizService){
         this.qs = quizService;
     }
 
@@ -56,7 +55,7 @@ public class QuizController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteQuiz(@PathVariable int id) {
-        boolean wasDeleted = qs.deleteQuiz(id);
+        boolean wasDeleted = qs.deleteQuizById(id);
         return new ResponseEntity<>(wasDeleted? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
     }
 
