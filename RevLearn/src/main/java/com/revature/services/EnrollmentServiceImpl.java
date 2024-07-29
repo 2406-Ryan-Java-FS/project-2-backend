@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Enrollment;
-import com.revature.models.PayStatus;
+import com.revature.models.enums.PayStatus;
 import com.revature.repositories.EnrollmentRepository;
 import org.springframework.stereotype.Service;
 
