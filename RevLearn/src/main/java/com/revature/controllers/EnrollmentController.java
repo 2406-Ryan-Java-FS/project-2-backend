@@ -77,7 +77,7 @@ public class EnrollmentController {
     }
 
     /**
-     *  GET request handler method that will find a record in the Enrollments table with the specified enrollmentId
+     * GET request handler method that will find a record in the Enrollments table with the specified enrollmentId
      * @param theEnrollmentId
      * @return returns an OK response entity with type of Enrollment if record exists in the table
      * returns a NOT_FOUND response entity with a String type displaying that it could not be found
@@ -94,6 +94,50 @@ public class EnrollmentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    /**
+     * GET request handler method that will find all records in the database with the specified course id
+     * @param theCourseId - course id value used as condition to query the database
+     * @return A Response Entity with a list of all enrollments with the specified course id
+     */
+    @GetMapping("/enrollments/courses/{theCourseId}")
+    public ResponseEntity<List<Enrollment>> getEnrollmentsByCourseId(@PathVariable("theCourseId") Integer theCourseId){
+        return ResponseEntity.ok(enrollmentService.getEnrollmentsByCourseId(theCourseId));
+    }
+
+    /**
+     * GET request handler method that will find all records in the database with the specified studentId and payment status
+     * @param theStudentId - studentId value being used as a condition to query the database
+     * @param status - payment status value used as condition to query the database
+     * @return A response entity of either List<Enrollment> type if no exceptions are thrown or String type if the status is not valid
+     */
+    @GetMapping("/enrollments/students/{theStudentId}/{thePaymentStatus}")
+    public ResponseEntity<?> getEnrollmentsForStudentWithStatus(@PathVariable("theStudentId") Integer theStudentId,
+                                                                               @PathVariable("thePaymentStatus") String status){
+        try{
+            PayStatus payStatus = PayStatus.valueOf(status);
+
+            return ResponseEntity.ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid Status");
+        }
+    }
+
+    /**
+     * GET request handler method that will find all records in the database with the specified payment status
+     * @param status - payment status value used as condition to query the database
+     * @return A response entity of either List<Enrollment> type if no exceptions are thrown or String type if the status is not valid
+     */
+    @GetMapping("/enrollments/status/{thePaymentStatus}")
+    public ResponseEntity<?> getEnrollmentsWithPayStatus(@PathVariable("thePaymentStatus") String status){
+        try{
+            PayStatus payStatus = PayStatus.valueOf(status);
+
+            return ResponseEntity.ok(enrollmentService.getEnrollmentsByPaymentStatus(payStatus));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid Status");
+        }
     }
 
     /**

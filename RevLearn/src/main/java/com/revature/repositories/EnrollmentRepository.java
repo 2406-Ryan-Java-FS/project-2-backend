@@ -23,5 +23,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     @Query("update Enrollment e set e.paymentStatus = :thePaymentStatus where e.enrollmentId = :theEnrollmentId")
     int updateEnrollmentPaymentStatusById(@Param("theEnrollmentId") Integer theEnrollmentId, @Param("thePaymentStatus")PayStatus thePaymentStatus);
 
-    List<Enrollment> findByStudentId(Integer studentId);
+    List<Enrollment> findByStudentId(Integer theStudentId);
+
+    List<Enrollment> findByCourseId(Integer theCourseId);
+
+    List<Enrollment> findByPaymentStatus(PayStatus thePaymentStatus);
+
+    List<Enrollment> findByStudentIdAndPaymentStatus(int theStudentId, PayStatus thePaymentStatus);
 }

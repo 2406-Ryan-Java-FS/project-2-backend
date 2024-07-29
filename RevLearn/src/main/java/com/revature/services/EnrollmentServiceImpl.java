@@ -85,6 +85,37 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     /**
+     * Service method that will find all records in the database with the specified courseId
+     * @param theCourseId - courseId value used as condition to query the database
+     * @return A List of all Enrollments in the database with the specified courseId
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId){
+        return enrollmentRepository.findByCourseId(theCourseId);
+    }
+
+    /**
+     * Service method that will find all records in the database with the specified studentId and payment status
+     * @param theStudentId - studentId value being used as a condition to query the database
+     * @param thePaymentStatus - payment status value used as condition to query the database
+     * @return A List of all Enrollments in the database with the specified studentId and payment status
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId, PayStatus thePaymentStatus) {
+        return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
+    }
+
+    /**
+     * Service method that will find all records in the database with the specified payment status
+     * @param thePaymentStatus - payment status value used as condition to query the database
+     * @return A List of all Enrollments in the database with the specified payment status
+     */
+    @Override
+    public List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus) {
+        return enrollmentRepository.findByPaymentStatus(thePaymentStatus);
+    }
+
+    /**
      * Service Layer method that searches for the record with the passed enrollmentId and updates the pay status field from that record
      * @param theEnrollmentId - primary key value to update a single row in table
      * @param thePaymentStatus - value to be updated must be string type and value must be 'pending', 'cancelled', or 'completed'
