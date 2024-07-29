@@ -1,12 +1,9 @@
 package com.revature.RevLearn.Courses;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.app.RevLearnApplication;
 import com.revature.models.Course;
-import com.revature.models.Enrollment;
-import com.revature.models.PayStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
