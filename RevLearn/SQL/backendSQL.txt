@@ -2,7 +2,7 @@
 SET search_path TO project2;
  
 -- Drop existing tables if they exist
-DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts;
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts CASCADE;
  
 -- Drop existing casts if they exist
 drop cast if exists (varchar AS user_role);
@@ -25,7 +25,8 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    role user_role NOT NULL
+    role user_role NOT NULL,
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Educators (
@@ -44,6 +45,7 @@ CREATE TABLE Courses (
     description TEXT,
     category VARCHAR(100),
     price NUMERIC(10, 2),
+    img_url text default 'https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg',
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (educator_id) REFERENCES Educators(educator_id) ON DELETE SET NULL
 );
@@ -55,6 +57,7 @@ CREATE TABLE Enrollments (
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_status VARCHAR(255) NOT NULL,
     enrollment_status BOOLEAN NOT NULL DEFAULT FALSE,
+    course_rating int default 3,
     course_review VARCHAR(255),
     FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE SET NULL,
     FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE SET NULL
@@ -89,7 +92,7 @@ CREATE TABLE QuizAttempts (
     student_id INT,
     quiz_id INT,
     attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    score NUMERIC(4,2),
+    score NUMERIC(5,2) check (score <= 100),
     FOREIGN KEY (student_id) REFERENCES Users(user_id),
     FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
 );
@@ -100,6 +103,30 @@ CREATE TABLE ChoiceSelections (
         PRIMARY KEY(choice_id, attempt_id)
 );
 
+
+INSERT INTO Users (email, password, first_name, last_name, role) VALUES
+('john.doe@example.com', 'password123', 'John', 'Doe', 'student'),
+('jane.smith@example.com', 'password123', 'Jane', 'Smith', 'student'),
+('alice.johnson@example.com', 'password123', 'Alice', 'Johnson', 'educator'),
+('bob.brown@example.com', 'password123', 'Bob', 'Brown', 'educator');
+
+
+INSERT INTO Educators (educator_id, degree_level, degree_major, alma_mater, year) VALUES
+((SELECT user_id FROM Users WHERE email='alice.johnson@example.com'), 'PhD', 'Computer Science', 'MIT', '2015'),
+((SELECT user_id FROM Users WHERE email='bob.brown@example.com'), 'Masters', 'Mathematics', 'Harvard', '2010');
+
+
+INSERT INTO Courses (educator_id, title, description, category, price) VALUES
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='alice.johnson@example.com')), 'Introduction to Programming', 'A beginner course on programming.', 'Computer Science', 49.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='alice.johnson@example.com')), 'Data Structures', 'Learn about different data structures.', 'Computer Science', 79.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='bob.brown@example.com')), 'Calculus I', 'An introductory course on calculus.', 'Mathematics', 59.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='bob.brown@example.com')), 'Statistics', 'Basic statistics concepts and techniques.', 'Mathematics', 69.99);
+
+INSERT INTO Enrollments (student_id, course_id, payment_status, enrollment_status, course_review) VALUES
+((SELECT user_id FROM Users WHERE email='john.doe@example.com'), (SELECT course_id FROM Courses WHERE title='Introduction to Programming'), 'completed', TRUE, 'Great course!'),
+((SELECT user_id FROM Users WHERE email='john.doe@example.com'), (SELECT course_id FROM Courses WHERE title='Calculus I'), 'completed', TRUE, 'Very informative.'),
+((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Data Structures'), 'completed', TRUE, 'Challenging but rewarding.'),
+((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Statistics'), 'pending', FALSE, NULL);
 
 -- Select statements
 select * from users;

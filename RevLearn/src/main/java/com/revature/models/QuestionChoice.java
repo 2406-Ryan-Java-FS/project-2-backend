@@ -20,5 +20,5 @@ public class QuestionChoice {
     private String choiceText;
 
     @Column(name = "correct")
-    private boolean isCorrect;
+    private boolean correct;
 }
