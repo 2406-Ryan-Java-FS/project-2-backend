@@ -18,7 +18,7 @@ import lombok.*;
 
 @Entity
 @Table (name = "Enrollments", schema = "project2")
-@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "enrolled", "courseReview"})
+@JsonPropertyOrder({"enrollmentId", "studentId", "courseId", "enrollmentDate", "paymentStatus", "enrolled", "courseRating", "courseReview"})
 @Data
 @Getter @Setter @NoArgsConstructor @ToString
 public class Enrollment {
@@ -49,6 +49,10 @@ public class Enrollment {
     @Column(name = "enrollment_status")
     @JsonProperty(value = "enrolled")
     private Boolean enrolled;
+
+    @Column(name = "course_rating")
+    @JsonProperty(value = "courseRating")
+    private Integer courseRating;
 
     @Column(name = "course_review")
     @JsonProperty(value = "courseReview")
