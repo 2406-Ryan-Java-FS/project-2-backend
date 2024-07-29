@@ -73,7 +73,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (optionalEnrollment.isPresent())
             return optionalEnrollment.get();
         else
-            throw new BadRequestException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+            throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
     }
 
     @Override
