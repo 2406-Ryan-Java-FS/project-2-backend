@@ -103,7 +103,9 @@ public class UserServiceImpl implements UserService {
     public UserEducator combineUserAndEducator(User user, Educator educator) {
         UserEducator dto = new UserEducator();
         dto.setUser(user);
-        educator.setEducatorId(user.getUserId());
+        if (educator != null) {
+            educator.setEducatorId(user.getUserId());
+        }
         dto.setEducator(educator);
         return dto;
     }
