@@ -3,7 +3,7 @@ package com.revature.services;
 import java.util.List;
 
 import com.revature.models.Enrollment;
-import com.revature.models.PayStatus;
+import com.revature.models.enums.PayStatus;
 
 public interface EnrollmentService {
     List<Enrollment> getAllEnrollments();

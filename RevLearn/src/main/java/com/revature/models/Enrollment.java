@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.revature.models.enums.PayStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

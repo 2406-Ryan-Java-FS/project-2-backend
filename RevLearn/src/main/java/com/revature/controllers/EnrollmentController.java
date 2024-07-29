@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.exceptions.BadRequestException;
 import com.revature.models.Enrollment;
-import com.revature.models.PayStatus;
+import com.revature.models.enums.PayStatus;
 import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
