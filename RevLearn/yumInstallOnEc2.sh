@@ -1,11 +1,9 @@
 
 yum search theThingYouNeed
-
-sudo yum install docker -y
-
-sudo yum install commons-compiler-jdk.noarch
-
-sudo yum install maven-local-amazon-corretto21.noarch
+sudo yum install -y docker
+sudo yum install -y commons-compiler-jdk.noarch
+sudo yum install -y maven-local-amazon-corretto21.noarch
+sudo yum install -y git
 
 
 sudo yum install nginx.x86_64
