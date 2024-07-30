@@ -19,25 +19,23 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 
-public class updateEnrollmentPaymentStatus {
+public class UpdateEnrollmentPaymentStatus {
 
     ApplicationContext app;
     HttpClient webClient;
     ObjectMapper objMapper;
 
-
     @BeforeEach
     public void setup() throws InterruptedException {
         webClient = HttpClient.newHttpClient();
         objMapper = new ObjectMapper();
-        String[] args = new String[] {};
+        String[] args = new String[]{};
         app = SpringApplication.run(RevLearnApplication.class, args);
         Thread.sleep(500);
     }
 
-
     @AfterEach
-    public void tearDown() throws InterruptedException{
+    public void tearDown() throws InterruptedException {
         Thread.sleep(500);
         SpringApplication.exit(app);
     }
@@ -47,12 +45,11 @@ public class updateEnrollmentPaymentStatus {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/enrollments/payStatus/1"))
-                .method("PATCH", HttpRequest.BodyPublishers.ofString("{" +
-                        "\"payStatus\": \"pending\" }"))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString("{\"payStatus\": \"pending\" }"))
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
 
         Assertions.assertEquals(200, status, "Expected 200 - Actual " + status);
@@ -68,7 +65,7 @@ public class updateEnrollmentPaymentStatus {
                 "Great course!"
         );
 
-        Enrollment actual = objMapper.readValue(response.body().toString(), new TypeReference<Enrollment>() {});
+        Enrollment actual = objMapper.readValue(response.body(), new TypeReference<Enrollment>() {});
         Assertions.assertEquals(expected, actual, "Expected=" + expected + ", Actual=" + actual);
     }
 
@@ -77,19 +74,18 @@ public class updateEnrollmentPaymentStatus {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/enrollments/payStatus/1000"))
-                .method("PATCH", HttpRequest.BodyPublishers.ofString("{" +
-                        "\"payStatus\": \"cancelled\" }"))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString("{\"payStatus\": \"cancelled\" }"))
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
 
         Assertions.assertEquals(404, status, "Expected 404 - Actual " + status);
 
         String expected = "Enrollment with Id: 1000 does not exist";
 
-        String actual = response.body().toString();
+        String actual = response.body();
         Assertions.assertEquals(expected, actual, "Expected=" + expected + ", Actual=" + actual);
     }
 
@@ -98,19 +94,18 @@ public class updateEnrollmentPaymentStatus {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/enrollments/payStatus/1"))
-                .method("PATCH", HttpRequest.BodyPublishers.ofString("{" +
-                        "\"status\": \"cancelled\" }"))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString("{\"status\": \"cancelled\" }"))
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
 
         Assertions.assertEquals(400, status, "Expected 400 - Actual " + status);
 
         String expected = "Could not update payment status";
 
-        String actual = response.body().toString();
+        String actual = response.body();
         Assertions.assertEquals(expected, actual, "Expected=" + expected + ", Actual=" + actual);
     }
 
@@ -119,19 +114,18 @@ public class updateEnrollmentPaymentStatus {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/enrollments/payStatus/1"))
-                .method("PATCH", HttpRequest.BodyPublishers.ofString("{" +
-                        "\"payStatus\": \"pineapple\" }"))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString("{\"payStatus\": \"pineapple\" }"))
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
 
         Assertions.assertEquals(400, status, "Expected 400 - Actual " + status);
 
         String expected = "Please enter 'pending', 'completed', or 'cancelled'";
 
-        String actual = response.body().toString();
+        String actual = response.body();
         Assertions.assertEquals(expected, actual, "Expected=" + expected + ", Actual=" + actual);
     }
 }
