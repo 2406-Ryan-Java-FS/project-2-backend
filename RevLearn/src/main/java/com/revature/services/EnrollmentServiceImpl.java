@@ -137,12 +137,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
 
-        int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
+        if(enrollmentRepository.existsById(theEnrollmentId)){
+            int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
 
-        if (rowsUpdated == 1)
-            return this.getEnrollmentById(theEnrollmentId);
-        else
-            throw new BadRequestException("Could not update Payment Status");
+            if (rowsUpdated == 1)
+                return this.getEnrollmentById(theEnrollmentId);
+            else
+                throw new BadRequestException("Could not update Payment Status");
+        } else {
+            throw new NotFoundException("Enrollment with Id: " + theEnrollmentId + " does not exist");
+        }
+
+
     }
 
     /**

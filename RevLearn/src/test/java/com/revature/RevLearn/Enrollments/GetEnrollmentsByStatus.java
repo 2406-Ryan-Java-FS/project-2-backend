@@ -57,6 +57,8 @@ public class GetEnrollmentsByStatus {
         List<Enrollment> expectedResult = new ArrayList<>();
         expectedResult.add(new Enrollment(4, 2, 4, Timestamp.valueOf("2024-07-29 15:01:26.464"),
                 PayStatus.pending, false,  3, null));
+        expectedResult.add(new Enrollment(1, 1, 1, Timestamp.valueOf("2024-07-29 15:01:26.464"),
+                PayStatus.pending, true,  3, "Great course!"));
 
         List<Enrollment> actualResult = objMapper.readValue(response.body().toString(), new TypeReference<List<Enrollment>>(){});
         Assertions.assertEquals(expectedResult, actualResult, "Expected=" + expectedResult + ", Actual=" + actualResult);
