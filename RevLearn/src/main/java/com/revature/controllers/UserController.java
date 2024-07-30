@@ -94,4 +94,27 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), e.getStatus());
         }
     }
+
+    /**
+     * Endpoint for retrieving User and Educator information given a valid User ID.
+     *
+     * @param userId The ID of the User whose data is being requested.
+     * @return A ResponseEntity containing the User and Educator data (if applicable) along with a 200 status code on success, or an error message and appropriate status code on failure.
+     */
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getUserById(@PathVariable Integer userId) {
+
+        try {
+            User currentUser = userService.getUser(userId);
+
+            if (currentUser.getRole().equals(Role.educator)) {
+                Educator currentEducator = educatorService.getEducator(currentUser.getUserId());
+                UserEducator dto = userService.combineUserAndEducator(currentUser, currentEducator);
+                return new ResponseEntity<>(dto, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(currentUser, HttpStatus.OK);
+        } catch (CustomHttpException e) {
+            return new ResponseEntity<>(e.getMessage(), e.getStatus());
+        }
+    }
 }
