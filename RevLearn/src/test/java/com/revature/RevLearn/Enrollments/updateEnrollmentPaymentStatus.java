@@ -48,7 +48,7 @@ public class updateEnrollmentPaymentStatus {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/enrollments/payStatus/1"))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString("{" +
-                        "\"payStatus\": \"cancelled\" }"))
+                        "\"payStatus\": \"pending\" }"))
                 .header("Content-Type", "application/json")
                 .build();
 
@@ -62,7 +62,7 @@ public class updateEnrollmentPaymentStatus {
                 1,
                 1,
                 Timestamp.valueOf("2024-07-29 15:01:26.464"),
-                PayStatus.cancelled,
+                PayStatus.pending,
                 true,
                 3,
                 "Great course!"
