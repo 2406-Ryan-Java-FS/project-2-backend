@@ -107,6 +107,9 @@ public class UserController {
         try {
             User existingUser = userService.getUser(userId);
 
+            existingUser.setEmail(null);
+            existingUser.setPassword(null);
+
             if (existingUser.getRole().equals(Role.educator)) {
                 Educator existingEducator = educatorService.getEducator(existingUser.getUserId());
                 UserEducator dto = userService.combineUserAndEducator(existingUser, existingEducator);
