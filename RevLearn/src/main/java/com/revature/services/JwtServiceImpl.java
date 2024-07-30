@@ -1,6 +1,5 @@
 package com.revature.services;
 
-import com.revature.exceptions.BadRequestException;
 import com.revature.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

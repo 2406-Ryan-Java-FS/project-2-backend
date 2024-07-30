@@ -74,7 +74,7 @@ public class CourseController {
     /**
      * handler to get courses by a specific educator id
      * 
-     * @param theEducatorId
+     * @param theEducatorId - the educator id of the list of courses
      * @return a response entity containing a list of courses by a specific educator
      */
     @GetMapping("/courses/educators/{theEducatorId}")
