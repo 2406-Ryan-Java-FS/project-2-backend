@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import com.revature.models.QuizQuestion;
+import com.revature.models.dtos.QuizQuestionDTO;
 import com.revature.repositories.QuizQuestionRepo;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,15 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public QuizQuestionDTO addQuestionDTO(QuizQuestionDTO q, int quizId) {
+        QuizQuestion newQuestion = new QuizQuestion();
+        newQuestion.setQuestionText(q.getQuestion_text());
+        newQuestion.setQuizId(quizId);
+        qr.save(newQuestion);
+        return q;
     }
 
     @Override

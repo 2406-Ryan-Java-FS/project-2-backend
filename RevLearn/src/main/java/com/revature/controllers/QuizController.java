@@ -1,6 +1,12 @@
 package com.revature.controllers;
 
+import com.revature.models.QuestionChoice;
 import com.revature.models.Quiz;
+import com.revature.models.QuizQuestion;
+import com.revature.models.dtos.QuizDTO;
+import com.revature.models.dtos.QuizQuestionDTO;
+import com.revature.services.QuestionChoiceServiceImpl;
+import com.revature.services.QuizQuestionServiceImpl;
 import com.revature.services.QuizServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,9 +20,15 @@ public class QuizController {
 
     QuizServiceImpl qs;
 
+    QuizQuestionServiceImpl qqs;
+
+    QuestionChoiceServiceImpl qcs;
+
     @Autowired
-    public QuizController(QuizServiceImpl quizService){
+    public QuizController(QuizServiceImpl quizService, QuizQuestionServiceImpl qqs, QuestionChoiceServiceImpl qcs){
         this.qs = quizService;
+        this.qcs = qcs;
+        this.qqs = qqs;
     }
 
     @GetMapping("/quizzes")
@@ -34,10 +46,29 @@ public class QuizController {
         return qs.getAllQuizzesByCourse(courseId);
     }
 
+//    @PostMapping("/quizzes")
+//    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz q){
+//        Quiz createdQuiz = qs.addQuiz(q);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
+//    }
+
+    @PostMapping("/test")
+    public ResponseEntity<QuizDTO> createQuiz(@RequestBody QuizDTO q){
+        QuizDTO myQDTO= qs.testCourseId(q);
+        return ResponseEntity.status(HttpStatus.CREATED).body(myQDTO);
+    }
+
+//    alternate post with combined DTO
     @PostMapping("/quizzes")
-    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz q){
-        Quiz createdQuiz = qs.addQuiz(q);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
+    public ResponseEntity<QuizDTO> createQuizAndQuestionsAndChoices(@RequestBody QuizDTO quizDTO){
+        QuizDTO createdQuizDTO = qs.addQuiz(quizDTO);
+        for( QuizQuestionDTO qqDTO : quizDTO.getQuestions()) {
+            qqDTO = qqs.addQuestionDTO(qqDTO, 1);
+            for(QuestionChoice qc : qqDTO.getQuestion_choices()){
+                qcs.addChoice(qc);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(quizDTO);
     }
 
     @PatchMapping("/quizzes/{id}")
