@@ -3,6 +3,7 @@ package com.revature.controllers;
 import com.revature.models.QuestionChoice;
 import com.revature.models.Quiz;
 import com.revature.models.QuizQuestion;
+import com.revature.models.dtos.QuestionChoiceDTO;
 import com.revature.models.dtos.QuizDTO;
 import com.revature.models.dtos.QuizQuestionDTO;
 import com.revature.services.QuestionChoiceServiceImpl;
@@ -64,8 +65,8 @@ public class QuizController {
         QuizDTO createdQuizDTO = qs.addQuiz(quizDTO);
         for( QuizQuestionDTO qqDTO : quizDTO.getQuestions()) {
             qqDTO = qqs.addQuestionDTO(qqDTO, 1);
-            for(QuestionChoice qc : qqDTO.getQuestion_choices()){
-                qcs.addChoice(qc);
+            for(QuestionChoiceDTO qcDTO : qqDTO.getQuestion_choices()){
+                qcs.addChoiceDTO(qcDTO, 1);
             }
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(quizDTO);
