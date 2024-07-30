@@ -9,7 +9,7 @@ import lombok.Data;
 @Entity
 @Table(name = "users", schema = "project2")
 @Data
-@JsonPropertyOrder({"userId", "firstName", "lastName", "email", "password", "role", "registrationDate"})
+@JsonPropertyOrder({"userId", "firstName", "lastName", "email", "password", "role"})
 public class User {
 
     @Id
