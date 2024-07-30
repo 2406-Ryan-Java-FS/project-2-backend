@@ -29,7 +29,7 @@ public class QuizController {
         return qs.getQuizById(id);
     }
 
-    @GetMapping("/course/{courseId}/quizzes")
+    @GetMapping("/courses/{courseId}/quizzes")
     public List<Quiz> getQuizByCourseId(@PathVariable int courseId){
         return qs.getAllQuizzesByCourse(courseId);
     }
@@ -40,7 +40,7 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
     }
 
-    @PutMapping("/quizzes/{id}")
+    @PatchMapping("/quizzes/{id}")
     public ResponseEntity<Quiz> updateQuiz(@PathVariable int id, @RequestBody Quiz updateQuiz){
         updateQuiz.setQuizId(id);
         Quiz q = qs.getQuizById(id);
