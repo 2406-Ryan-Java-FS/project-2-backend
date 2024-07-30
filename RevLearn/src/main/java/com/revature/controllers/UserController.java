@@ -105,14 +105,14 @@ public class UserController {
     public ResponseEntity<Object> getUserById(@PathVariable Integer userId) {
 
         try {
-            User currentUser = userService.getUser(userId);
+            User existingUser = userService.getUser(userId);
 
-            if (currentUser.getRole().equals(Role.educator)) {
-                Educator currentEducator = educatorService.getEducator(currentUser.getUserId());
-                UserEducator dto = userService.combineUserAndEducator(currentUser, currentEducator);
+            if (existingUser.getRole().equals(Role.educator)) {
+                Educator existingEducator = educatorService.getEducator(existingUser.getUserId());
+                UserEducator dto = userService.combineUserAndEducator(existingUser, existingEducator);
                 return new ResponseEntity<>(dto, HttpStatus.OK);
             }
-            return new ResponseEntity<>(currentUser, HttpStatus.OK);
+            return new ResponseEntity<>(existingUser, HttpStatus.OK);
         } catch (CustomHttpException e) {
             return new ResponseEntity<>(e.getMessage(), e.getStatus());
         }
