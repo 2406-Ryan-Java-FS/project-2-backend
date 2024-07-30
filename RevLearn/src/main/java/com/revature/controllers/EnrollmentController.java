@@ -172,12 +172,12 @@ public class EnrollmentController {
 
             return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status));
 
-        } catch (JsonMappingException e) {
-            throw new BadRequestException("Could not complete update request");
-        } catch (JsonProcessingException e) {
-            throw new BadRequestException("Could not complete update request");
+        } catch (JsonProcessingException | BadRequestException | NullPointerException e) {
+            return ResponseEntity.badRequest().body("Could not update payment status");
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Please enter 'pending', 'completed', or 'cancelled'");
+            return ResponseEntity.badRequest().body("Please enter 'pending', 'completed', or 'cancelled'");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 
