@@ -1,6 +1,5 @@
 package com.revature.controllers;
 
-import com.revature.app.RevLearnApplication;
 import com.revature.models.User;
 import com.revature.repositories.UserRepository;
 import com.revature.services.JwtServiceImpl;
