@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import com.revature.models.Quiz;
+import com.revature.models.dtos.QuizDTO;
 import com.revature.repositories.QuizRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +26,19 @@ public class QuizServiceImpl implements QuizService{
         return qr.findByQuizId(id);
     }
 
+//    @Override
+//    public Quiz addQuiz(Quiz quiz){
+//        return qr.save(quiz);
+//    }
+
     @Override
-    public Quiz addQuiz(Quiz quiz){
-        return qr.save(quiz);
+    public Quiz addQuiz(QuizDTO quizDTO){
+        Quiz newQuiz = new Quiz();
+        newQuiz.setCourseId(quizDTO.getCourse_id());
+        newQuiz.setTitle(quizDTO.getTitle());
+        newQuiz.setTimer(quizDTO.getTimer());
+        newQuiz.setAttemptsAllowed(quizDTO.getAttempts_allowed());
+        return qr.save(newQuiz);
     }
 
     @Override
