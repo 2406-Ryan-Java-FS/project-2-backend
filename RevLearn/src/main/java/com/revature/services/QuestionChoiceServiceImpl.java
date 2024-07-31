@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import com.revature.models.QuestionChoice;
+import com.revature.models.dtos.QuestionChoiceDTO;
 import com.revature.repositories.QuestionChoiceRepo;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,16 @@ public class QuestionChoiceServiceImpl implements QuestionChoiceService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public QuestionChoiceDTO addChoiceDTO(QuestionChoiceDTO csDTO, int questionId) {
+        QuestionChoice myChoice = new QuestionChoice();
+        myChoice.setChoiceText(csDTO.getText());
+        myChoice.setCorrect(csDTO.getCorrect());
+        myChoice.setQuestionId(questionId);
+        qcr.save(myChoice);
+        return csDTO;
     }
 
     @Override
