@@ -73,7 +73,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (optionalEnrollment.isPresent())
             return optionalEnrollment.get();
         else
-            throw new BadRequestException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+            throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
     }
 
     @Override
@@ -137,12 +137,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus) {
 
-        int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
+        if(enrollmentRepository.existsById(theEnrollmentId)){
+            int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
 
-        if (rowsUpdated == 1)
-            return this.getEnrollmentById(theEnrollmentId);
-        else
-            throw new BadRequestException("Could not update Payment Status");
+            if (rowsUpdated == 1)
+                return this.getEnrollmentById(theEnrollmentId);
+            else
+                throw new BadRequestException("Could not update Payment Status");
+        } else {
+            throw new NotFoundException("Enrollment with Id: " + theEnrollmentId + " does not exist");
+        }
+
+
     }
 
     /**

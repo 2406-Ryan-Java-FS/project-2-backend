@@ -1,48 +1,286 @@
-Database Information: <br>
-For Hibernate plase use validate <br>
-Schema name is project2 <br>
-At the end of your spring.datasource.url please add /postgres?currentSchema=project2 <br>
- 
+# RevLearn
+RevLearn is a platform designed to facilitate learning and teaching by providing comprehensive features for both students and educators. The platform supports various functionalities, including account management, course enrollment, progress tracking, and payment processing. Institutions can also use the platform to create and manage courses, monitor student progress, and receive payments.
 
-Student account:  <br>
-As a student, I should be able to:  <br>
-Register as a student. <br>
-Login using email and password. <br>
-Browse and search for courses and programs by keywords, and categories. <br>
-Enroll in courses and programs. <br>
-Pay the course fee using the payment gateway. <br>
-Receive confirmation emails.  <br>
-View the course content. <br>
-Attempt quizzes assigned in the course. <br>
-Get quiz scores. <br>
-Participate in a discussion forum with other students and educators. – Nice to have <br>
-Cancel course enrollment within 5 days of course purchase. <br>
-Submit a review for the course. <br>
- <br><br>
-Educator account:  <br>
-As an educator, I should be able to:  <br>
-Register as an educator using email, password, and professional details. <br>
-Login using email and password. <br>
-Create and manage courses and program content. <br>
-Create an MCQ-based quiz for each course.  <br>
-Set a timer for the quiz. <br>
-Set the number of attempts for the quiz. <br>
-Participate in a discussion forum with the students. – Nice to have <br>
-Submit a response to the student review. <br>
+### Frontend Repository
+For the frontend code, please visit the [RevLearn Frontend Repository](https://github.com/2406-Ryan-Java-FS/project-2-frontend).
+
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [User Stories](#user-stories)
+3. [Technologies Used](#technologies-used)
+4. [Installation and Setup](#installation-and-setup)
+5. [Usage](#usage)
+6. [Project Structure](#project-structure)
+7. [SQL Schema](#sql-schema)
+
+## Project Overview
+RevLearn aims to provide a robust and user-friendly platform for educational engagement. Key features include:
+- Student and educator account management
+- Course and program browsing, enrollment, and management
+- Payment gateway integration for course fees
+- Discussion forums for interactive learning
+- Progress tracking and reporting
+- Institutional accounts for course and student management
+
+## User Stories
+### Student Account
+As a student, I should be able to:
+1. Register as a student.
+2. Login using email and password.
+3. Browse and search for courses and programs by keywords and categories.
+4. Enroll in courses and programs.
+5. Pay the course fee using the payment gateway.
+6. Receive confirmation emails.
+7. View the course content.
+8. Attempt quizzes assigned in the course.
+9. Get quiz scores.
+10. Participate in a discussion forum with other students and educators. (Nice to have)
+11. Cancel course enrollment within 5 days of course purchase.
+12. Submit a review for the course.
+Educator Account
+
+### As an educator, I should be able to:
+Register as an educator using email, password, and professional details.
+1. Login using email and password.
+2. Create and manage courses and program content.
+3. Create an MCQ-based quiz for each course.
+4. Set a timer for the quiz.
+5. Set the number of attempts for the quiz.
+6. Participate in a discussion forum with the students. (Nice to have)
+7. Submit a response to student reviews.
+
+## Technologies Used
+### Backend
+- Java
+- Spring Boot
+- Spring Data JPA
+- Spring Security
+- REST API
+
+#### Models
+- ChoiceSelection
+- Course
+- Educator
+- Enrollment
+- QuestionChoice
+- Quiz
+- QuizAttempts
+- QuizQuestion
+- SelectionId
+- User
+
+### Frontend
+- JavaScript
+- React
+- Axios
+- Bootstrap (or another CSS framework, if used)
+
+## Installation and Setup
+### Backend
+1. Clone the backend repository:
+```bash
+git clone https://github.com/2406-Ryan-Java-FS/project-2-backend.git
+```
+2. Navigate to the backend directory:
+```bash
+cd project-2-backend
+```
+3. Set up the necessary environment variables (e.g., database URL, credentials).
+4. Build the project and run the application:
+```bash
+./mvnw spring-boot:run
+```
+
+### Frontend
+1. Clone the frontend repository:
+```bash
+git clone https://github.com/2406-Ryan-Java-FS/project-2-frontend.git
+```
+2. Navigate to the frontend directory:
+```bash
+cd project-2-frontend
+```
+3. Install the required dependencies:
+```bash
+npm install
+```
+4. Start the development server:
+```bash
+npm start
+```
+
+### Usage
+Once both the backend and frontend servers are running, you can access the application via the frontend at `http://localhost:3000`. The backend API will be accessible at `http://localhost:8080/api`.
+
+## Project Structure
+### Backend
+The backend project is structured as follows:
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/revature/
+│   │       ├── app/
+│   │       ├── controllers/
+│   │       ├── exceptions/
+│   │       ├── models/
+│   │       ├── repositories/
+│   │       └── services/
+│   └── resources/
+│       └── application.properties
+└── test/
+    └── java/
+        └── com/revature/
+            ├── app/
+            ├── controllers/
+            └── services/
+```
+
+### Frontend
+The frontend project structure is as follows:
+```
+src/
+├── components/
+├── controllers/
+├── images/
+├── pages/
+├── provider/
+├── styles/
+├── App.js
+└── index.js
+```
+
+## SQL Schema
+- For Hibernate plase use validate
+- Schema name is project2
+- At the end of your spring.datasource.url please add /postgres?currentSchema=project2
+```sql
+-- Set the schema for the current session
+SET search_path TO project2;
  
-## Models
-- Users
- - Students
- - Educators
- - Admins
-Courses
-Enrollments
-Quizzes
-Quiz Questions
-Quiz Attempts
-Reviews
-Review Responses
-Discussion Threads
-Discussion Posts
- - id
- - 
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts CASCADE;
+ 
+-- Drop existing casts if they exist
+DROP CAST IF EXISTS (varchar AS user_role);
+ 
+-- Drop existing types if they exist
+DROP TYPE IF EXISTS user_role;
+DROP TYPE IF EXISTS pay_status;
+ 
+-- Create types
+CREATE TYPE user_role AS ENUM('student', 'educator');
+CREATE TYPE pay_status AS ENUM('pending', 'completed', 'cancelled');
+ 
+-- Create cast for types
+CREATE CAST (varchar AS user_role) WITH INOUT AS implicit;
+
+-- Create tables
+CREATE TABLE Users (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    role user_role NOT NULL
+);
+
+CREATE TABLE Educators (
+    educator_id INT PRIMARY KEY,
+    degree_level VARCHAR(255),
+    degree_major VARCHAR(255),
+    alma_mater VARCHAR(255),
+    year VARCHAR(255),
+    FOREIGN KEY (educator_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Courses (
+    course_id SERIAL PRIMARY KEY,
+    educator_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    price NUMERIC(10, 2),
+    img_url text DEFAULT 'https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg',
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (educator_id) REFERENCES Educators(educator_id) ON DELETE SET NULL
+);
+
+CREATE TABLE Enrollments (
+    enrollment_id SERIAL PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_status VARCHAR(255) NOT NULL,
+    enrollment_status BOOLEAN NOT NULL DEFAULT FALSE,
+    course_rating INT DEFAULT 3,
+    course_review VARCHAR(255),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE SET NULL
+);
+
+CREATE TABLE Quizzes (
+    quiz_id SERIAL PRIMARY KEY,
+    course_id INT,
+    title VARCHAR(255) NOT NULL,
+    timer INT,
+    attempts_allowed INT,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+CREATE TABLE QuizQuestions (
+    question_id SERIAL PRIMARY KEY,
+    quiz_id INT,
+    question_text TEXT NOT NULL,
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+);
+
+CREATE TABLE QuestionChoices (
+    choice_id SERIAL PRIMARY KEY,
+    question_id  INT,
+    correct BOOL,
+    text VARCHAR(255) NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id)
+);
+
+CREATE TABLE QuizAttempts (
+    attempt_id SERIAL PRIMARY KEY,
+    student_id INT,
+    quiz_id INT,
+    attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    score NUMERIC(5,2) CHECK (score <= 100),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id),
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+);
+
+CREATE TABLE ChoiceSelections (
+    choice_id INT REFERENCES QuestionChoices(choice_id) NOT NULL,
+    attempt_id INT REFERENCES QuizAttempts(attempt_id) NOT NULL,
+    PRIMARY KEY (choice_id, attempt_id)
+);
+
+-- Sample Data
+
+INSERT INTO Users (email, password, first_name, last_name, role) VALUES
+('john.doe@example.com', 'password123', 'John', 'Doe', 'student'),
+('jane.smith@example.com', 'password123', 'Jane', 'Smith', 'student'),
+('alice.johnson@example.com', 'password123', 'Alice', 'Johnson', 'educator'),
+('bob.brown@example.com', 'password123', 'Bob', 'Brown', 'educator');
+
+INSERT INTO Educators (educator_id, degree_level, degree_major, alma_mater, year) VALUES
+((SELECT user_id FROM Users WHERE email='alice.johnson@example.com'), 'PhD', 'Computer Science', 'MIT', '2015'),
+((SELECT user_id FROM Users WHERE email='bob.brown@example.com'), 'Masters', 'Mathematics', 'Harvard', '2010');
+
+INSERT INTO Courses (educator_id, title, description, category, price) VALUES
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='alice.johnson@example.com')), 'Introduction to Programming', 'A beginner course on programming.', 'Computer Science', 49.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='alice.johnson@example.com')), 'Data Structures', 'Learn about different data structures.', 'Computer Science', 79.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='bob.brown@example.com')), 'Calculus I', 'An introductory course on calculus.', 'Mathematics', 59.99),
+((SELECT educator_id FROM Educators WHERE educator_id=(SELECT user_id FROM Users WHERE email='bob.brown@example.com')), 'Statistics', 'Basic statistics concepts and techniques.', 'Mathematics', 69.99);
+
+INSERT INTO Enrollments (student_id, course_id, payment_status, enrollment_status, course_review) VALUES
+((SELECT user_id FROM Users WHERE email='john.doe@example.com'), (SELECT course_id FROM Courses WHERE title='Introduction to Programming'), 'completed', TRUE, 'Great course!'),
+((SELECT user_id FROM Users WHERE email='john.doe@example.com'), (SELECT course_id FROM Courses WHERE title='Calculus I'), 'completed', TRUE, 'Very informative.'),
+((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Data Structures'), 'completed', TRUE, 'Challenging but rewarding.'),
+((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Statistics'), 'pending', FALSE, NULL);
+```

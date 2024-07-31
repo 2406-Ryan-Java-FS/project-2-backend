@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class ChoiceSelection {
 
+    @Id
     @Column(name = "choice_id")
     private int choiceId;
 
