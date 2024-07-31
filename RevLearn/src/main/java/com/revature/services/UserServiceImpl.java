@@ -31,9 +31,7 @@ public class UserServiceImpl implements UserService {
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
-    	boolean signUpStatus = true;
-        String signUpStatusMessage = "";
-
+    	
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
         }
