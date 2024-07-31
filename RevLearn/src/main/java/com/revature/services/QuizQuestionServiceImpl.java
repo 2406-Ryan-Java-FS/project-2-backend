@@ -27,12 +27,11 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
     }
 
     @Override
-    public QuizQuestionDTO addQuestionDTO(QuizQuestionDTO q, int quizId) {
+    public QuizQuestion addQuestionDTO(QuizQuestionDTO q, int quizId) {
         QuizQuestion newQuestion = new QuizQuestion();
         newQuestion.setQuestionText(q.getQuestion_text());
         newQuestion.setQuizId(quizId);
-        qr.save(newQuestion);
-        return q;
+        return qr.save(newQuestion);
     }
 
     @Override

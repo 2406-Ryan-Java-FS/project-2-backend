@@ -32,18 +32,13 @@ public class QuizServiceImpl implements QuizService{
 //    }
 
     @Override
-    public QuizDTO addQuiz(QuizDTO quizDTO){
+    public Quiz addQuiz(QuizDTO quizDTO){
         Quiz newQuiz = new Quiz();
         newQuiz.setCourseId(quizDTO.getCourse_id());
         newQuiz.setTitle(quizDTO.getTitle());
         newQuiz.setTimer(quizDTO.getTimer());
         newQuiz.setAttemptsAllowed(quizDTO.getAttempts_allowed());
-        qr.save(newQuiz);
-        return quizDTO;
-    }
-
-    public QuizDTO testCourseId(QuizDTO quizDTO){
-        return quizDTO;
+        return qr.save(newQuiz);
     }
 
     @Override

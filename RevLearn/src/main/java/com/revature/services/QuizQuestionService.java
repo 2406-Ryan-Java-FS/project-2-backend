@@ -9,7 +9,7 @@ import java.util.List;
 public interface QuizQuestionService {
 
     public QuizQuestion addQuestion(QuizQuestion q) throws BadRequestException;
-    public QuizQuestionDTO addQuestionDTO(QuizQuestionDTO q, int quizId) throws BadRequestException;
+    public QuizQuestion addQuestionDTO(QuizQuestionDTO q, int quizId) throws BadRequestException;
     public QuizQuestion getQuestion(int id);
     public List<QuizQuestion> getAllQuestions();
     public QuizQuestion updateQuestion(QuizQuestion change);

@@ -37,9 +37,47 @@ public class QuizController {
         return qs.getAllQuizzes();
     }
 
+//    get without DTO
+//    @GetMapping("/quizzes/{id}")
+//    public Quiz getQuizById(@PathVariable int id){
+//        return qs.getQuizById(id);
+//    }
+
+//    get with DTO
     @GetMapping("/quizzes/{id}")
-    public Quiz getQuizById(@PathVariable int id){
-        return qs.getQuizById(id);
+    public QuizDTO getQuizById(@PathVariable int id){
+        Quiz myQuiz = qs.getQuizById(id);
+        QuizDTO newQuizDTO = new QuizDTO();
+        newQuizDTO.setCourse_id(myQuiz.getCourseId());
+        newQuizDTO.setTitle(myQuiz.getTitle());
+        newQuizDTO.setTimer(myQuiz.getTimer());
+        newQuizDTO.setAttempts_allowed(myQuiz.getAttemptsAllowed());
+        newQuizDTO.setOpen(myQuiz.isOpen());
+
+        List<QuizQuestion> myQuestions = qqs.getQuizQuestions(myQuiz.getQuizId());
+        QuizQuestionDTO[] quizQuestionDTOS = new QuizQuestionDTO[myQuestions.size()];
+        int counter =0;
+        for(QuizQuestion quizQuestion : myQuestions) {
+            QuizQuestionDTO quizQuestionDTO = new QuizQuestionDTO();
+            quizQuestionDTO.setQuestion_text(quizQuestion.getQuestionText());
+
+            List<QuestionChoice> questionChoices = qcs.getQuestionChoices(quizQuestion.getId());
+            QuestionChoiceDTO[] questionChoiceDTOS = new QuestionChoiceDTO[questionChoices.size()];
+            int counter2=0;
+            for(QuestionChoice questionChoice : questionChoices){
+                QuestionChoiceDTO questionChoiceDTO = new QuestionChoiceDTO();
+                questionChoiceDTO.setText(questionChoice.getChoiceText());
+                questionChoiceDTO.setCorrect(questionChoice.isCorrect());
+                questionChoiceDTOS[counter2] = questionChoiceDTO;
+                counter2++;
+            }
+            quizQuestionDTO.setQuestion_choices(questionChoiceDTOS);
+            quizQuestionDTOS[counter] = quizQuestionDTO;
+            counter++;
+        }
+        newQuizDTO.setQuestions(quizQuestionDTOS);
+
+        return newQuizDTO;
     }
 
     @GetMapping("/courses/{courseId}/quizzes")
@@ -47,26 +85,22 @@ public class QuizController {
         return qs.getAllQuizzesByCourse(courseId);
     }
 
+//    Post without DTO
 //    @PostMapping("/quizzes")
 //    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz q){
 //        Quiz createdQuiz = qs.addQuiz(q);
 //        return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
 //    }
 
-    @PostMapping("/test")
-    public ResponseEntity<QuizDTO> createQuiz(@RequestBody QuizDTO q){
-        QuizDTO myQDTO= qs.testCourseId(q);
-        return ResponseEntity.status(HttpStatus.CREATED).body(myQDTO);
-    }
 
-//    alternate post with combined DTO
+//    alternate post with combined DTO QuizDTO, QuizQuestionDTO, QuestionChoiceDTO
     @PostMapping("/quizzes")
     public ResponseEntity<QuizDTO> createQuizAndQuestionsAndChoices(@RequestBody QuizDTO quizDTO){
-        QuizDTO createdQuizDTO = qs.addQuiz(quizDTO);
+        Quiz createdQuiz = qs.addQuiz(quizDTO);
         for( QuizQuestionDTO qqDTO : quizDTO.getQuestions()) {
-            qqDTO = qqs.addQuestionDTO(qqDTO, 1);
+            QuizQuestion createdQuizQuestion = qqs.addQuestionDTO(qqDTO, createdQuiz.getQuizId());
             for(QuestionChoiceDTO qcDTO : qqDTO.getQuestion_choices()){
-                qcs.addChoiceDTO(qcDTO, 1);
+                qcs.addChoiceDTO(qcDTO, createdQuizQuestion.getId());
             }
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(quizDTO);

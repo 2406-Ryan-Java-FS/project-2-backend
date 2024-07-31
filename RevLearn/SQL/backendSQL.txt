@@ -69,6 +69,7 @@ CREATE TABLE Quizzes (
     title VARCHAR(255) NOT NULL,
     timer INT,
     attempts_allowed INT,
+    open bool,
     FOREIGN KEY (course_id) REFERENCES Courses(course_id)
 );
 
