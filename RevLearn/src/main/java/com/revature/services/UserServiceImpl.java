@@ -8,6 +8,7 @@ import com.revature.models.User;
 import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
+import com.revature.services.PasswordEncrypter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,9 @@ public class UserServiceImpl implements UserService {
             user.setRole(Role.student);
         }
 
+        String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
+        user.setPassword(encryptedPassword);
+           
         return userRepository.save(user);
     }
 
@@ -85,8 +89,9 @@ public class UserServiceImpl implements UserService {
     public Integer verifyUser(User user) {
 
         User existingUser = userRepository.findByEmail(user.getEmail());
+        String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
 
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+        if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
             return existingUser.getUserId();
         } else {
             throw new UnauthorizedException("Invalid login credentials");
