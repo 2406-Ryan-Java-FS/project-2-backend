@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.revature.exceptions.BadRequestException;
+import com.revature.models.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.exceptions.NotFoundException;
@@ -155,18 +156,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      * updates an existing item
      * 
      * @param theEnrollmentId - the id of the enrollment we want to update
-     * @param theCourseReview - the review of the course for that particular
+     * @param theReview - the review of the course for that particular
      *                        enrollment
      * @return Enrollment - the updated enrollment object
      * @throws IllegalArgumentException - if the provided parameters are invalid
      * @throws RuntimeException         - if the update fails
      */
     @Override
-    public Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview) {
-        // parameter validation
-        if (theEnrollmentId == null || theCourseReview == null || theCourseReview.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid input values");
-        }
+    public Enrollment updateEnrollmentById(Integer theEnrollmentId, Review theReview) {
 
         // check if the enrollment already exists in the database
         Optional<Enrollment> dBEnrollmentOptional = enrollmentRepository.findById(theEnrollmentId);
@@ -179,16 +176,53 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             // else get the enrollment
             Enrollment dBEnrollment = dBEnrollmentOptional.get();
 
-            // set the enrollment course review and update
-            dBEnrollment.setCourseReview(theCourseReview);
+
+            //sets courseRating and courseReview if both are present in the Review object
+            if((theReview.getCourseReview() != null) && theReview.getCourseRating() != null){
+
+                //checks if courseRating is between 1 and 5 and if courseReview is not blank
+                if(!theReview.getCourseReview().isBlank() && (theReview.getCourseRating() > 0 && theReview.getCourseRating() <6)){
+                    dBEnrollment.setCourseRating(theReview.getCourseRating());
+                    dBEnrollment.setCourseReview(theReview.getCourseReview());
+                } else {
+                    throw new BadRequestException("Invalid operation");
+                }
+            }
+
+            //sets courseRating if present in the Review object and courseReview is not present
+            else if(theReview.getCourseReview() == null && theReview.getCourseRating() != null){
+
+                //checks if value of courseRating is between 1 and 5
+                if (theReview.getCourseRating() > 0 && theReview.getCourseRating() <6){
+                    dBEnrollment.setCourseRating(theReview.getCourseRating());
+                }else {
+                    throw new BadRequestException("Invalid operation");
+                }
+            }
+
+            //sets courseReview if present in the Review object and courseRating is not present
+            else if(theReview.getCourseReview() != null && theReview.getCourseRating() == null){
+
+                //checks if courseReview is not a blank/empty string
+                if(!theReview.getCourseReview().isBlank()){
+                    dBEnrollment.setCourseReview(theReview.getCourseReview());
+                } else {
+                    throw new BadRequestException("Invalid operation");
+                }
+            }
+
+            //throws BadRequestException if both courseRating and courseReview are null
+            else {
+                throw new BadRequestException("Invalid operation");
+            }
 
             return enrollmentRepository.save(dBEnrollment);
 
         } catch (Exception e) {
             // throw new exception with original as cause
             throw new RuntimeException(
-                    String.format("Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Review: %s",
-                            theEnrollmentId, theCourseReview),
+                    String.format("Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Rating: %s\nCourse Review: %s",
+                            theEnrollmentId, theReview.getCourseRating(), theReview.getCourseReview()),
                     e);
         }
     }
