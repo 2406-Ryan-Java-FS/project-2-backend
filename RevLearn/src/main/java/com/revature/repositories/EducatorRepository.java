@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EducatorRepository extends JpaRepository<Educator, Integer> {
+
     Educator findByEducatorId(Integer educatorId);
 }
