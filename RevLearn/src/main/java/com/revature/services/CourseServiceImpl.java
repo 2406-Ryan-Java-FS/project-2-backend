@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
+import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.repositories.CourseRepository;
 
 @Service
@@ -107,6 +108,47 @@ public class CourseServiceImpl implements CourseService {
         } catch (Exception e) {
             System.err.println("Exception occurred while updating course: " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * gets all courses and educators of those courses
+     * 
+     * @return List<CourseEducatorDTO> - a list of CourseEducatorDTO objects with
+     *         the course and
+     *         educator information
+     */
+    @Override
+    public List<CourseEducatorDTO> getAllCoursesAndEducatorDetails() {
+        try {
+            List<CourseEducatorDTO> allCourseEducatorDTOs = courseRepository.findAllCoursesAndEducatorDetails();
+            return allCourseEducatorDTOs;
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching courses and educators: " + e.getMessage());
+        }
+    }
+
+    /**
+     * gets a course and the educator of that course
+     * 
+     * @param theCourseId - the id of the course that we want to fetch
+     * @return CourseEducatorDTO - a CourseEducatorDTO object with the course and
+     *         educator information
+     */
+    @Override
+    public CourseEducatorDTO getCourseAndEducatorDetail(Integer theCourseId) {
+        // check if the course exists
+        Optional<Course> dBCourse = courseRepository.findById(theCourseId);
+
+        if (dBCourse.isPresent()) {
+            CourseEducatorDTO courseEducatorDTO = courseRepository.findCourseAndEducatorDetail(theCourseId);
+            if (courseEducatorDTO.getFirstName() != null || courseEducatorDTO.getLastName() != null) {
+                return courseEducatorDTO;
+            } else {
+                throw new NotFoundException("No educator details found for the course ID: " + theCourseId);
+            }
+        } else {
+            throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);
         }
     }
 
