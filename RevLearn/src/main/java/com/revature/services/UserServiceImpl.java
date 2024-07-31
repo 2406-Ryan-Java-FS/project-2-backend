@@ -9,6 +9,7 @@ import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
 import com.revature.services.PasswordEncrypter;
+import com.revature.models.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,8 @@ public class UserServiceImpl implements UserService {
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
+    	boolean signUpStatus = true;
+        String signUpStatusMessage = "";
 
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
@@ -47,10 +50,14 @@ public class UserServiceImpl implements UserService {
             user.setRole(Role.student);
         }
 
-        String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
-        user.setPassword(encryptedPassword);
-           
-        return userRepository.save(user);
+        try {
+            // Encrypt the password and save the user
+            String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
+            user.setPassword(encryptedPassword);
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Internal error occurred during sign up", e);
+        }
     }
 
     /**
@@ -88,15 +95,19 @@ public class UserServiceImpl implements UserService {
      */
     public Integer verifyUser(User user) {
 
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
+       try {  
+    	   User existingUser = userRepository.findByEmail(user.getEmail());
+    	   String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
 
         if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
             return existingUser.getUserId();
-        } else {
-            throw new UnauthorizedException("Invalid login credentials");
         }
+        throw new UnauthorizedException("Invalid login credentials");
     }
+        catch (Exception e) {
+        throw new RuntimeException("Internal error occurred during sign up", e);
+}
+}
 
     /**
      * Merges data from User and Educator entities into a UserEducatorDTO.
