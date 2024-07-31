@@ -91,7 +91,7 @@ public class CourseController {
      * @return a response entity containing the CourseEducatorDTO if found or a NOT_FOUND exception
      *         if not found
      */
-    @GetMapping("/{theCourseId}")
+    @GetMapping("/courses/educators/details/{theCourseId}")
     public ResponseEntity<?> getCourseAndEducatorDetail(@PathVariable Integer theCourseId) {
         try 
         {
