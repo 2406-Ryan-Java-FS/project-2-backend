@@ -4,7 +4,6 @@ import java.util.List;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
-import com.revature.models.Enrollment;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
