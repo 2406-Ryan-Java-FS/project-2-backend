@@ -8,8 +8,7 @@ import com.revature.models.User;
 import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
-import com.revature.services.PasswordEncrypter;
-import com.revature.models.dtos.*;
+import com.revature.services.passutil.PasswordEncrypter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
