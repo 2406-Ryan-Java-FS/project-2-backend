@@ -4,6 +4,7 @@ import java.util.List;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
+import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 public class CourseController {
@@ -71,10 +73,41 @@ public class CourseController {
         }
     }
 
+
+    @GetMapping("/courses/educators/details")
+    public ResponseEntity<?> getAllCoursesAndEducatorDetails() {
+        try {
+            List<CourseEducatorDTO> allCourseEducatorDTOs = courseService.getAllCoursesAndEducatorDetails();
+            return ResponseEntity.ok(allCourseEducatorDTOs);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * handler to get a course and educator by the course id
+     * 
+     * @param theCourseId - the id of the course and educator details we want to retrieve
+     * @return a response entity containing the CourseEducatorDTO if found or a NOT_FOUND exception
+     *         if not found
+     */
+    @GetMapping("/{theCourseId}")
+    public ResponseEntity<?> getCourseAndEducatorDetail(@PathVariable Integer theCourseId) {
+        try 
+        {
+            CourseEducatorDTO courseEducatorDTO = courseService.getCourseAndEducatorDetail(theCourseId);
+            return ResponseEntity.ok(courseEducatorDTO);
+        } 
+        catch (NotFoundException e) 
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    
     /**
      * handler to get courses by a specific educator id
      * 
-     * @param theEducatorId
+     * @param theEducatorId - the educator id of the list of courses
      * @return a response entity containing a list of courses by a specific educator
      */
     @GetMapping("/courses/educators/{theEducatorId}")

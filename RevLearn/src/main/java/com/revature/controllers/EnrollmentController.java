@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.exceptions.BadRequestException;
@@ -56,7 +55,7 @@ public class EnrollmentController {
      *         upon failure
      */
     @PatchMapping("/enrollments/review/{theEnrollmentId}")
-    public ResponseEntity<?> updateEnrollmentById(@PathVariable("theEnrollmentIdCR") Integer theEnrollmentId,
+    public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
             @RequestBody String theCourseReview) {
         try {
             Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theCourseReview);
