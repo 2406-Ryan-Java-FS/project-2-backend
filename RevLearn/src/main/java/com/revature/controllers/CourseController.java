@@ -73,7 +73,11 @@ public class CourseController {
         }
     }
 
-
+    /**
+     * handler to get a list of courses and educators
+     * @return List<CourseEducatorDTO> - a Response entity wrapping a list of courses and educators
+     * or a not found exception
+     */
     @GetMapping("/courses/educators/details")
     public ResponseEntity<?> getAllCoursesAndEducatorDetails() {
         try {
