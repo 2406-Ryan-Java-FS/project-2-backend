@@ -3,6 +3,7 @@ package com.revature.services;
 import java.util.List;
 
 import com.revature.models.Enrollment;
+import com.revature.models.Review;
 import com.revature.models.enums.PayStatus;
 
 public interface EnrollmentService {
@@ -22,7 +23,7 @@ public interface EnrollmentService {
 
     Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus);
 
-    Enrollment updateEnrollmentById(Integer theEnrollmentId, String theCourseReview);
+    Enrollment updateEnrollmentById(Integer theEnrollmentId, Review review);
 
     Integer deleteEnrollment(Integer theEnrollmentId);
 }

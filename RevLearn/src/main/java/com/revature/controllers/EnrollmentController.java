@@ -2,6 +2,7 @@ package com.revature.controllers;
 
 import java.util.List;
 
+import com.revature.models.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,15 +51,15 @@ public class EnrollmentController {
      * 
      * @param theEnrollmentId - the id of the course that we want to update in the
      *                        database
-     * @param theCourseReview the review data that we will update in the database
+     * @param theReview the review data that we will update in the database
      * @return a response entity containing the updated course or exception messages
      *         upon failure
      */
     @PatchMapping("/enrollments/review/{theEnrollmentId}")
     public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
-            @RequestBody String theCourseReview) {
+            @RequestBody Review theReview) {
         try {
-            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theCourseReview);
+            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview);
             return ResponseEntity.ok(updatedEnrollment);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
