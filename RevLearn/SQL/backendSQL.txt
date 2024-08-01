@@ -76,7 +76,7 @@ CREATE TABLE QuizQuestions (
     question_id SERIAL PRIMARY KEY,
     quiz_id INT,
     question_text TEXT NOT NULL,
-    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuestionChoices (
@@ -84,7 +84,7 @@ CREATE TABLE QuestionChoices (
     question_id  INT,
     correct bool,
     text VARCHAR(255) NOT NULL,
-    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id)
+    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuizAttempts (
