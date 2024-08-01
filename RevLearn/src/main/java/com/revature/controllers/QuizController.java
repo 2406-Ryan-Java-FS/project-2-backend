@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = " http://localhost:3000 ")
+@CrossOrigin
 public class QuizController {
 
     QuizServiceImpl qs;
@@ -34,8 +34,8 @@ public class QuizController {
     }
 
     @GetMapping("/quizzes")
-    public List<Quiz> getAllQuizzes(){
-        return qs.getAllQuizzes();
+    public ResponseEntity<List<Quiz>> getAllQuizzes(){
+        return ResponseEntity.ok(qs.getAllQuizzes());
     }
 
 //    get with combined Quiz DTO
