@@ -3,6 +3,9 @@ package com.revature.controllers;
 import java.util.List;
 
 import com.revature.models.Review;
+import com.revature.services.KafkaConsumerService;
+import com.revature.services.KafkaProducerService;
+import org.apache.kafka.common.metrics.internals.IntGaugeSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,6 +17,7 @@ import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import com.revature.exceptions.NotFoundException;
@@ -22,6 +26,9 @@ import com.revature.exceptions.NotFoundException;
 public class EnrollmentController {
 
     EnrollmentService enrollmentService;
+
+
+
 
     @Autowired
     public EnrollmentController(EnrollmentService enrollmentService) {
@@ -37,6 +44,7 @@ public class EnrollmentController {
      *         goes wrong with the HTTP call.
      */
     @GetMapping("/enrollments")
+    @KafkaListener(topics = "response")
     public ResponseEntity<?> getAllEnrollments() {
         try {
             List<Enrollment> allEnrollments = enrollmentService.getAllEnrollments();
@@ -91,6 +99,17 @@ public class EnrollmentController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
 
+    }
+
+
+    @GetMapping("enrollments/students/{theStudentId}/courses/{theCourseId}")
+    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable("theStudentId") Integer theStudentId,
+                                                        @PathVariable("theCourseId") Integer theCourseId){
+        try{
+            return ResponseEntity.ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId));
+        } catch (NotFoundException e){
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     /**
