@@ -21,8 +21,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     EnrollmentRepository enrollmentRepository;
 
-
-
     @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
@@ -94,25 +92,36 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     /**
-     * Finds all records in the database with the specified studentId.
-     * 
-     * @param theStudentId - studentId value used as a condition to query the
-     *                     database
-     * @param user         - the user requesting the enrollments, used for
+     * Finds an enrollment record in the database based on the specified student ID
+     * and course ID.
+     *
+     * @param theStudentId the student ID used as a condition to query the database
+     * @param theCourseId  the course ID used as a condition to query the database
+     * @param user         the user requesting the enrollments, used for
      *                     authorization
-     * @return A List of all Enrollments in the database with the specified
-     *         studentId
+     * @return an Enrollment in the database with the specified student ID and
+     *         course ID
      * @throws UnauthorizedException if the user is not authorized to access the
      *                               enrollments
+     * @throws NotFoundException     if no enrollment is found
      */
     @Override
-    public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId) {
-        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId, theCourseId);
+    public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId, User user) {
+        Integer userId = user.getUserId();
 
-        if (optionalEnrollment.isPresent())
+        if (!userId.equals(theStudentId)) {
+            throw new UnauthorizedException("Invalid Authorization!");
+        }
+
+        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId,
+                theCourseId);
+
+        if (optionalEnrollment.isPresent()) {
             return optionalEnrollment.get();
-        else
-            throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");
+        } else {
+            throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: "
+                    + theCourseId + " could not be found");
+        }
     }
 
     @Override
@@ -124,9 +133,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
         return enrollmentRepository.findByStudentId(theStudentId);
     }
-
-
-
 
     /**
      * Finds all records in the database with the specified courseId.

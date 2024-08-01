@@ -14,7 +14,7 @@ public interface EnrollmentService {
 
     Enrollment getEnrollmentById(Integer theEnrollmentId, User user); // getting an enrollment object with a specific id
 
-    Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId);
+    Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId, User user);
 
     List<Enrollment> getEnrollmentByStudentId(Integer theStudentId, User user);
 

@@ -18,7 +18,6 @@ import com.revature.services.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import com.revature.exceptions.NotFoundException;
@@ -51,7 +50,6 @@ public class EnrollmentController {
      *         goes wrong with the HTTP call.
      */
     @GetMapping("/enrollments")
-    @KafkaListener(topics = "response")
     public ResponseEntity<?> getAllEnrollments() {
         try {
             List<Enrollment> allEnrollments = enrollmentService.getAllEnrollments();
@@ -115,14 +113,26 @@ public class EnrollmentController {
         }
     }
 
-
+    /**
+     * Retrieves an enrollment record based on student ID and course ID.
+     *
+     * @param theStudentId the ID of the student
+     * @param theCourseId  the ID of the course
+     * @param token        the JWT token for authorization
+     * @return a ResponseEntity containing the enrollment record or an error message
+     */
     @GetMapping("enrollments/students/{theStudentId}/courses/{theCourseId}")
-    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable("theStudentId") Integer theStudentId,
-                                                        @PathVariable("theCourseId") Integer theCourseId){
-        try{
-            return ResponseEntity.ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId));
-        } catch (NotFoundException e){
-            return ResponseEntity.status(404).body(e.getMessage());
+    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable Integer theStudentId,
+            @PathVariable Integer theCourseId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            return ResponseEntity
+                    .ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId, user));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
