@@ -1,15 +1,16 @@
-package com.revature.DTO;
+package com.revature.models.dtos;
 
 import com.revature.models.QuizQuestion;
 import lombok.Data;
 
 @Data
 public class QuizDTO {
-    private int courseId;
+    private int course_id;
     private String title;
     private int timer;
-    private int attemptsAllowed;
+    private int attempts_allowed;
     private boolean open;
+    private QuizQuestionDTO[] questions;
 }
 
 //{

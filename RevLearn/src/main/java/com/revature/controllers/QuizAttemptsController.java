@@ -15,10 +15,12 @@ import org.springframework.http.HttpStatus;
 //Local
 import com.revature.models.QuizAttempts;
 import com.revature.models.User;
+import com.revature.models.dtos.QuizAttemptsDTO;
+import com.revature.models.dtos.QuizAttemptsEditDTO;
 import com.revature.repositories.UserRepository;
 import com.revature.services.JwtServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
-import com.revature.DTO.QuizAttemptsDTO;
+import com.revature.services.UserService;
 import com.revature.exceptions.*;
 
 //-------------CRUD-----------------//
@@ -49,6 +51,8 @@ import com.revature.exceptions.*;
 
 @Validated
 @RestController
+
+//@CrossOrigin
 public class QuizAttemptsController {
 
 	@Autowired
@@ -83,12 +87,11 @@ public class QuizAttemptsController {
 		if(user.getRole().name().equals("student"))
 		{
 			// and the user is making an entry for themselves...
-			if(newEntry.getStudent_id() == user.getUserId())
-				// ... then we create an entry.
-				return attemptsServ.create(newEntry);
-			else {
+			if(newEntry.getStudent_id() != user.getUserId())
 				throw new UnauthorizedException("User doesn't match user id in new data");
-			}
+
+			// ... then we create an entry.
+			return attemptsServ.create(newEntry);
 		}
 		
 		// Otherwise, the user is an educator, who can create a QuizAttempts without restriction.			
@@ -200,6 +203,25 @@ public class QuizAttemptsController {
 		throw new UnauthorizedException("User is not an educator, abandoning getAllQuizAttemptsByStudentId.");
     }
 	
+    // Gets all QuizAttempts for a User by that User's Id.
+    // Receives a User Id to search with.
+    // - A student can view all of their own QuizAttempts.
+    // - An educator can view any QuizAttempts.
+	@GetMapping(value = "/quizAttemptsFromCourse/{course_id}")
+    public @ResponseBody List<QuizAttempts> getQuizAttemptByCourseId(@PathVariable Integer course_id, @RequestHeader(name = "Authorization") String token) 
+    		throws BadRequestException, UnauthorizedException
+    {	
+		// Extract a user from the token
+		User user = jwtServ.getUserFromToken(token);
+		
+		// if the user is an educator... then proceed.
+		if(!user.getRole().name().equals("educator"))
+			throw new UnauthorizedException("Only Educators can see all quizes by CourseId.");
+
+			
+		return attemptsServ.getAllByCourseId(course_id);
+    }
+	
 	// Retrieving all attempts for a User and Quiz
     // - "Retrieve a all of a user's attempts on a quiz".
     // Get a student id and quiz id to search with.
@@ -220,12 +242,12 @@ public class QuizAttemptsController {
 				throw new UnauthorizedException("Requested QuizAttempts does not belong to user.");
 				
 			// ...then we can retrieve the entries.
-			return attemptsServ.getAllByStudentIdAndQuizId(user_id, quiz_id);
+			return attemptsServ.getAllByStudentIdAndQuizId(quiz_id, user_id);
 		}	
 		
 		// if the user is an educator... then proceed.
 		if(user.getRole().name().equals("educator"))
-			return attemptsServ.getAllByStudentIdAndQuizId(user_id, quiz_id);
+			return attemptsServ.getAllByStudentIdAndQuizId(quiz_id, user_id);
 			
 		// otherwise, we do not recognize the user. 
 		throw new UnauthorizedException("User is not an educator, abandoning getAllQuizAttemptsByStudentId.");
@@ -243,15 +265,21 @@ public class QuizAttemptsController {
 	// - may result in exception if switching an attempt's quiz id, \
 	//   which can exceed max attempts.
     @PatchMapping(value = "/quizAttempts/{quizAttempts_id}")
-    public @ResponseBody QuizAttempts updateQuizAttemptsById(@PathVariable Integer quizAttempts_id, @RequestBody QuizAttemptsDTO newData, @RequestHeader(name = "Authorization") String token) 
+    public @ResponseBody QuizAttempts updateQuizAttemptsById(@PathVariable Integer quizAttempts_id, @RequestBody QuizAttemptsEditDTO newData, @RequestHeader(name = "Authorization") String token) 
     throws BadRequestException, UnauthorizedException, MaximumAllowedQuizAttemptsException
     {
     	// Extract a User from the token.
 		User user = jwtServ.getUserFromToken(token);
 		
+		
+		/* Security issue: students can declare their own score if score is submitted from 
+		   the front end.
+		   Solution: score should be calculated on the backend and a request to process 
+		   such a score should be commanded via an endpoint.
 		// If user is an educator...
-		if(!user.getRole().name().equals("educator"))
+		if(user.getRole().name().equals("educator"))
 			throw new UnauthorizedException("Educator level access required, abandoning updateQuizAttemptsById.");
+		*/
 
 		// ...then proceed, but keep original timestamp if there is no new one.
     	if(newData.getAttempt_date() == null)
@@ -322,11 +350,29 @@ public class QuizAttemptsController {
         return attemptsServ.deleteAllByStudentId(user_id);
     }
     
+	// Delete all QuizAttempts for a User by that User's Id
+    // Receive a User Id to search with.
+    @DeleteMapping(value = "/quizAttemptsFromCourse/{course_id}") 
+    @ResponseStatus( HttpStatus.NO_CONTENT )
+    public @ResponseBody Integer deleteQuizAttemptsByCourseId(@PathVariable Integer course_id, @RequestHeader(name = "Authorization") String token)
+    throws UnauthorizedException
+    {
+    	// Extract a User from the token.
+		User user = jwtServ.getUserFromToken(token);
+		
+		// If the user is an educator...
+		if(!user.getRole().name().equals("educator"))
+			throw new UnauthorizedException("Educator level access required, abandoning deleteQuizAttemptsByStudentId.");
+
+		// ...then proceed with deleting the QuizAttempts.
+        return attemptsServ.deleteAllByCourseId(course_id);
+    }
+    
 	// Delete all QuizAttempts for a student's quiz via QuizId and UserId
     // Receive a User Id and quiz Id to search with. note: not by path.
-    @DeleteMapping(value = "/quizAttemptsFromUserAndQuiz") 
+    @DeleteMapping(value = "/quizAttemptsFromQuizAndUser") 
     @ResponseStatus( HttpStatus.NO_CONTENT )
-    public @ResponseBody Integer deleteQuizAttemptsByQuizAndStudent(@RequestParam("userId") Integer user_id,  @RequestParam("quizId") Integer quiz_id, @RequestHeader(name = "Authorization") String token)
+    public @ResponseBody Integer deleteQuizAttemptsByQuizAndStudent(@RequestParam("quizId") Integer quiz_id,  @RequestParam("userId") Integer user_id, @RequestHeader(name = "Authorization") String token)
     throws UnauthorizedException
     {
     	// Extract a User from the token.
@@ -343,5 +389,6 @@ public class QuizAttemptsController {
     // Business
 
 	// For anything more past the comments above, Please Ask Steven Coronel
+    // note: I need to study for the upcoming assessments.
 		
 }

@@ -1,14 +1,11 @@
 package com.revature.controllers;
 
-
 import java.util.List;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
+import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
-import io.micrometer.core.ipc.http.HttpSender.Response;
-// import org.hibernate.mapping.List;
-import com.revature.services.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +15,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+
+@RestController
 public class CourseController {
 
     CourseService courseService;
@@ -30,14 +28,13 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-
     /**
      * handler to get all courses
      * 
-     * @return a response entity containing all the course 
-     */  
-    @GetMapping("/course")
-    public ResponseEntity<?> getAllCourses(){
+     * @return ResponseEntity containing a list of courses
+     */
+    @GetMapping("/courses")
+    public ResponseEntity<List<Course>> getAllCourses() {
         List<Course> allCourses = courseService.getAllCourses();
         return ResponseEntity.ok(allCourses);
     }
@@ -49,12 +46,12 @@ public class CourseController {
      * @return a response entity containing the new course or a Bad Request
      *         error message if not null entitrys are not filled out
      */
-    @PostMapping("/course")
-    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse){
-        try{
+    @PostMapping("/courses")
+    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse) {
+        try {
             Course course = courseService.addCourse(newCourse);
             return ResponseEntity.ok(course);
-        }catch (BadRequestException e){
+        } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -67,13 +64,55 @@ public class CourseController {
      *         error message if not found
      */
     @GetMapping("/courses/{theCourseId}")
-    ResponseEntity<?> getCourseByIdgetCourseById(@PathVariable Integer theCourseId) {
+    ResponseEntity<?> getCourseById(@PathVariable Integer theCourseId) {
         try {
             Course dBCourse = courseService.getCourseById(theCourseId);
             return ResponseEntity.ok(dBCourse);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+
+    @GetMapping("/courses/educators/details")
+    public ResponseEntity<?> getAllCoursesAndEducatorDetails() {
+        try {
+            List<CourseEducatorDTO> allCourseEducatorDTOs = courseService.getAllCoursesAndEducatorDetails();
+            return ResponseEntity.ok(allCourseEducatorDTOs);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * handler to get a course and educator by the course id
+     * 
+     * @param theCourseId - the id of the course and educator details we want to retrieve
+     * @return a response entity containing the CourseEducatorDTO if found or a NOT_FOUND exception
+     *         if not found
+     */
+    @GetMapping("/courses/educators/details/{theCourseId}")
+    public ResponseEntity<?> getCourseAndEducatorDetail(@PathVariable Integer theCourseId) {
+        try 
+        {
+            CourseEducatorDTO courseEducatorDTO = courseService.getCourseAndEducatorDetail(theCourseId);
+            return ResponseEntity.ok(courseEducatorDTO);
+        } 
+        catch (NotFoundException e) 
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    
+    /**
+     * handler to get courses by a specific educator id
+     * 
+     * @param theEducatorId - the educator id of the list of courses
+     * @return a response entity containing a list of courses by a specific educator
+     */
+    @GetMapping("/courses/educators/{theEducatorId}")
+    public ResponseEntity<List<Course>> getCoursesWithEducatorId(@PathVariable Integer theEducatorId) {
+        return ResponseEntity.ok(courseService.getCoursesByEducatorId(theEducatorId));
     }
 
     /**
@@ -96,9 +135,17 @@ public class CourseController {
         }
     }
 
-    @PutMapping("/courses/{id}")
+    /**
+     * handler to update a course by its course id
+     * 
+     * @param theCourseId - the id of the course that we want to update
+     * @param theCourse   - the course object that we want to update
+     * @return ResponseEntity<Course> - a course object wrapped in a Response entity
+     *         upon success or an exception upon failure
+     */
+    @PutMapping("/courses/{theCourseId}")
     public ResponseEntity<Course> updateCourseById(
-            @PathVariable("id") Integer theCourseId,
+            @PathVariable Integer theCourseId,
             @RequestBody Course theCourse) {
         try {
             Course updatedCourse = courseService.updateCourseById(theCourseId, theCourse);
