@@ -1,8 +1,8 @@
 package com.revature.controllers;
 
 import com.revature.models.*;
+import com.revature.models.dtos.Body;
 import com.revature.models.dtos.UserEducator;
-import com.revature.models.dtos.UserToken;
 import com.revature.services.JwtService;
 import com.revature.services.UserService;
 import com.revature.util.Help;
@@ -49,12 +49,12 @@ public class UserController2 {
     }
 
     @PostMapping("/users2/signout")
-    public ResponseEntity<String> signout(@RequestHeader String token) {
+    public ResponseEntity<Body> signout(@RequestHeader String token) {
         logger.info("token="+ StringUtils.truncate(token,30));
 
         User currentUser = jwtService.getUserFromToken(token);
         logger.info("currentUser="+ Help.json(currentUser,true,true));
 
-        return new ResponseEntity<>("This is not implemented in the backend", HttpStatus.OK);
+        return new ResponseEntity<>(new Body("This is not implemented in the backend"), HttpStatus.OK);
     }
 }

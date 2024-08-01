@@ -1,5 +1,6 @@
 package com.revature.services;
 
+import com.revature.controllers.UserController2;
 import com.revature.exceptions.BadRequestException;
 import com.revature.models.User;
 import io.jsonwebtoken.Claims;
@@ -7,15 +8,21 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
 public class JwtServiceImpl implements JwtService{
+
+    private static final Logger logger= LoggerFactory.getLogger(JwtServiceImpl.class);
+
     public static final long EXPIRATION = 12 * 60 * 60 * 1000;          // expiration = 12 hours
 
     @Autowired
@@ -83,8 +90,12 @@ public class JwtServiceImpl implements JwtService{
      */
     @Override
     public int verifyJwt(String token) {
+
+        //This command doesn't put "Bearer" in the key
+        //openssl rand -base64 512
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));   // create key from app.yml
-        token = token.split(" ")[1].trim();                                      //remove "Bearer" from token header
+
+        //token = token.split(" ")[1].trim(); //remove "Bearer" from token header
         Claims body;
         try {
             body = Jwts.parser()
