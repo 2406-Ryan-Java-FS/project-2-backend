@@ -4,8 +4,11 @@ import java.util.List;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
+import com.revature.models.Enrollment;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
+
+// import org.apache.kafka.common.protocol.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +19,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.kafka.annotation.KafkaHandler;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 
 @RestController
 public class CourseController {
@@ -27,6 +35,9 @@ public class CourseController {
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
+
+    @Autowired
+    private KafkaTemplate<String, Course> kafkaTemplate;
 
     /**
      * handler to get all courses
@@ -47,8 +58,15 @@ public class CourseController {
      *         error message if not null entitrys are not filled out
      */
     @PostMapping("/courses")
+    // @KafkaListener(topics = "addedCourse", groupId = "course-listeners-added")
     public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse) {
         try {
+            System.out.println("Adding course");
+            Message<Course> message = MessageBuilder
+                .withPayload(newCourse)
+                .setHeader(KafkaHeaders.TOPIC, "addCourse")
+                .build();
+            kafkaTemplate.send(message);
             Course course = courseService.addCourse(newCourse);
             return ResponseEntity.ok(course);
         } catch (BadRequestException e) {

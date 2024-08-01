@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.revature.exceptions.BadRequestException;
@@ -11,6 +13,12 @@ import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.repositories.CourseRepository;
+import org.springframework.kafka.annotation.KafkaHandler;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -20,6 +28,9 @@ public class CourseServiceImpl implements CourseService {
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
+
+    @Autowired
+    private KafkaTemplate<String, Course> kafkaTemplate;
 
     /**
      * retrieves all courses from the repository
@@ -39,11 +50,18 @@ public class CourseServiceImpl implements CourseService {
      * @return Course - the course object if the addition was successful
      */
     @Override
+    @KafkaListener(topics = "addCourse", groupId = "course-listeners-adding")
     public Course addCourse(Course newCourse) {
 
         if (newCourse.getTitle() == null) {
             throw new BadRequestException("Please give the new course a title.");
         }
+        // System.out.println("Added course");
+        //     Message<Course> message = MessageBuilder
+        //         .withPayload(newCourse)
+        //         .setHeader(KafkaHeaders.TOPIC, "addedCourse")
+        //         .build();
+        //     kafkaTemplate.send(message);
         Course dbCourse = courseRepository.save(newCourse);
         return dbCourse;
     }
@@ -56,6 +74,7 @@ public class CourseServiceImpl implements CourseService {
      * @throws NotFoundException - if the course does not exist
      */
     @Override
+    // @KafkaListener(topics = "Getting Course", groupId = "course-listeners-getting")
     public Course getCourseById(Integer theCourseId) {
 
         Optional<Course> dBCourse = courseRepository.findById(theCourseId);
