@@ -26,5 +26,5 @@ public interface EnrollmentService {
 
     Enrollment updateEnrollmentById(Integer theEnrollmentId, Review review, User user);
 
-    Integer deleteEnrollment(Integer theEnrollmentId);
+    Integer deleteEnrollment(Integer theEnrollmentId, User user);
 }

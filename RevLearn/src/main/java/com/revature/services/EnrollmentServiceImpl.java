@@ -250,10 +250,24 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      * Deletes an enrollment from the repository.
      * 
      * @param theEnrollmentId - the ID of the enrollment we want to delete
+     * @param user            - the user making the request, used for authorization
      * @return 1 upon successful deletion or 0 if nothing was deleted
+     * @throws UnauthorizedException if the user is not authorized to delete the
+     *                               enrollment
+     * @throws NotFoundException     if the enrollment to be deleted does not exist
      */
     @Override
-    public Integer deleteEnrollment(Integer theEnrollmentId) {
+    public Integer deleteEnrollment(Integer theEnrollmentId, User user) {
+        Integer userId = user.getUserId();
+
+        Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Enrollment Record with ID: " + theEnrollmentId + " could not be found"));
+
+        if (!userId.equals(enrollment.getStudentId())) {
+            throw new UnauthorizedException("Invalid Authorization!");
+        }
+
         try {
             enrollmentRepository.deleteById(theEnrollmentId);
             return 1;
@@ -262,4 +276,5 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             return 0;
         }
     }
+
 }

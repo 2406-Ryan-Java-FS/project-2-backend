@@ -257,13 +257,29 @@ public class EnrollmentController {
         }
     }
 
+    /**
+     * Deletes an enrollment by its ID.
+     * 
+     * @param theEnrollmentId - the ID of the enrollment to be deleted
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity with the result of the deletion operation
+     */
     @DeleteMapping("/enrollments/{theEnrollmentId}")
-    public ResponseEntity<Integer> deleteEnrollment(@PathVariable Integer theEnrollmentId) {
-        Integer result = enrollmentService.deleteEnrollment(theEnrollmentId);
-        if (result == 1) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(500).body(result);
+    public ResponseEntity<Integer> deleteEnrollment(@PathVariable Integer theEnrollmentId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            Integer result = enrollmentService.deleteEnrollment(theEnrollmentId, user);
+            if (result == 1) {
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            }
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(0);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
     }
 }
