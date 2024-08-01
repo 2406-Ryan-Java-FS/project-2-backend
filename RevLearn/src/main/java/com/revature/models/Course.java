@@ -21,6 +21,8 @@ import lombok.*;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
 public class Course {
 
+    public static final String IMG_URL = "https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id", updatable = false)
@@ -45,7 +47,7 @@ public class Course {
 
     @Column(name = "price", columnDefinition = "NUMERIC(10, 2)")
     @JsonProperty(value = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "img_url")
     @JsonProperty(value = "imgUrl")
