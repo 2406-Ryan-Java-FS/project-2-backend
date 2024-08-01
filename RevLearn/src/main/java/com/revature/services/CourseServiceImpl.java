@@ -1,5 +1,7 @@
 package com.revature.services;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,12 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public Course addCourse(Course newCourse) {
+
+        newCourse.setCreationDate(Timestamp.from(Instant.now()));
+
+        if(newCourse.getImgUrl() == null){
+            newCourse.setImgUrl(Course.IMG_URL);
+        }
 
         if (newCourse.getTitle() == null) {
             throw new BadRequestException("Please give the new course a title.");
