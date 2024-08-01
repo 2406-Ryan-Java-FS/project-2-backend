@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import com.revature.models.Course;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.repositories.CourseRepository;
 import org.springframework.kafka.annotation.KafkaHandler;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -51,8 +49,8 @@ public class CourseServiceImpl implements CourseService {
      * @param newCourse - the course object that we want to add to the repository
      * @return Course - the course object if the addition was successful
      */
+
     @Override
-    @KafkaListener(topics = "addCourse", groupId = "course-listeners-adding")
     public Course addCourse(Course newCourse) {
 
         newCourse.setCreationDate(Timestamp.from(Instant.now()));
@@ -64,12 +62,15 @@ public class CourseServiceImpl implements CourseService {
         if (newCourse.getTitle() == null) {
             throw new BadRequestException("Please give the new course a title.");
         }
-        // System.out.println("Added course");
-        //     Message<Course> message = MessageBuilder
-        //         .withPayload(newCourse)
-        //         .setHeader(KafkaHeaders.TOPIC, "addedCourse")
-        //         .build();
-        //     kafkaTemplate.send(message);
+
+        System.out.println("Adding course");
+
+        Message<Course> message = MessageBuilder
+            .withPayload(newCourse)
+            .setHeader(KafkaHeaders.TOPIC, "addCourse")
+            .build();
+
+        kafkaTemplate.send(message);
         Course dbCourse = courseRepository.save(newCourse);
         return dbCourse;
     }

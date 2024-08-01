@@ -3,8 +3,8 @@ package com.revature.controllers;
 import java.util.List;
 
 import com.revature.models.Review;
-import com.revature.services.KafkaConsumerService;
-import com.revature.services.KafkaProducerService;
+// import com.revature.services.KafkaConsumerService;
+// import com.revature.services.KafkaProducerService;
 import org.apache.kafka.common.metrics.internals.IntGaugeSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
