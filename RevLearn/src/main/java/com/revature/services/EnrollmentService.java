@@ -13,6 +13,8 @@ public interface EnrollmentService {
 
     Enrollment getEnrollmentById(Integer theEnrollmentId); // getting an enrollment object with a specific id
 
+    Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId);
+
     List<Enrollment> getEnrollmentByStudentId(Integer theStudentId);
 
     List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId);
