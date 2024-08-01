@@ -18,6 +18,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     EnrollmentRepository enrollmentRepository;
 
+
+
     @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
@@ -78,9 +80,22 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
+    public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId) {
+        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId, theCourseId);
+
+        if (optionalEnrollment.isPresent())
+            return optionalEnrollment.get();
+        else
+            throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");
+    }
+
+    @Override
     public List<Enrollment> getEnrollmentByStudentId(Integer theStudentId) {
         return enrollmentRepository.findByStudentId(theStudentId);
     }
+
+
+
 
     /**
      * Service method that will find all records in the database with the specified
