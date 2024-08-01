@@ -4,16 +4,17 @@ import java.util.List;
 
 import com.revature.models.Enrollment;
 import com.revature.models.Review;
+import com.revature.models.User;
 import com.revature.models.enums.PayStatus;
 
 public interface EnrollmentService {
     List<Enrollment> getAllEnrollments();
 
-    Enrollment registerEnrollment(Enrollment newEnrollment);
+    Enrollment registerEnrollment(Enrollment newEnrollment, User user);
 
-    Enrollment getEnrollmentById(Integer theEnrollmentId); // getting an enrollment object with a specific id
+    Enrollment getEnrollmentById(Integer theEnrollmentId, User user); // getting an enrollment object with a specific id
 
-    List<Enrollment> getEnrollmentByStudentId(Integer theStudentId);
+    List<Enrollment> getEnrollmentByStudentId(Integer theStudentId, User user);
 
     List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId);
 
@@ -21,9 +22,9 @@ public interface EnrollmentService {
 
     List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus);
 
-    Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus);
+    Enrollment updateEnrollmentById(Integer theEnrollmentId, PayStatus thePaymentStatus, User user);
 
-    Enrollment updateEnrollmentById(Integer theEnrollmentId, Review review);
+    Enrollment updateEnrollmentById(Integer theEnrollmentId, Review review, User user);
 
     Integer deleteEnrollment(Integer theEnrollmentId);
 }
