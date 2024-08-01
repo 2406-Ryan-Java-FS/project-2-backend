@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -167,7 +167,7 @@ public class CourseController {
      * @return ResponseEntity<Course> - a course object wrapped in a Response entity
      *         upon success or an exception upon failure
      */
-    @PutMapping("/courses/{theCourseId}")
+    @PatchMapping("/courses/{theCourseId}")
     public ResponseEntity<Course> updateCourseById(
             @PathVariable Integer theCourseId,
             @RequestBody Course theCourse, @RequestHeader(name = "Authorization") String token) {
