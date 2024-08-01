@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
      * @throws ConflictException if there's already a User with the given email.
      */
     public User addUser(User user) {
-    	
+
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
         }
@@ -92,19 +92,18 @@ public class UserServiceImpl implements UserService {
      */
     public Integer verifyUser(User user) {
 
-       try {  
-    	   User existingUser = userRepository.findByEmail(user.getEmail());
-    	   String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
+        try {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
 
-        if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
-            return existingUser.getUserId();
+            if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
+                return existingUser.getUserId();
+            }
+            throw new UnauthorizedException("Invalid login credentials");
+        } catch (Exception e) {
+            throw new RuntimeException("Internal error occurred during sign up", e);
         }
-        throw new UnauthorizedException("Invalid login credentials");
     }
-        catch (Exception e) {
-        throw new RuntimeException("Internal error occurred during sign up", e);
-}
-}
 
     /**
      * Merges data from User and Educator entities into a UserEducatorDTO.
