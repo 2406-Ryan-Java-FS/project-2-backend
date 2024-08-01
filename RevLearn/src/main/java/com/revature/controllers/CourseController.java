@@ -6,9 +6,14 @@ import com.revature.exceptions.NotFoundException;
 import com.revature.models.Course;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
+import com.revature.services.KafkaProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +29,9 @@ public class CourseController {
     CourseService courseService;
 
     @Autowired
+    KafkaProducerService kafkaProducerService;
+
+    @Autowired
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
@@ -35,6 +43,9 @@ public class CourseController {
      */
     @GetMapping("/courses")
     public ResponseEntity<List<Course>> getAllCourses() {
+        kafkaProducerService.sendRequestMessage("Requesting list of all courses");
+
+
         List<Course> allCourses = courseService.getAllCourses();
         return ResponseEntity.ok(allCourses);
     }
@@ -49,6 +60,7 @@ public class CourseController {
     @PostMapping("/courses")
     public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse) {
         try {
+            kafkaProducerService.sendRequestMessage("Creating new Course");
             Course course = courseService.addCourse(newCourse);
             return ResponseEntity.ok(course);
         } catch (BadRequestException e) {
@@ -66,6 +78,8 @@ public class CourseController {
     @GetMapping("/courses/{theCourseId}")
     ResponseEntity<?> getCourseById(@PathVariable Integer theCourseId) {
         try {
+
+            kafkaProducerService.sendRequestMessage("Getting course with ID: " + theCourseId);
             Course dBCourse = courseService.getCourseById(theCourseId);
             return ResponseEntity.ok(dBCourse);
         } catch (NotFoundException e) {
@@ -81,6 +95,7 @@ public class CourseController {
     @GetMapping("/courses/educators/details")
     public ResponseEntity<?> getAllCoursesAndEducatorDetails() {
         try {
+            kafkaProducerService.sendRequestMessage("Getting a list of all courses with educator details");
             List<CourseEducatorDTO> allCourseEducatorDTOs = courseService.getAllCoursesAndEducatorDetails();
             return ResponseEntity.ok(allCourseEducatorDTOs);
         } catch (RuntimeException e) {
@@ -99,6 +114,7 @@ public class CourseController {
     public ResponseEntity<?> getCourseAndEducatorDetail(@PathVariable Integer theCourseId) {
         try 
         {
+            kafkaProducerService.sendRequestMessage("Getting a course with educator details with ID: " + theCourseId);
             CourseEducatorDTO courseEducatorDTO = courseService.getCourseAndEducatorDetail(theCourseId);
             return ResponseEntity.ok(courseEducatorDTO);
         } 
@@ -116,6 +132,7 @@ public class CourseController {
      */
     @GetMapping("/courses/educators/{theEducatorId}")
     public ResponseEntity<List<Course>> getCoursesWithEducatorId(@PathVariable Integer theEducatorId) {
+        kafkaProducerService.sendRequestMessage("Getting all courses with Educator ID: " + theEducatorId);
         return ResponseEntity.ok(courseService.getCoursesByEducatorId(theEducatorId));
     }
 
@@ -129,6 +146,9 @@ public class CourseController {
      */
     @DeleteMapping("/courses/{theCourseId}")
     public ResponseEntity<?> deleteCourseById(@PathVariable Integer theCourseId) {
+
+        kafkaProducerService.sendRequestMessage("Deleting course with ID: " + theCourseId);
+
         Integer rowsAffected = courseService.deleteCourseById(theCourseId);
 
         if (rowsAffected == 0) {
@@ -151,6 +171,9 @@ public class CourseController {
     public ResponseEntity<Course> updateCourseById(
             @PathVariable Integer theCourseId,
             @RequestBody Course theCourse) {
+
+        kafkaProducerService.sendRequestMessage("Updating course with ID: " + theCourseId);
+
         try {
             Course updatedCourse = courseService.updateCourseById(theCourseId, theCourse);
             if (updatedCourse != null) {

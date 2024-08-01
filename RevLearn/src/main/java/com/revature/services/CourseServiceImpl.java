@@ -19,6 +19,9 @@ public class CourseServiceImpl implements CourseService {
     CourseRepository courseRepository;
 
     @Autowired
+    KafkaProducerService kafkaProducerService;
+
+    @Autowired
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
@@ -31,6 +34,9 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<Course> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
+
+        kafkaProducerService.sendResponseMessage(courses.toString());
+
         return courses;
     }
 
@@ -50,9 +56,12 @@ public class CourseServiceImpl implements CourseService {
         }
 
         if (newCourse.getTitle() == null) {
+            kafkaProducerService.sendResponseMessage("Request Failed. Course had no title");
             throw new BadRequestException("Please give the new course a title.");
         }
         Course dbCourse = courseRepository.save(newCourse);
+
+        kafkaProducerService.sendResponseMessage(dbCourse.toString());
         return dbCourse;
     }
 
@@ -69,8 +78,10 @@ public class CourseServiceImpl implements CourseService {
         Optional<Course> dBCourse = courseRepository.findById(theCourseId);
 
         if (dBCourse.isPresent()) {
+            kafkaProducerService.sendResponseMessage(dBCourse.get().toString());
             return dBCourse.get();
         } else {
+            kafkaProducerService.sendResponseMessage("Course with ID: " + theCourseId + " does not exist");
             throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);
         }
     }
@@ -86,11 +97,15 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public List<Course> getCoursesByEducatorId(Integer theEducatorId) {
-        return courseRepository.findByEducatorId(theEducatorId);
+
+        List<Course> courses = courseRepository.findByEducatorId(theEducatorId);
+
+        kafkaProducerService.sendResponseMessage(courses.toString());
+        return courses;
     }
 
     /**
-     * updates a course by it's id
+     * updates a course by its id
      * 
      * @param theCourseId - the id of the course that we want to update
      * @param theCourse   - the course object that we want to update
@@ -100,6 +115,7 @@ public class CourseServiceImpl implements CourseService {
     public Course updateCourseById(Integer theCourseId, Course theCourse) {
         try {
             if (!courseRepository.existsById(theCourse.getEducatorId())) {
+                kafkaProducerService.sendResponseMessage("Educator ID " + theCourse.getEducatorId() + " does not exist.");
                 throw new IllegalArgumentException("Educator ID " + theCourse.getEducatorId() + " does not exist.");
             }
             Optional<Course> optionalCourse = courseRepository.findById(theCourseId);
@@ -110,10 +126,13 @@ public class CourseServiceImpl implements CourseService {
                 existingCourse.setCategory(theCourse.getCategory());
                 existingCourse.setPrice(theCourse.getPrice());
                 existingCourse.setEducatorId(theCourse.getEducatorId());
+
+                kafkaProducerService.sendResponseMessage(existingCourse.toString());
                 return courseRepository.save(existingCourse);
             }
             return null;
         } catch (Exception e) {
+            kafkaProducerService.sendResponseMessage("Exception occurred while updating course: " + e.getMessage());
             System.err.println("Exception occurred while updating course: " + e.getMessage());
             return null;
         }
@@ -130,8 +149,10 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseEducatorDTO> getAllCoursesAndEducatorDetails() {
         try {
             List<CourseEducatorDTO> allCourseEducatorDTOs = courseRepository.findAllCoursesAndEducatorDetails();
+            kafkaProducerService.sendResponseMessage(allCourseEducatorDTOs.toString());
             return allCourseEducatorDTOs;
         } catch (Exception e) {
+            kafkaProducerService.sendResponseMessage("Error fetching courses and educators: " + e.getMessage());
             throw new RuntimeException("Error fetching courses and educators: " + e.getMessage());
         }
     }
@@ -151,11 +172,14 @@ public class CourseServiceImpl implements CourseService {
         if (dBCourse.isPresent()) {
             CourseEducatorDTO courseEducatorDTO = courseRepository.findCourseAndEducatorDetail(theCourseId);
             if (courseEducatorDTO.getFirstName() != null || courseEducatorDTO.getLastName() != null) {
+                kafkaProducerService.sendResponseMessage(courseEducatorDTO.toString());
                 return courseEducatorDTO;
             } else {
+                kafkaProducerService.sendResponseMessage("No educator details found for the course ID: " + theCourseId);
                 throw new NotFoundException("No educator details found for the course ID: " + theCourseId);
             }
         } else {
+            kafkaProducerService.sendResponseMessage("Course does not exist. Please check the course ID: " + theCourseId);
             throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);
         }
     }
@@ -171,8 +195,10 @@ public class CourseServiceImpl implements CourseService {
         // if the account doesn't exist
         if (courseRepository.findById(theCourseId).isPresent()) {
             courseRepository.deleteById(theCourseId);
+            kafkaProducerService.sendResponseMessage("Courses Deleted: 1");
             return 1;
         } else {
+            kafkaProducerService.sendResponseMessage("Courses Deleted: 0");
             return 0;
         }
     }
