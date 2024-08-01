@@ -2,6 +2,7 @@ package com.revature.services;
 
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
+import com.revature.exceptions.InternalServerErrorException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Educator;
 import com.revature.models.User;
@@ -11,6 +12,8 @@ import com.revature.repositories.UserRepository;
 import com.revature.services.passutil.PasswordEncrypter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -28,6 +31,7 @@ public class UserServiceImpl implements UserService {
      * @param user The User to be added.
      * @return The persisted User including its newly assigned userId.
      * @throws ConflictException if there's already a User with the given email.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public User addUser(User user) {
 
@@ -52,8 +56,8 @@ public class UserServiceImpl implements UserService {
             String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
             user.setPassword(encryptedPassword);
             return userRepository.save(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Internal error occurred during sign up", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InternalServerErrorException("Password encryption error, please try again.");
         }
     }
 
@@ -89,6 +93,7 @@ public class UserServiceImpl implements UserService {
      * @param user User object containing the email and password to verify.
      * @return The userId of the verified User.
      * @throws UnauthorizedException if the email and/or password are invalid.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public Integer verifyUser(User user) {
 
@@ -100,8 +105,8 @@ public class UserServiceImpl implements UserService {
                 return existingUser.getUserId();
             }
             throw new UnauthorizedException("Invalid login credentials");
-        } catch (Exception e) {
-            throw new RuntimeException("Internal error occurred during sign up", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InternalServerErrorException("Password encryption error, please try again.");
         }
     }
 
