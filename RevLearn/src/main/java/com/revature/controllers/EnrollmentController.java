@@ -3,9 +3,9 @@ package com.revature.controllers;
 import java.util.List;
 
 import com.revature.models.Review;
-// import com.revature.services.KafkaConsumerService;
-// import com.revature.services.KafkaProducerService;
-import org.apache.kafka.common.metrics.internals.IntGaugeSuite;
+import com.revature.services.KafkaConsumerService;
+import com.revature.services.KafkaProducerService;
+// import org.apache.kafka.common.metrics.internals.IntGaugeSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +27,8 @@ public class EnrollmentController {
 
     EnrollmentService enrollmentService;
 
-
+    @Autowired
+    KafkaProducerService kafkaProducerService;
 
 
     @Autowired
@@ -44,9 +45,9 @@ public class EnrollmentController {
      *         goes wrong with the HTTP call.
      */
     @GetMapping("/enrollments")
-    @KafkaListener(topics = "response")
     public ResponseEntity<?> getAllEnrollments() {
         try {
+            kafkaProducerService.sendRequestMessage("Getting all enrollments");
             List<Enrollment> allEnrollments = enrollmentService.getAllEnrollments();
             return ResponseEntity.ok(allEnrollments);
         } catch (RuntimeException e) {
@@ -67,6 +68,7 @@ public class EnrollmentController {
     public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
             @RequestBody Review theReview) {
         try {
+            kafkaProducerService.sendRequestMessage("Updating enrollment with id: " + theEnrollmentId);
             Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview);
             return ResponseEntity.ok(updatedEnrollment);
         } catch (IllegalArgumentException e) {
@@ -92,6 +94,7 @@ public class EnrollmentController {
     public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentId") Integer theEnrollmentId) {
 
         try {
+            kafkaProducerService.sendRequestMessage("Getting enrollment with id: " + theEnrollmentId);
             Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId);
 
             return ResponseEntity.ok(theEnrollment);
@@ -106,6 +109,7 @@ public class EnrollmentController {
     public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable("theStudentId") Integer theStudentId,
                                                         @PathVariable("theCourseId") Integer theCourseId){
         try{
+            kafkaProducerService.sendRequestMessage("Getting enrollment with student id: " + theStudentId + " and course id: " + theCourseId);
             return ResponseEntity.ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId));
         } catch (NotFoundException e){
             return ResponseEntity.status(404).body(e.getMessage());
@@ -122,6 +126,7 @@ public class EnrollmentController {
      */
     @GetMapping("/enrollments/courses/{theCourseId}")
     public ResponseEntity<List<Enrollment>> getEnrollmentsByCourseId(@PathVariable("theCourseId") Integer theCourseId) {
+        kafkaProducerService.sendRequestMessage("Getting enrollments with course id: " + theCourseId);
         return ResponseEntity.ok(enrollmentService.getEnrollmentsByCourseId(theCourseId));
     }
 
@@ -141,6 +146,7 @@ public class EnrollmentController {
             @PathVariable("thePaymentStatus") String status) {
         try {
             PayStatus payStatus = PayStatus.valueOf(status);
+            kafkaProducerService.sendRequestMessage("Getting enrollments with student id: " + theStudentId + " and payment status: " + status);
 
             return ResponseEntity
                     .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus));
@@ -161,6 +167,7 @@ public class EnrollmentController {
     public ResponseEntity<?> getEnrollmentsWithPayStatus(@PathVariable("thePaymentStatus") String status) {
         try {
             PayStatus payStatus = PayStatus.valueOf(status);
+            kafkaProducerService.sendRequestMessage("Getting enrollments with payment status: " + status);
 
             return ResponseEntity.ok(enrollmentService.getEnrollmentsByPaymentStatus(payStatus));
         } catch (IllegalArgumentException e) {
@@ -188,6 +195,7 @@ public class EnrollmentController {
             String payStatusString = jsonNode.get("payStatus").asText();
 
             PayStatus status = PayStatus.valueOf(payStatusString);
+            kafkaProducerService.sendRequestMessage("Updating payment status for enrollment with id: " + theEnrollmentId + " to: " + payStatusString);
 
             return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status));
 
@@ -204,6 +212,7 @@ public class EnrollmentController {
     public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment) {
         try {
             Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment);
+            kafkaProducerService.sendRequestMessage("Adding enrollment for student with id: " + newEnrollment.getStudentId() + " and course with id: " + newEnrollment.getCourseId());  
             return ResponseEntity.ok(enrollment);
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -214,6 +223,7 @@ public class EnrollmentController {
     public ResponseEntity<List<Enrollment>> getEnrollmentByStudentId(@PathVariable("studentId") Integer theStudentId) {
         List<Enrollment> enrollments = enrollmentService.getEnrollmentByStudentId(theStudentId);
         if (enrollments != null && !enrollments.isEmpty()) {
+            kafkaProducerService.sendRequestMessage("Getting enrollments for student with id: " + theStudentId);
             return ResponseEntity.ok(enrollments);
         }
         return ResponseEntity.notFound().build();
@@ -223,6 +233,7 @@ public class EnrollmentController {
     public ResponseEntity<Integer> deleteEnrollment(@PathVariable("id") Integer theEnrollmentId) {
         Integer result = enrollmentService.deleteEnrollment(theEnrollmentId);
         if (result == 1) {
+            kafkaProducerService.sendRequestMessage("Deleting enrollment with id: " + theEnrollmentId);
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(500).body(result);

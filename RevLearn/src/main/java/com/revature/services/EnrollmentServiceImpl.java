@@ -18,7 +18,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     EnrollmentRepository enrollmentRepository;
 
-
+    @Autowired
+    KafkaProducerService kafkaProducerService;
 
     @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
@@ -34,9 +35,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<Enrollment> getAllEnrollments() {
         try {
+            kafkaProducerService.sendRequestMessage("Getting all enrollments");
             List<Enrollment> allEnrollments = enrollmentRepository.findAll();
             return allEnrollments;
         } catch (Exception e) {
+            kafkaProducerService.sendResponseMessage("Request failed: " + e.getMessage());
             throw new RuntimeException("Error fetching enrollments: " + e.getMessage());
         }
     }
@@ -52,10 +55,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public Enrollment registerEnrollment(Enrollment newEnrollment) {
 
         if (newEnrollment.getPaymentStatus() == null) {
+            kafkaProducerService.sendRequestMessage("Payment status is null");
             throw new BadRequestException(
                     "Please enter either 'pending', 'completed', or 'conselled' for payment status.");
         }
 
+        kafkaProducerService.sendRequestMessage("Registering new enrollment");
         Enrollment dbEnrollment = enrollmentRepository.save(newEnrollment);
         return dbEnrollment;
 
@@ -73,24 +78,33 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public Enrollment getEnrollmentById(Integer theEnrollmentId) {
         Optional<Enrollment> optionalEnrollment = enrollmentRepository.findById(theEnrollmentId);
 
-        if (optionalEnrollment.isPresent())
+        if (optionalEnrollment.isPresent()){
+            kafkaProducerService.sendRequestMessage(optionalEnrollment.get().toString());
             return optionalEnrollment.get();
-        else
+        }
+        else{
+            kafkaProducerService.sendRequestMessage("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
             throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+        }
     }
 
     @Override
     public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId) {
         Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId, theCourseId);
 
-        if (optionalEnrollment.isPresent())
+        if (optionalEnrollment.isPresent()){
+            kafkaProducerService.sendRequestMessage(optionalEnrollment.get().toString());
             return optionalEnrollment.get();
-        else
+        }
+        else{
+            kafkaProducerService.sendRequestMessage("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");  
             throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");
+        }
     }
 
     @Override
     public List<Enrollment> getEnrollmentByStudentId(Integer theStudentId) {
+        kafkaProducerService.sendRequestMessage("Getting all enrollments for student with ID: " + theStudentId);
         return enrollmentRepository.findByStudentId(theStudentId);
     }
 
@@ -106,6 +120,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId) {
+        kafkaProducerService.sendRequestMessage("Getting all enrollments for course with ID: " + theCourseId);
         return enrollmentRepository.findByCourseId(theCourseId);
     }
 
@@ -123,6 +138,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId,
             PayStatus thePaymentStatus) {
+                kafkaProducerService.sendRequestMessage("Getting all enrollments for student with ID: " + theStudentId + " and payment status: " + thePaymentStatus);
         return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
     }
 
@@ -137,6 +153,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus) {
+        kafkaProducerService.sendRequestMessage("Getting all enrollments with payment status: " + thePaymentStatus);
         return enrollmentRepository.findByPaymentStatus(thePaymentStatus);
     }
 
@@ -156,10 +173,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if(enrollmentRepository.existsById(theEnrollmentId)){
             int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
 
-            if (rowsUpdated == 1)
+            if (rowsUpdated == 1){
+                kafkaProducerService.sendRequestMessage("Payment Status updated to: " + thePaymentStatus + " for Enrollment with ID: " + theEnrollmentId);
                 return this.getEnrollmentById(theEnrollmentId);
-            else
+            }
+            else{
+                kafkaProducerService.sendRequestMessage("Could not update Payment Status");
                 throw new BadRequestException("Could not update Payment Status");
+            }
         } else {
             throw new NotFoundException("Enrollment with Id: " + theEnrollmentId + " does not exist");
         }
@@ -184,6 +205,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Optional<Enrollment> dBEnrollmentOptional = enrollmentRepository.findById(theEnrollmentId);
 
         if (!dBEnrollmentOptional.isPresent()) {
+            kafkaProducerService.sendRequestMessage("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
             throw new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
         }
 
@@ -200,6 +222,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                     dBEnrollment.setCourseRating(theReview.getCourseRating());
                     dBEnrollment.setCourseReview(theReview.getCourseReview());
                 } else {
+                    kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
             }
@@ -211,6 +234,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 if (theReview.getCourseRating() > 0 && theReview.getCourseRating() <6){
                     dBEnrollment.setCourseRating(theReview.getCourseRating());
                 }else {
+                    kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
             }
@@ -222,19 +246,23 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 if(!theReview.getCourseReview().isBlank()){
                     dBEnrollment.setCourseReview(theReview.getCourseReview());
                 } else {
+                    kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
             }
 
             //throws BadRequestException if both courseRating and courseReview are null
             else {
+                kafkaProducerService.sendRequestMessage("Invalid operation");
                 throw new BadRequestException("Invalid operation");
             }
+            kafkaProducerService.sendRequestMessage("Enrollment updated: " + dBEnrollment.toString());
 
             return enrollmentRepository.save(dBEnrollment);
 
         } catch (Exception e) {
             // throw new exception with original as cause
+            kafkaProducerService.sendRequestMessage("Cannot update. Please check inputted values.");
             throw new RuntimeException(
                     String.format("Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Rating: %s\nCourse Review: %s",
                             theEnrollmentId, theReview.getCourseRating(), theReview.getCourseReview()),
@@ -251,8 +279,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public Integer deleteEnrollment(Integer theEnrollmentId) {
         try {
             enrollmentRepository.deleteById(theEnrollmentId);
+            kafkaProducerService.sendRequestMessage("Enrollment deleted: " + theEnrollmentId);
             return 1;
         } catch (Exception e) {
+            kafkaProducerService.sendRequestMessage("Exception occurred while deleting enrollment: " + e.getMessage());
             System.err.println("Exception occurred while deleting enrollment: " + e.getMessage());
             return 0;
         }
