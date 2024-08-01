@@ -1,5 +1,7 @@
 package com.revature.services;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +52,12 @@ public class CourseServiceImpl implements CourseService {
         if (!userId.equals(newCourse.getEducatorId())) {
             throw new UnauthorizedException("You are not authorized to add a course for another educator.");
         }
+        newCourse.setCreationDate(Timestamp.from(Instant.now()));
+
+        if(newCourse.getImgUrl() == null){
+            newCourse.setImgUrl(Course.IMG_URL);
+        }
+
         if (newCourse.getTitle() == null || newCourse.getTitle().isBlank()) {
             throw new BadRequestException("Please give the new course a title.");
         }

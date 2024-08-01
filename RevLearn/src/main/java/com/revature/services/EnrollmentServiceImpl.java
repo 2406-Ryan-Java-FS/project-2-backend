@@ -1,6 +1,7 @@
 package com.revature.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.revature.exceptions.BadRequestException;
 import com.revature.models.Review;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 public class EnrollmentServiceImpl implements EnrollmentService {
 
     EnrollmentRepository enrollmentRepository;
+
+
 
     @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
@@ -103,6 +106,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      *                               enrollments
      */
     @Override
+    public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId) {
+        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId, theCourseId);
+
+        if (optionalEnrollment.isPresent())
+            return optionalEnrollment.get();
+        else
+            throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");
+    }
+
+    @Override
     public List<Enrollment> getEnrollmentByStudentId(Integer theStudentId, User user) {
         Integer userId = user.getUserId();
 
@@ -111,6 +124,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
         return enrollmentRepository.findByStudentId(theStudentId);
     }
+
+
+
 
     /**
      * Finds all records in the database with the specified courseId.

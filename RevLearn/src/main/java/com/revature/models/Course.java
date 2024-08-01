@@ -21,6 +21,8 @@ import lombok.*;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
 public class Course {
 
+    public static final String IMG_URL = "https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id", updatable = false)

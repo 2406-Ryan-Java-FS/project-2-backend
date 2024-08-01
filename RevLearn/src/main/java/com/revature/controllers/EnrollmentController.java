@@ -18,6 +18,7 @@ import com.revature.services.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import com.revature.exceptions.NotFoundException;
@@ -50,6 +51,7 @@ public class EnrollmentController {
      *         goes wrong with the HTTP call.
      */
     @GetMapping("/enrollments")
+    @KafkaListener(topics = "response")
     public ResponseEntity<?> getAllEnrollments() {
         try {
             List<Enrollment> allEnrollments = enrollmentService.getAllEnrollments();
@@ -110,6 +112,17 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("enrollments/students/{theStudentId}/courses/{theCourseId}")
+    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable("theStudentId") Integer theStudentId,
+                                                        @PathVariable("theCourseId") Integer theCourseId){
+        try{
+            return ResponseEntity.ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId));
+        } catch (NotFoundException e){
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 
