@@ -83,12 +83,19 @@ public class CourseServiceImpl implements CourseService {
      * @throws NotFoundException - if the course does not exist
      */
     @Override
-    // @KafkaListener(topics = "Getting Course", groupId = "course-listeners-getting")
     public Course getCourseById(Integer theCourseId) {
 
         Optional<Course> dBCourse = courseRepository.findById(theCourseId);
 
+        System.out.println("Looking for course");
+
         if (dBCourse.isPresent()) {
+            Message<Course> message = MessageBuilder
+            .withPayload(dBCourse.get())
+            .setHeader(KafkaHeaders.TOPIC, "findCourse")
+            .build();
+
+            kafkaTemplate.send(message);
             return dBCourse.get();
         } else {
             throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);

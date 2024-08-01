@@ -23,5 +23,12 @@ public class KafkaConsumerService{
     @KafkaListener(topics = "addCourse", groupId = "course-listeners-adding")
     public void listenForNewCourses(Course course){
         System.out.println("Received message: " + course);
+        System.out.println("Added course");
+    }
+
+    @KafkaListener(topics = "findCourse", groupId = "course-listeners-adding")
+    public void listenForFindCourses(Course course){
+        System.out.println("Received message: " + course);
+        System.out.println("Found Course");
     }
 }
