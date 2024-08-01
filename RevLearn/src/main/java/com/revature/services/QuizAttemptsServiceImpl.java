@@ -26,45 +26,85 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 	@Autowired
 	QuizRepository quizRepo;
 	
-	///////-------Basic CRUD--------///////
+	
+	////////////////////////////
+	//---------Create---------//
+	////////////////////////////
 	
 	// Create an entry
 	public QuizAttempts create(QuizAttemptsDTO newDTOEntry) 
-			throws com.revature.exceptions.BadRequestException
+			throws BadRequestException, MaximumAllowedQuizAttemptsException
 	{		
+		// Check if another entry is allowed...
+		if(!isQuizAttemptsAllowed(newDTOEntry.getQuiz_id(), newDTOEntry.getStudent_id()))
+			throw new MaximumAllowedQuizAttemptsException("You do not have remaining chances to attempt this quiz.");
+		
 		QuizAttempts newEntity = verifyFields(newDTOEntry, 0);
 		
 		return attemptsRepo.save(newEntity);
 	}
-
+	
+	////////////////////////////
+	//--------Retrieve--------//
+	////////////////////////////
+	
 	// Get all entries
 	public List<QuizAttempts> getAll() 
 	{
-		
 		return attemptsRepo.findAll();
 	}
-
-	// Get all entries by id
+	
+	// Get an entry by its id
 	public QuizAttempts getById(int quizAttempts_id)
-		throws BadRequestException
+		throws BadRequestException 
 	{
-
-		if(!attemptsRepo.existsById(quizAttempts_id))
+			if(!attemptsRepo.existsById(quizAttempts_id))
 			throw new BadRequestException("QuizAttemptsService getById - entry with given id doesn't exist.");
 		return attemptsRepo.findById(quizAttempts_id).get();
 	}
-
+	
+	// Get all entries for a quiz
+	public List<QuizAttempts> getAllByQuizId(Integer quiz_id) 
+	{	
+		return attemptsRepo.findAllByQuiz_QuizId(quiz_id);
+	}
+	
+	// Get all entries for a student
+	public List<QuizAttempts> getAllByStudentId(Integer student_id) 
+	{
+		return attemptsRepo.findAllByStudent_UserId(student_id);
+	}
+	
+	// get all entries for a student's quiz.
+	public List<QuizAttempts> getAllByStudentIdAndQuizId(Integer student_id, Integer quiz_id) {
+		return attemptsRepo.findByStudent_UserIdAndQuiz_QuizId(student_id, quiz_id);
+	}
+	
+	////////////////////////////
+	//---------Update---------//
+	////////////////////////////
+	
 	// Update Entries by id, this assumes we do not update the time.
 	public QuizAttempts updateByIdNoTime(int quizAttempts_id, QuizAttemptsDTO newData) 
-			throws BadRequestException
+			throws BadRequestException, MaximumAllowedQuizAttemptsException
 	{
-		
 		// This is update, not create. Only perform if the entry with id exists.
 		if(!attemptsRepo.existsById(quizAttempts_id))
 			throw new BadRequestException("QuizAttemptsService updateById - entry with given id doesn't exist.");
 		
+		QuizAttempts updateTarget = attemptsRepo.findById(quizAttempts_id).get();
+		
+		// Update has the capacity to illegally exceed maximum attempts.
+		// If an attempt is being placed under a different quiz...
+		if(updateTarget.getQuiz().getQuizId() != newData.getQuiz_id())
+		{
+			//... then make sure there is room for another entry.
+			if(!isQuizAttemptsAllowed(quizAttempts_id, newData.getStudent_id()))
+				throw new MaximumAllowedQuizAttemptsException("Update results in exceeded attempts allowed. abandoning updateByIdNoTime.");
+		}
+		
 		// This method assumes that time will not be updated, so we'll use the current one.
-		newData.setAttempt_date(attemptsRepo.findById(quizAttempts_id).get().getAttempt_date());
+		newData.setAttempt_date(updateTarget.getAttempt_date());
 		
 		QuizAttempts updatedEntity = verifyFields(newData, quizAttempts_id);
 						
@@ -73,26 +113,83 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 	
 	// Update Entries by id, this assumes we do not update the time.
 	public QuizAttempts updateByIdWithTime(int quizAttempts_id, QuizAttemptsDTO newData) 
-			throws BadRequestException
+			throws BadRequestException, MaximumAllowedQuizAttemptsException
 	{
 		
 		// This is update, not create. Only perform if the entry with id exists.
 		if(!attemptsRepo.existsById(quizAttempts_id))
 			throw new BadRequestException("QuizAttemptsService updateById - entry with given id doesn't exist.");
 				
+		QuizAttempts updateTarget = attemptsRepo.findById(quizAttempts_id).get();
+		
+		// Update has the capacity to illegally exceed maximum attempts.
+		// If an attempt is being placed under a different quiz...
+		if(updateTarget.getQuiz().getQuizId() != newData.getQuiz_id())
+		{
+			//... then make sure there is room for another entry.
+			if(!isQuizAttemptsAllowed(quizAttempts_id, newData.getStudent_id()))
+				throw new MaximumAllowedQuizAttemptsException("Update results in exceeded attempts allowed. abandoning updateByIdWithTime.");
+		}
 		 
 		QuizAttempts updatedEntity = verifyFields(newData, quizAttempts_id);
 						
 		return attemptsRepo.save(updatedEntity);
 	}
+	
+	////////////////////////////
+	//---------Delete---------//
+	////////////////////////////
 
 	public Integer deleteById(int quizAttempts_id) 
 	{
-		if(!attemptsRepo.existsById(quizAttempts_id))
-			return 0;
+		//if(!attemptsRepo.existsById(quizAttempts_id))
+		//	return 0;
 		try 
 		{
 			attemptsRepo.deleteById(quizAttempts_id);
+		} 
+		catch (Exception e)
+		{
+			e.getMessage();
+			return 0;
+		}
+		
+		return 1;	
+	}
+	
+	public Integer deleteAllByQuizId(Integer quiz_id) {
+		try 
+		{
+			attemptsRepo.deleteAllByQuiz_QuizId(quiz_id);
+		} 
+		catch (Exception e)
+		{
+			e.getMessage();
+			return 0;
+		}
+		
+		return 1;	
+	}
+	
+	public Integer deleteAllByStudentId(Integer student_id) {
+		try 
+		{
+			attemptsRepo.deleteAllByStudent_UserId(student_id);
+		} 
+		catch (Exception e)
+		{
+			e.getMessage();
+			return 0;
+		}
+		
+		return 1;	
+	}
+	
+	@Override
+	public Integer deleteAllByQuizAndStudent(Integer quiz_id, Integer student_id) {
+		try 
+		{
+			attemptsRepo.deleteAllByQuiz_QuizIdAndStudent_UserId(quiz_id, student_id);
 		} 
 		catch (Exception e)
 		{
@@ -136,5 +233,18 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 
 		return validatedData;
 	}
+	
+	
+	public boolean isQuizAttemptsAllowed(Integer quiz_id, Integer student_id) {
+		// If the number of attempts linked to a quiz and student are less than the number allowed...
+		if(attemptsRepo.countByQuiz_QuizIdAndStudent_UserId(quiz_id, student_id) < quizRepo.findById(quiz_id).get().getAttemptsAllowed())
+			return true; // Then we can return true;
+		
+		// Otherwise, return false;
+		return false;
+	}
+
+
+
 
 }
