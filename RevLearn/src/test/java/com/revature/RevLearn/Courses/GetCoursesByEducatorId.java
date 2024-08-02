@@ -2,7 +2,7 @@ package com.revature.RevLearn.Courses;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.app.RevLearnApplication;
+import com.revature.RevLearnApplication;
 import com.revature.models.Course;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
