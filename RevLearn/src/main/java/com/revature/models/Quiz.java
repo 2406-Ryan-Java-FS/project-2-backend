@@ -8,7 +8,7 @@ import lombok.Data;
 @Entity
 @Table(name = "Quizzes", schema = "project2")
 @Data
-@JsonPropertyOrder({"quizId","courseId","title","timer","attemptsAllowed"})
+@JsonPropertyOrder({"quizId","courseId","title","timer","attemptsAllowed", "open"})
 public class Quiz {
 
     @Id
@@ -29,6 +29,9 @@ public class Quiz {
 
     @JsonProperty(value = "attemptsAllowed")
     private int attemptsAllowed;
+
+    @JsonProperty(value = "open")
+    private boolean open;
 
 }
 

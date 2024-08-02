@@ -18,8 +18,10 @@ import lombok.*;
 @Table (name = "Courses", schema = "project2")
 @JsonPropertyOrder({"courseId", "educatorId", "title", "description", "category", "price", "imgUrl", "creationDate"})
 @Data
-@Getter @Setter @NoArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
 public class Course {
+
+    public static final String IMG_URL = "https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +47,7 @@ public class Course {
 
     @Column(name = "price", columnDefinition = "NUMERIC(10, 2)")
     @JsonProperty(value = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "img_url")
     @JsonProperty(value = "imgUrl")

@@ -10,14 +10,14 @@ import lombok.Data;
 @Entity
 @Table(name = "users", schema = "project2")
 @Data
-@JsonPropertyOrder({"userId","firstName","lastName","email","password","role","registrationDate"})
+@JsonPropertyOrder({"userId", "firstName", "lastName", "email", "password", "role"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     @JsonProperty(value = "userId")
-    private  int userId;
+    private int userId;
 
     @Column(name = "first_name")
     @JsonProperty(value = "firstName")
@@ -39,9 +39,4 @@ public class User {
     @JsonProperty(value = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    //@Column(name = "registration_date")
-    //@JsonProperty(value = "registrationDate")
-    //private Date registrationDate;
-
 }

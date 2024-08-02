@@ -1,35 +1,35 @@
 
-#Copies the compiled jar into the docker image we're creating
+# Stage 1: build app
+FROM maven:3.8.4-openjdk-17-slim AS build
 
-#docker build -t image1 .
+# set up workdir
+WORKDIR /app
 
-from eclipse-temurin:17-jdk as build
-workdir /theApp
-copy ./target/RevLearn-0.0.1-SNAPSHOT.jar ./RevLearn-0.0.1-SNAPSHOT.jar
+# install dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-copy ./application-awstest.properties ./application-awstest.properties
+# Copy over our project's src code.
+COPY src ./src
 
-#Could not get environment variables working. Using secret spring profiles instead.
-# arg RAND
-# run echo "RAND=${RAND}"
-# env JWT_SECRET=${RAND}
-# run echo "JWT_SECRET=${JWT_SECRET}"
+# Build the application
+RUN mvn package -DskipTests
 
-expose 8080
-entrypoint ["java","-jar",\
-    "RevLearn-0.0.1-SNAPSHOT.jar",\
-    "--spring.profiles.active=awstest",\
-    "--spring.config.location=file:/theApp/application-awstest.properties"]
+# Stage 2: Running the Application
+FROM eclipse-temurin:17-jdk AS run
 
-#from oracle/graalvm-ce:21.3.0-java17
-# from eclipse-temurin:17-jdk
-# workdir /theApp
-#
-# #ERROR: failed to solve: failed to compute cache key:
-# #failed to calculate checksum of ref 3633481f-e69d-439a-a183-d8a6bb9179f4::9od0mzmyu8sa4f3icbnqbrhvi:
-# #"/target/RevLearn-0.0.1-SNAPSHOT.jar": not found
-# run ls
-# copy --from=build ./target/RevLearn-0.0.1-SNAPSHOT.jar ./RevLearn-0.0.1-SNAPSHOT.jar
-# expose 8080
-# entrypoint ["java","-jar","RevLearn-0.0.1-SNAPSHOT.jar"]
+# Also set this new Stage's working directory
+WORKDIR /app
 
+# Bring over the JAR file from the build Stage.
+COPY --from=build /app/target/RevLearn-0.0.1-SNAPSHOT.jar ./app.jar
+
+# Tell Docker to use port 8080
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# How to run
+# 1. docker build --tag=revlearn:latest .
+# 2. docker run -p 8080:8080 revlearn:latest

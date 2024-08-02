@@ -1,8 +1,8 @@
 package com.revature.services;
 
-import com.revature.controllers.UserController;
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
+import com.revature.exceptions.InternalServerErrorException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Educator;
 import com.revature.models.User;
@@ -12,8 +12,11 @@ import com.revature.repositories.UserRepository;
 import com.revature.util.Help;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.revature.services.passutil.PasswordEncrypter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
      * @param user The User to be added.
      * @return The persisted User including its newly assigned userId.
      * @throws ConflictException if there's already a User with the given email.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public User addUser(User user) {
 
@@ -54,7 +58,14 @@ public class UserServiceImpl implements UserService {
             user.setRole(Role.student);
         }
 
-        return userRepository.save(user);
+        try {
+            // Encrypt the password and save the user
+            String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
+            user.setPassword(encryptedPassword);
+            return userRepository.save(user);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InternalServerErrorException("Password encryption error, please try again.");
+        }
     }
 
     /**
@@ -89,17 +100,20 @@ public class UserServiceImpl implements UserService {
      * @param user User object containing the email and password to verify.
      * @return The userId of the verified User.
      * @throws UnauthorizedException if the email and/or password are invalid.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public Integer verifyUser(User user) {
 
-        logger.info("incoming user="+ Help.json(user,true,false));
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        logger.info("existingUser="+Help.json(existingUser,true,false));
+        try {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
 
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return existingUser.getUserId();
-        } else {
+            if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
+                return existingUser.getUserId();
+            }
             throw new UnauthorizedException("Invalid login credentials");
+        } catch (NoSuchAlgorithmException e) {
+            throw new InternalServerErrorException("Password encryption error, please try again.");
         }
     }
 
@@ -113,7 +127,9 @@ public class UserServiceImpl implements UserService {
     public UserEducator combineUserAndEducator(User user, Educator educator) {
         UserEducator dto = new UserEducator();
         dto.setUser(user);
-        educator.setEducatorId(user.getUserId());
+        if (educator != null) {
+            educator.setEducatorId(user.getUserId());
+        }
         dto.setEducator(educator);
         return dto;
     }
