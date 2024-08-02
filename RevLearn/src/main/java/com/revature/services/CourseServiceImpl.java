@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.revature.exceptions.BadRequestException;
@@ -15,15 +16,26 @@ import com.revature.models.Course;
 import com.revature.models.User;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.repositories.CourseRepository;
+import org.springframework.kafka.annotation.KafkaHandler;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 
 @Service
 public class CourseServiceImpl implements CourseService {
     CourseRepository courseRepository;
 
     @Autowired
+    KafkaProducerService kafkaProducerService;
+
+    @Autowired
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
+
+    @Autowired
+    private KafkaTemplate<String, Course> kafkaTemplate;
 
     /**
      * Retrieves all courses from the repository.
@@ -33,6 +45,9 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<Course> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
+
+        kafkaProducerService.sendResponseMessage(courses.toString());
+
         return courses;
     }
 
@@ -46,10 +61,12 @@ public class CourseServiceImpl implements CourseService {
      *                               for another educator
      * @throws BadRequestException   if the course title is null
      */
+
     @Override
     public Course addCourse(Course newCourse, User user) {
         Integer userId = user.getUserId();
         if (!userId.equals(newCourse.getEducatorId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. Not Authorized");
             throw new UnauthorizedException("You are not authorized to add a course for another educator.");
         }
         newCourse.setCreationDate(Timestamp.from(Instant.now()));
@@ -59,9 +76,18 @@ public class CourseServiceImpl implements CourseService {
         }
 
         if (newCourse.getTitle() == null || newCourse.getTitle().isBlank()) {
+            kafkaProducerService.sendResponseMessage("Request Failed. Course had no title");
             throw new BadRequestException("Please give the new course a title.");
         }
-        return courseRepository.save(newCourse);
+
+        Course dbCourse = courseRepository.save(newCourse);
+
+
+
+        kafkaProducerService.sendResponseMessage(dbCourse.toString());
+        return dbCourse;
+
+
     }
 
     /**
@@ -74,6 +100,14 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course getCourseById(Integer theCourseId) {
         Optional<Course> dBCourse = courseRepository.findById(theCourseId);
+
+
+        if (dBCourse.isPresent()) {
+            kafkaProducerService.sendResponseMessage(dBCourse.get().toString());
+        } else {
+            kafkaProducerService.sendResponseMessage("Course with ID: " + theCourseId + " does not exist");
+        }
+
         return dBCourse.orElseThrow(() -> new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId));
     }
 
@@ -88,7 +122,11 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public List<Course> getCoursesByEducatorId(Integer theEducatorId) {
-        return courseRepository.findByEducatorId(theEducatorId);
+
+        List<Course> courses = courseRepository.findByEducatorId(theEducatorId);
+
+        kafkaProducerService.sendResponseMessage(courses.toString());
+        return courses;
     }
 
     /**
@@ -109,8 +147,10 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new NotFoundException("Course with ID: " + theCourseId + " not found"));
 
         if (!userId.equals(existingCourse.getEducatorId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not Authorized");
             throw new UnauthorizedException("You are not authorized to update this course.");
         }
+
 
         // Update only non-null fields, while ensuring courseId and educatorId are not changed
         if (theCourse.getTitle() != null) {
@@ -131,7 +171,7 @@ public class CourseServiceImpl implements CourseService {
         if (theCourse.getCreationDate() != null) {
             existingCourse.setCreationDate(theCourse.getCreationDate());
         }
-
+        kafkaProducerService.sendResponseMessage(existingCourse.toString());
         return courseRepository.save(existingCourse);
     }
 
@@ -145,8 +185,10 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseEducatorDTO> getAllCoursesAndEducatorDetails() {
         try {
             List<CourseEducatorDTO> allCourseEducatorDTOs = courseRepository.findAllCoursesAndEducatorDetails();
+            kafkaProducerService.sendResponseMessage(allCourseEducatorDTOs.toString());
             return allCourseEducatorDTOs;
         } catch (Exception e) {
+            kafkaProducerService.sendResponseMessage("Error fetching courses and educators: " + e.getMessage());
             throw new RuntimeException("Error fetching courses and educators: " + e.getMessage());
         }
     }
@@ -167,11 +209,14 @@ public class CourseServiceImpl implements CourseService {
         if (dBCourse.isPresent()) {
             CourseEducatorDTO courseEducatorDTO = courseRepository.findCourseAndEducatorDetail(theCourseId);
             if (courseEducatorDTO.getFirstName() != null || courseEducatorDTO.getLastName() != null) {
+                kafkaProducerService.sendResponseMessage(courseEducatorDTO.toString());
                 return courseEducatorDTO;
             } else {
+                kafkaProducerService.sendResponseMessage("No educator details found for the course ID: " + theCourseId);
                 throw new NotFoundException("No educator details found for the course ID: " + theCourseId);
             }
         } else {
+            kafkaProducerService.sendResponseMessage("Course does not exist. Please check the course ID: " + theCourseId);
             throw new NotFoundException("Course does not exist. Please check the course ID: " + theCourseId);
         }
     }
@@ -191,15 +236,21 @@ public class CourseServiceImpl implements CourseService {
         Integer userId = user.getUserId();
         // Retrieve the course by ID
         Course course = courseRepository.findById(theCourseId)
-                .orElseThrow(() -> new NotFoundException("Course with ID: " + theCourseId + " not found"));
+                .orElseThrow(() -> {
+                    kafkaProducerService.sendResponseMessage("Course could not be found");
+                    throw new NotFoundException("Course with ID: " + theCourseId + " not found");
+                });
 
         // Check if the user is authorized to delete the course
         if (!userId.equals(course.getEducatorId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("You are not authorized to delete this course");
+
         }
 
         // Delete the course
         courseRepository.deleteById(theCourseId);
+        kafkaProducerService.sendResponseMessage("Courses Deleted: 1");
         return 1;
     }
 }

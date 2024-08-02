@@ -22,6 +22,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     EnrollmentRepository enrollmentRepository;
 
     @Autowired
+    KafkaProducerService kafkaProducerService;
+
+    @Autowired
     public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
     }
@@ -35,9 +38,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<Enrollment> getAllEnrollments() {
         try {
+            kafkaProducerService.sendRequestMessage("Getting all enrollments");
             List<Enrollment> allEnrollments = enrollmentRepository.findAll();
             return allEnrollments;
         } catch (Exception e) {
+            kafkaProducerService.sendResponseMessage("Request failed: " + e.getMessage());
             throw new RuntimeException("Error fetching enrollments: " + e.getMessage());
         }
     }
@@ -56,12 +61,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public Enrollment registerEnrollment(Enrollment newEnrollment, User user) {
         Integer userId = user.getUserId();
         if (!userId.equals(newEnrollment.getStudentId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
         if (newEnrollment.getPaymentStatus() == null) {
+            kafkaProducerService.sendRequestMessage("Payment status is null");
             throw new BadRequestException(
                     "Please enter either 'pending', 'completed', or 'cancelled' for payment status.");
         }
+
+        kafkaProducerService.sendRequestMessage("Registering new enrollment");
         return enrollmentRepository.save(newEnrollment);
     }
 
@@ -80,14 +89,17 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public Enrollment getEnrollmentById(Integer theEnrollmentId, User user) {
         Integer userId = user.getUserId();
-
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Enrollment Record with ID: " + theEnrollmentId + " could not be found"));
-
+                .orElseThrow(() -> { 
+                  kafkaProducerService.sendResponseMessage("Enrollment could not be found");
+                throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+                });
+                
         if (!userId.equals(enrollment.getStudentId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
+        kafkaProducerService.sendResponseMessage("Enrollment found");
         return enrollment;
     }
 
@@ -108,17 +120,19 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public Enrollment getEnrollmentByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId, User user) {
         Integer userId = user.getUserId();
-
         if (!userId.equals(theStudentId)) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
 
         Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByStudentIdAndCourseId(theStudentId,
                 theCourseId);
 
-        if (optionalEnrollment.isPresent()) {
+        if (optionalEnrollment.isPresent()){
+            kafkaProducerService.sendRequestMessage(optionalEnrollment.get().toString());
             return optionalEnrollment.get();
         } else {
+            kafkaProducerService.sendRequestMessage("Enrollment Record with Student ID: " + theStudentId + " and Course ID: " + theCourseId + " could not be found");  
             throw new NotFoundException("Enrollment Record with Student ID: " + theStudentId + " and Course ID: "
                     + theCourseId + " could not be found");
         }
@@ -129,8 +143,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Integer userId = user.getUserId();
 
         if (!userId.equals(theStudentId)) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
+        kafkaProducerService.sendRequestMessage("Getting all enrollments for student with ID: " + theStudentId);
         return enrollmentRepository.findByStudentId(theStudentId);
     }
 
@@ -142,6 +158,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId) {
+        kafkaProducerService.sendRequestMessage("Getting all enrollments for course with ID: " + theCourseId);
         return enrollmentRepository.findByCourseId(theCourseId);
     }
 
@@ -159,6 +176,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId,
             PayStatus thePaymentStatus) {
+                kafkaProducerService.sendRequestMessage("Getting all enrollments for student with ID: " + theStudentId + " and payment status: " + thePaymentStatus);
         return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
     }
 
@@ -172,6 +190,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus) {
+        kafkaProducerService.sendRequestMessage("Getting all enrollments with payment status: " + thePaymentStatus);
         return enrollmentRepository.findByPaymentStatus(thePaymentStatus);
     }
 
@@ -195,18 +214,24 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Integer userId = user.getUserId();
 
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Cannot update. The requested enrollment does not exist: " + theEnrollmentId));
-
+                .orElseThrow(() -> {
+                  kafkaProducerService.sendRequestMessage("Could not update Payment Status, enrollment does not exist");
+                throw  new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
+                });
+                                        
+   
         if (!userId.equals(enrollment.getStudentId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
 
         int rowsUpdated = enrollmentRepository.updateEnrollmentPaymentStatusById(theEnrollmentId, thePaymentStatus);
         if (rowsUpdated != 1) {
+            kafkaProducerService.sendRequestMessage("Could not update Payment Status");
             throw new BadRequestException("Could not update Payment Status");
         }
-
+        
+        kafkaProducerService.sendRequestMessage("Payment Status updated to: " + thePaymentStatus + " for Enrollment with ID: " + theEnrollmentId);
         return this.getEnrollmentById(theEnrollmentId, user);
     }
 
@@ -227,10 +252,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Integer userId = user.getUserId();
 
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Cannot update. The requested enrollment does not exist: " + theEnrollmentId));
-
+                .orElseThrow(() -> {
+                              kafkaProducerService.sendRequestMessage("Cannot update. The requested enrollment does not exist:");
+                             throw new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
+                });
+                                                   
+                  
         if (!userId.equals(enrollment.getStudentId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
 
@@ -241,27 +270,39 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                     enrollment.setCourseRating(theReview.getCourseRating());
                     enrollment.setCourseReview(theReview.getCourseReview());
                 } else {
+                    kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
+
             } else if (theReview.getCourseReview() == null && theReview.getCourseRating() != null) {
                 if (theReview.getCourseRating() > 0 && theReview.getCourseRating() < 6) {
                     enrollment.setCourseRating(theReview.getCourseRating());
                 } else {
+                  kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
             } else if (theReview.getCourseReview() != null && theReview.getCourseRating() == null) {
                 if (!theReview.getCourseReview().isBlank()) {
                     enrollment.setCourseReview(theReview.getCourseReview());
                 } else {
+                    kafkaProducerService.sendRequestMessage("Invalid operation");
                     throw new BadRequestException("Invalid operation");
                 }
-            } else {
+            }
+
+            //throws BadRequestException if both courseRating and courseReview are null
+            else {
+                kafkaProducerService.sendRequestMessage("Invalid operation");
                 throw new BadRequestException("Invalid operation");
             }
+            kafkaProducerService.sendRequestMessage("Enrollment updated: " + enrollment.toString());
 
             return enrollmentRepository.save(enrollment);
 
         } catch (Exception e) {
+            // throw new exception with original as cause
+            kafkaProducerService.sendRequestMessage("Cannot update. Please check inputted values.");
+          
             throw new RuntimeException(String.format(
                     "Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Rating: %s\nCourse Review: %s",
                     theEnrollmentId, theReview.getCourseRating(), theReview.getCourseReview()), e);
@@ -283,17 +324,23 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Integer userId = user.getUserId();
 
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Enrollment Record with ID: " + theEnrollmentId + " could not be found"));
+                .orElseThrow(() -> {
+                  kafkaProducerService.sendRequestMessage("Cannot delete. The requested enrollment does not exist:");
+                  throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+                });
+                                      
 
         if (!userId.equals(enrollment.getStudentId())) {
+            kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
         }
 
         try {
             enrollmentRepository.deleteById(theEnrollmentId);
+            kafkaProducerService.sendRequestMessage("Enrollment deleted: " + theEnrollmentId);
             return 1;
         } catch (Exception e) {
+            kafkaProducerService.sendRequestMessage("Exception occurred while deleting enrollment: " + e.getMessage());
             System.err.println("Exception occurred while deleting enrollment: " + e.getMessage());
             return 0;
         }
