@@ -1,43 +1,49 @@
 package com.revature.controllers;
 
 import java.util.List;
+
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.NotFoundException;
+import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Course;
+import com.revature.models.User;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.services.CourseService;
 import com.revature.services.KafkaProducerService;
+import com.revature.services.JwtService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
+@CrossOrigin
 public class CourseController {
 
     CourseService courseService;
+    JwtService jwtService;
 
     @Autowired
     KafkaProducerService kafkaProducerService;
 
     @Autowired
-    public CourseController(CourseService courseService) {
+    public CourseController(CourseService courseService, JwtService jwtService) {
         this.courseService = courseService;
+        this.jwtService = jwtService;
     }
 
     /**
-     * handler to get all courses
+     * Handler to get all courses.
      * 
      * @return ResponseEntity containing a list of courses
      */
@@ -51,29 +57,37 @@ public class CourseController {
     }
 
     /**
-     * handler to add a new course
+     * Handler to add a new course.
      * 
      * @param newCourse - course object that contains all fields
-     * @return a response entity containing the new course or a Bad Request
-     *         error message if not null entitrys are not filled out
+     * @param token     - the authorization token to identify the user making the
+     *                  request
+     * @return ResponseEntity containing the new course or a Bad Request error
+     *         message if required fields are not filled out
      */
     @PostMapping("/courses")
-    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse) {
+    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
+
             kafkaProducerService.sendRequestMessage("Creating new Course");
-            Course course = courseService.addCourse(newCourse);
+            Course course = courseService.addCourse(newCourse, user);
+
             return ResponseEntity.ok(course);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     /**
-     * handler to get a course by id
+     * Handler to get a course by ID.
      * 
-     * @param theCourseId - the id of the course to retrieve
-     * @return a response entity containing the course if found or a Bad Request
-     *         error message if not found
+     * @param theCourseId - the ID of the course to retrieve
+     * @return ResponseEntity containing the course if found or a Bad Request error
+     *         message if not found
      */
     @GetMapping("/courses/{theCourseId}")
     ResponseEntity<?> getCourseById(@PathVariable Integer theCourseId) {
@@ -88,9 +102,10 @@ public class CourseController {
     }
 
     /**
-     * handler to get a list of courses and educators
-     * @return List<CourseEducatorDTO> - a Response entity wrapping a list of courses and educators
-     * or a not found exception
+     * Handler to get a list of courses and educators.
+     * 
+     * @return ResponseEntity wrapping a list of courses and educators or a not
+     *         found exception
      */
     @GetMapping("/courses/educators/details")
     public ResponseEntity<?> getAllCoursesAndEducatorDetails() {
@@ -104,11 +119,12 @@ public class CourseController {
     }
 
     /**
-     * handler to get a course and educator by the course id
+     * Handler to get a course and educator by the course ID.
      * 
-     * @param theCourseId - the id of the course and educator details we want to retrieve
-     * @return a response entity containing the CourseEducatorDTO if found or a NOT_FOUND exception
-     *         if not found
+     * @param theCourseId - the ID of the course and educator details we want to
+     *                    retrieve
+     * @return ResponseEntity containing the CourseEducatorDTO if found or a
+     *         NOT_FOUND exception if not found
      */
     @GetMapping("/courses/educators/details/{theCourseId}")
     public ResponseEntity<?> getCourseAndEducatorDetail(@PathVariable Integer theCourseId) {
@@ -117,18 +133,16 @@ public class CourseController {
             kafkaProducerService.sendRequestMessage("Getting a course with educator details with ID: " + theCourseId);
             CourseEducatorDTO courseEducatorDTO = courseService.getCourseAndEducatorDetail(theCourseId);
             return ResponseEntity.ok(courseEducatorDTO);
-        } 
-        catch (NotFoundException e) 
-        {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-    
+
     /**
-     * handler to get courses by a specific educator id
+     * Handler to get courses by a specific educator ID.
      * 
-     * @param theEducatorId - the educator id of the list of courses
-     * @return a response entity containing a list of courses by a specific educator
+     * @param theEducatorId - the educator ID of the list of courses
+     * @return ResponseEntity containing a list of courses by a specific educator
      */
     @GetMapping("/courses/educators/{theEducatorId}")
     public ResponseEntity<List<Course>> getCoursesWithEducatorId(@PathVariable Integer theEducatorId) {
@@ -137,55 +151,63 @@ public class CourseController {
     }
 
     /**
-     * handler to delete course data
+     * Handler to delete course data.
      * 
-     * @param theCourseId - the id of the course that we want to delete in the
-     *                    database
-     * @return a response entity containing 1 if a course is deleted or 0 if the
-     *         course is not deleted
+     * @param theCourseId - the ID of the course to delete from the database
+     * @param token       - the authorization token to identify the user making the
+     *                    request
+     * @return ResponseEntity containing the result of the deletion
      */
     @DeleteMapping("/courses/{theCourseId}")
-    public ResponseEntity<?> deleteCourseById(@PathVariable Integer theCourseId) {
 
+    public ResponseEntity<?> deleteCourseById(@PathVariable Integer theCourseId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         kafkaProducerService.sendRequestMessage("Deleting course with ID: " + theCourseId);
-
-        Integer rowsAffected = courseService.deleteCourseById(theCourseId);
-
-        if (rowsAffected == 0) {
+        try {
+            Integer rowsAffected = courseService.deleteCourseById(theCourseId, user);
             return ResponseEntity.ok(rowsAffected + " course deleted.");
-        } else {
-            return ResponseEntity.ok(rowsAffected + " course deleted.");
-
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while deleting the course.");
         }
     }
 
     /**
-     * handler to update a course by its course id
+     * Handler to update a course by its course ID.
      * 
-     * @param theCourseId - the id of the course that we want to update
+     * @param theCourseId - the ID of the course that we want to update
      * @param theCourse   - the course object that we want to update
+     * @param token       - the authorization token to identify the user making the
+     *                    request
      * @return ResponseEntity<Course> - a course object wrapped in a Response entity
      *         upon success or an exception upon failure
      */
-    @PutMapping("/courses/{theCourseId}")
+    @PatchMapping("/courses/{theCourseId}")
     public ResponseEntity<Course> updateCourseById(
             @PathVariable Integer theCourseId,
-            @RequestBody Course theCourse) {
-
+            @RequestBody Course theCourse, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         kafkaProducerService.sendRequestMessage("Updating course with ID: " + theCourseId);
-
         try {
-            Course updatedCourse = courseService.updateCourseById(theCourseId, theCourse);
+            Course updatedCourse = courseService.updateCourseById(theCourseId, theCourse, user);
             if (updatedCourse != null) {
                 return ResponseEntity.ok(updatedCourse);
             }
             return ResponseEntity.notFound().build();
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IllegalArgumentException e) {
-            // Handle invalid educator ID error
             return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
             System.err.println("Exception occurred while updating course: " + e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
