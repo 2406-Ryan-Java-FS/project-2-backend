@@ -3,11 +3,20 @@ set -e
 
 echo "AWS_EC2_IP=$AWS_EC2_IP"
 
-echo "Shell script: Uploading src code files"
+echo "Shell script: Clearing src folder"
+ssh -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
+  mkdir src
+  rm -r src/
+END
+
+echo "Shell script: Uploading files"
 sftp -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
   put pom.xml
   put -r src
+  lcd ~
+  put application-awstest.properties target/application-awstest.properties
 END
+
 
 #echo "Shell script: Uploading jar file"
 #sftp -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
@@ -30,7 +39,8 @@ sleep 6
 
 ssh -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
   echo "Shell script: Starting the new jar"
-  sudo java -jar target/RevLearn-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2 --server.port=8080
+  cd target
+  sudo java -jar RevLearn-0.0.1-SNAPSHOT.jar --spring.profiles.active=awstest --spring.config.location=application-awstest.properties --server.port=8080
 END
 
 #sudo nohup java -jar target/RevLearn-0.0.1-SNAPSHOT.jar --spring.profiles.active=h2 --server.port=80 > theOutput.txt 2>&1 &
