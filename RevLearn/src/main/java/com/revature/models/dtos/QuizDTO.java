@@ -1,6 +1,5 @@
 package com.revature.models.dtos;
 
-import com.revature.models.QuizQuestion;
 import lombok.Data;
 
 @Data
