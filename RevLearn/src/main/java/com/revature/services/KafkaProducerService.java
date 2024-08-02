@@ -34,3 +34,4 @@ public class KafkaProducerService {
         kafkaTemplate.send(message);
     }
 }
+

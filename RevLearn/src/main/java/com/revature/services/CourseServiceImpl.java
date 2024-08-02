@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.revature.exceptions.BadRequestException;
@@ -15,6 +16,11 @@ import com.revature.models.Course;
 import com.revature.models.User;
 import com.revature.models.dtos.CourseEducatorDTO;
 import com.revature.repositories.CourseRepository;
+import org.springframework.kafka.annotation.KafkaHandler;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -27,6 +33,9 @@ public class CourseServiceImpl implements CourseService {
     public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
+
+    @Autowired
+    private KafkaTemplate<String, Course> kafkaTemplate;
 
     /**
      * Retrieves all courses from the repository.
@@ -52,6 +61,7 @@ public class CourseServiceImpl implements CourseService {
      *                               for another educator
      * @throws BadRequestException   if the course title is null
      */
+
     @Override
     public Course addCourse(Course newCourse, User user) {
         Integer userId = user.getUserId();
