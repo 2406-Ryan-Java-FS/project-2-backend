@@ -18,10 +18,13 @@ import com.revature.models.User;
 import com.revature.models.dtos.QuizAttemptsDTO;
 import com.revature.models.dtos.QuizAttemptsEditDTO;
 import com.revature.repositories.UserRepository;
+import com.revature.services.EducatorService;
+import com.revature.services.JwtService;
 import com.revature.services.JwtServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
 import com.revature.services.UserService;
 import com.revature.exceptions.*;
+
 
 //-------------CRUD-----------------//
 //
@@ -43,8 +46,12 @@ import com.revature.exceptions.*;
 
 //---Quiz&Student-based Operations--//
 //
-// GET    on /quizAttemptsFromUserAndQuiz
-// DELETE on /quizAttemptsFromUserAndQuiz
+// GET    on /quizAttemptsFromQuizAndUser
+// DELETE on /quizAttemptsFromQuizAndUser
+
+//------Course-based Operations-----//
+//GET    on /quizAttemptsFromCourse/{course_id}
+//DELETE on /quizAttemptsFromCourse/{course_id}
 
 // if any of this is inconsistent in terms of what is present or working
 //    in this controller, then please let Steven Ray Coronel know.
@@ -55,16 +62,15 @@ import com.revature.exceptions.*;
 //@CrossOrigin
 public class QuizAttemptsController {
 
-	@Autowired
 	QuizAttemptsServiceImpl attemptsServ;
-	
-	@Autowired
 	JwtServiceImpl jwtServ;
 	
 	@Autowired
-	UserRepository userServ;
-	
-	// Basic CRUD for QuizAttempts by QuizAttempt information.
+	QuizAttemptsController(QuizAttemptsServiceImpl attemptsServ, JwtServiceImpl jwtServ)
+	{
+		this.attemptsServ = attemptsServ;
+		this.jwtServ = jwtServ;
+	}	
 	
 	////////////////////////////
 	//---------Create---------//
@@ -388,6 +394,8 @@ public class QuizAttemptsController {
     
     // Business
 
+    
+    
 	// For anything more past the comments above, Please Ask Steven Coronel
     // note: I need to study for the upcoming assessments.
 		
