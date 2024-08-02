@@ -3,9 +3,7 @@ package com.revature.controllers;
 import java.util.List;
 
 import com.revature.models.Review;
-import com.revature.services.KafkaConsumerService;
 import com.revature.services.KafkaProducerService;
-// import org.apache.kafka.common.metrics.internals.IntGaugeSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,7 +15,6 @@ import com.revature.services.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import com.revature.exceptions.NotFoundException;
