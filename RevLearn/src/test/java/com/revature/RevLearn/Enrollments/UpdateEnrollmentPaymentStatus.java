@@ -129,3 +129,4 @@ public class UpdateEnrollmentPaymentStatus {
         Assertions.assertEquals(expected, actual, "Expected=" + expected + ", Actual=" + actual);
     }
 }
+
