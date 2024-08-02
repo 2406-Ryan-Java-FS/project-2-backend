@@ -158,7 +158,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId,
-            PayStatus thePaymentStatus) {
+            PayStatus thePaymentStatus, User user) {
+        Integer userId = user.getUserId();
+        if (userId != theStudentId) {
+            throw new UnauthorizedException("Invalid Authorization!");
+        }
         return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
     }
 

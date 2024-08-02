@@ -129,13 +129,16 @@ public class EnrollmentController {
      */
     @GetMapping("/enrollments/students/{theStudentId}/{thePaymentStatus}")
     public ResponseEntity<?> getEnrollmentsForStudentWithStatus(@PathVariable Integer theStudentId,
-            @PathVariable String thePaymentStatus) {
+            @PathVariable String thePaymentStatus, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
             PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
             return ResponseEntity
-                    .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus));
+                    .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus, user));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid Status");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
