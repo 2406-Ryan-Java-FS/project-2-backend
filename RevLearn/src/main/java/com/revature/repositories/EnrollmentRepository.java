@@ -11,6 +11,7 @@ import com.revature.models.Enrollment;
 import com.revature.models.enums.PayStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>{
@@ -22,6 +23,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     @Transactional
     @Query("update Enrollment e set e.paymentStatus = :thePaymentStatus where e.enrollmentId = :theEnrollmentId")
     int updateEnrollmentPaymentStatusById(@Param("theEnrollmentId") Integer theEnrollmentId, @Param("thePaymentStatus")PayStatus thePaymentStatus);
+
+    Optional<Enrollment> findByStudentIdAndCourseId(Integer theStudentId, Integer theCourseId);
 
     List<Enrollment> findByStudentId(Integer theStudentId);
 

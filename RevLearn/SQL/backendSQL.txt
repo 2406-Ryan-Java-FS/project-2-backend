@@ -105,10 +105,10 @@ CREATE TABLE ChoiceSelections (
 
 
 INSERT INTO Users (email, password, first_name, last_name, role) VALUES
-('john.doe@example.com', 'password123', 'John', 'Doe', 'student'),
-('jane.smith@example.com', 'password123', 'Jane', 'Smith', 'student'),
-('alice.johnson@example.com', 'password123', 'Alice', 'Johnson', 'educator'),
-('bob.brown@example.com', 'password123', 'Bob', 'Brown', 'educator');
+('john.doe@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'John', 'Doe', 'student'),
+('jane.smith@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Jane', 'Smith', 'student'),
+('alice.johnson@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Alice', 'Johnson', 'educator'),
+('bob.brown@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Bob', 'Brown', 'educator');
 
 
 INSERT INTO Educators (educator_id, degree_level, degree_major, alma_mater, year) VALUES
