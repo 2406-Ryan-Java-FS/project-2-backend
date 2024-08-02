@@ -17,12 +17,8 @@ import com.revature.models.QuizAttempts;
 import com.revature.models.User;
 import com.revature.models.dtos.QuizAttemptsDTO;
 import com.revature.models.dtos.QuizAttemptsEditDTO;
-import com.revature.repositories.UserRepository;
-import com.revature.services.EducatorService;
-import com.revature.services.JwtService;
 import com.revature.services.JwtServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
-import com.revature.services.UserService;
 import com.revature.exceptions.*;
 
 
@@ -275,7 +271,7 @@ public class QuizAttemptsController {
     throws BadRequestException, UnauthorizedException, MaximumAllowedQuizAttemptsException
     {
     	// Extract a User from the token.
-		User user = jwtServ.getUserFromToken(token);
+		// User user = jwtServ.getUserFromToken(token);
 		
 		
 		/* Security issue: students can declare their own score if score is submitted from 
