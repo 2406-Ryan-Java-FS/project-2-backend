@@ -8,7 +8,7 @@ import com.revature.models.User;
 import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
-import com.revature.services.passutil.PasswordEncrypter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +16,14 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-
+   
     /**
      * Persists a User to the repository.
      *
@@ -49,8 +51,8 @@ public class UserServiceImpl implements UserService {
 
         try {
             // Encrypt the password and save the user
-            String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
-            user.setPassword(encryptedPassword);
+        	String encodedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
             return userRepository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Internal error occurred during sign up", e);
@@ -94,15 +96,15 @@ public class UserServiceImpl implements UserService {
 
        try {  
     	   User existingUser = userRepository.findByEmail(user.getEmail());
-    	   String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
-
-        if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
+    	   String encodedPassword = passwordEncoder.encode(user.getPassword());
+           
+        if (existingUser != null && existingUser.getPassword().equals(encodedPassword)) {
             return existingUser.getUserId();
         }
         throw new UnauthorizedException("Invalid login credentials");
     }
         catch (Exception e) {
-        throw new RuntimeException("Internal error occurred during sign up", e);
+        throw new RuntimeException("Internal error occurred during sign in", e);
 }
 }
 
