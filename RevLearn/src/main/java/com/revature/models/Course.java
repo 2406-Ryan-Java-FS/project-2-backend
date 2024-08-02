@@ -47,7 +47,7 @@ public class Course {
 
     @Column(name = "price", columnDefinition = "NUMERIC(10, 2)")
     @JsonProperty(value = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "img_url")
     @JsonProperty(value = "imgUrl")

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.revature.models.Review;
 import com.revature.services.KafkaProducerService;
+import com.revature.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,13 +13,17 @@ import com.revature.exceptions.BadRequestException;
 import com.revature.models.Enrollment;
 import com.revature.models.enums.PayStatus;
 import com.revature.services.EnrollmentService;
+import com.revature.services.JwtService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 
 import com.revature.exceptions.NotFoundException;
+import com.revature.exceptions.UnauthorizedException;
 
+@CrossOrigin
 @RestController
 public class EnrollmentController {
 
@@ -27,10 +32,18 @@ public class EnrollmentController {
     @Autowired
     KafkaProducerService kafkaProducerService;
 
+    /**
+     * Get all methods will be protected by Spring Security - if Implemented
+     */
+
+    EnrollmentService enrollmentService;
+
+    JwtService jwtService;
 
     @Autowired
-    public EnrollmentController(EnrollmentService enrollmentService) {
+    public EnrollmentController(EnrollmentService enrollmentService, JwtService jwtService) {
         this.enrollmentService = enrollmentService;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -53,63 +66,84 @@ public class EnrollmentController {
     }
 
     /**
-     * handler to update any information for an existing user in the database
+     * Handler to update the review information for an existing enrollment in the
+     * database.
      * 
-     * @param theEnrollmentId - the id of the course that we want to update in the
-     *                        database
-     * @param theReview the review data that we will update in the database
-     * @return a response entity containing the updated course or exception messages
-     *         upon failure
+     * @param theEnrollmentId - the ID of the enrollment that we want to update in
+     *                        the database
+     * @param theReview       - the review data that will be updated in the database
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity containing the updated enrollment or exception
+     *         messages upon failure
      */
     @PatchMapping("/enrollments/review/{theEnrollmentId}")
     public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
-            @RequestBody Review theReview) {
+            @RequestBody Review theReview, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
+
             kafkaProducerService.sendRequestMessage("Updating enrollment with id: " + theEnrollmentId);
-            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview);
+            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview, user);
             return ResponseEntity.ok(updatedEnrollment);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     /**
-     * GET request handler method that will find a record in the Enrollments table
-     * with the specified enrollmentId
+     * GET request handler method that finds a record in the Enrollments table with
+     * the specified enrollmentId.
      * 
-     * @param theEnrollmentId
-     * @return returns an OK response entity with type of Enrollment if record
-     *         exists in the table
-     *         returns a NOT_FOUND response entity with a String type displaying
-     *         that it could not be found
+     * @param theEnrollmentId - the ID of the enrollment to find
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity containing the Enrollment if the record exists, or
+     *         an appropriate error message
      */
     @GetMapping("/enrollments/{theEnrollmentId}")
-    public ResponseEntity<?> getEnrollmentById(@PathVariable("theEnrollmentId") Integer theEnrollmentId) {
-
+    public ResponseEntity<?> getEnrollmentById(@PathVariable Integer theEnrollmentId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
+
             kafkaProducerService.sendRequestMessage("Getting enrollment with id: " + theEnrollmentId);
-            Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId);
-
+            Enrollment theEnrollment = enrollmentService.getEnrollmentById(theEnrollmentId, user);
             return ResponseEntity.ok(theEnrollment);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (NotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 
-
+    /**
+     * Retrieves an enrollment record based on student ID and course ID.
+     *
+     * @param theStudentId the ID of the student
+     * @param theCourseId  the ID of the course
+     * @param token        the JWT token for authorization
+     * @return a ResponseEntity containing the enrollment record or an error message
+     */
     @GetMapping("enrollments/students/{theStudentId}/courses/{theCourseId}")
-    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable("theStudentId") Integer theStudentId,
-                                                        @PathVariable("theCourseId") Integer theCourseId){
-        try{
+    public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable Integer theStudentId,
+            @PathVariable Integer theCourseId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
             kafkaProducerService.sendRequestMessage("Getting enrollment with student id: " + theStudentId + " and course id: " + theCourseId);
-            return ResponseEntity.ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId));
-        } catch (NotFoundException e){
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity
+                    .ok(enrollmentService.getEnrollmentByStudentIdAndCourseId(theStudentId, theCourseId, user));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
@@ -122,7 +156,7 @@ public class EnrollmentController {
      *         course id
      */
     @GetMapping("/enrollments/courses/{theCourseId}")
-    public ResponseEntity<List<Enrollment>> getEnrollmentsByCourseId(@PathVariable("theCourseId") Integer theCourseId) {
+    public ResponseEntity<List<Enrollment>> getEnrollmentsByCourseId(@PathVariable Integer theCourseId) {
         kafkaProducerService.sendRequestMessage("Getting enrollments with course id: " + theCourseId);
         return ResponseEntity.ok(enrollmentService.getEnrollmentsByCourseId(theCourseId));
     }
@@ -139,10 +173,10 @@ public class EnrollmentController {
      *         are thrown or String type if the status is not valid
      */
     @GetMapping("/enrollments/students/{theStudentId}/{thePaymentStatus}")
-    public ResponseEntity<?> getEnrollmentsForStudentWithStatus(@PathVariable("theStudentId") Integer theStudentId,
-            @PathVariable("thePaymentStatus") String status) {
+    public ResponseEntity<?> getEnrollmentsForStudentWithStatus(@PathVariable Integer theStudentId,
+            @PathVariable String thePaymentStatus) {
         try {
-            PayStatus payStatus = PayStatus.valueOf(status);
+            PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
             kafkaProducerService.sendRequestMessage("Getting enrollments with student id: " + theStudentId + " and payment status: " + status);
 
             return ResponseEntity
@@ -161,9 +195,10 @@ public class EnrollmentController {
      *         are thrown or String type if the status is not valid
      */
     @GetMapping("/enrollments/status/{thePaymentStatus}")
-    public ResponseEntity<?> getEnrollmentsWithPayStatus(@PathVariable("thePaymentStatus") String status) {
+    public ResponseEntity<?> getEnrollmentsWithPayStatus(@PathVariable String thePaymentStatus) {
         try {
-            PayStatus payStatus = PayStatus.valueOf(status);
+
+            PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
             kafkaProducerService.sendRequestMessage("Getting enrollments with payment status: " + status);
 
             return ResponseEntity.ok(enrollmentService.getEnrollmentsByPaymentStatus(payStatus));
@@ -174,66 +209,121 @@ public class EnrollmentController {
 
     /**
      * Patch request handler that searches for the record with the passed
-     * enrollmentId and updates the pay status field from that record
+     * enrollmentId and updates the pay status field.
      * 
-     * @param theEnrollmentId - primary key value to update a single row in table
-     * @param payStatus       - value to be updated must be string type and value
-     *                        must be 'pending', 'cancelled', or 'completed'
-     * @return returns the updated record from the table
-     * @throws BadRequestException
+     * @param theEnrollmentId - the primary key value to identify the enrollment to
+     *                        update
+     * @param payStatus       - a JSON string containing the pay status to be
+     *                        updated; must be 'PENDING', 'CANCELLED', or
+     *                        'COMPLETED'
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity containing the updated enrollment record or an error
+     *         message
+     * @throws BadRequestException if the provided pay status is invalid or the
+     *                             update fails
      */
     @PatchMapping("/enrollments/payStatus/{theEnrollmentId}")
-    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable("theEnrollmentId") Integer theEnrollmentId,
-            @RequestBody String payStatus) {
-
+    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable Integer theEnrollmentId,
+            @RequestBody String payStatus, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(payStatus);
             String payStatusString = jsonNode.get("payStatus").asText();
 
-            PayStatus status = PayStatus.valueOf(payStatusString);
+            PayStatus status = PayStatus.valueOf(payStatusString.toUpperCase());
             kafkaProducerService.sendRequestMessage("Updating payment status for enrollment with id: " + theEnrollmentId + " to: " + payStatusString);
+          
 
-            return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status));
+            return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status, user));
 
-        } catch (JsonProcessingException | BadRequestException | NullPointerException e) {
-            return ResponseEntity.badRequest().body("Could not update payment status");
+        } catch (JsonProcessingException | NullPointerException e) {
+            return ResponseEntity.badRequest().body("Invalid JSON format for payment status");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Please enter 'pending', 'completed', or 'cancelled'");
+            return ResponseEntity.badRequest().body("Please enter 'PENDING', 'COMPLETED', or 'CANCELLED'");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (NotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
+    /**
+     * Adds a new enrollment and returns the newly created enrollment object.
+     * 
+     * @param newEnrollment - the enrollment object to be created
+     * @param token         - the authorization token to identify the user making
+     *                      the request
+     * @return a ResponseEntity containing the newly created enrollment object or an
+     *         error message
+     */
     @PostMapping("/enrollments")
-    public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment) {
+    public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
-            Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment);
+            Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment, user);
             kafkaProducerService.sendRequestMessage("Adding enrollment for student with id: " + newEnrollment.getStudentId() + " and course with id: " + newEnrollment.getCourseId());  
             return ResponseEntity.ok(enrollment);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @GetMapping("/enrollments/students/{studentId}")
-    public ResponseEntity<List<Enrollment>> getEnrollmentByStudentId(@PathVariable("studentId") Integer theStudentId) {
-        List<Enrollment> enrollments = enrollmentService.getEnrollmentByStudentId(theStudentId);
-        if (enrollments != null && !enrollments.isEmpty()) {
-            kafkaProducerService.sendRequestMessage("Getting enrollments for student with id: " + theStudentId);
-            return ResponseEntity.ok(enrollments);
+    /**
+     * Retrieves enrollments for a specific student by their student ID.
+     * 
+     * @param theStudentId - the ID of the student whose enrollments are to be
+     *                     retrieved
+     * @param token        - the authorization token to identify the user making the
+     *                     request
+     * @return a ResponseEntity containing a list of enrollments if found, or a 404
+     *         Not Found status if no enrollments are found
+     */
+    @GetMapping("/enrollments/students/{theStudentId}")
+    public ResponseEntity<?> getEnrollmentByStudentId(@PathVariable Integer theStudentId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            List<Enrollment> enrollments = enrollmentService.getEnrollmentByStudentId(theStudentId, user);
+            if (enrollments != null && !enrollments.isEmpty()) {
+              kafkaProducerService.sendRequestMessage("Getting enrollments for student with id: " + theStudentId);
+                return ResponseEntity.ok(enrollments);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/enrollments/{id}")
-    public ResponseEntity<Integer> deleteEnrollment(@PathVariable("id") Integer theEnrollmentId) {
-        Integer result = enrollmentService.deleteEnrollment(theEnrollmentId);
-        if (result == 1) {
-            kafkaProducerService.sendRequestMessage("Deleting enrollment with id: " + theEnrollmentId);
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(500).body(result);
+
+    /**
+     * Deletes an enrollment by its ID.
+     * 
+     * @param theEnrollmentId - the ID of the enrollment to be deleted
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity with the result of the deletion operation
+     */
+    @DeleteMapping("/enrollments/{theEnrollmentId}")
+    public ResponseEntity<Integer> deleteEnrollment(@PathVariable Integer theEnrollmentId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            Integer result = enrollmentService.deleteEnrollment(theEnrollmentId, user);
+            if (result == 1) {
+              kafkaProducerService.sendRequestMessage("Deleting enrollment with id: " + theEnrollmentId);
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            }
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(0);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
     }
 }
