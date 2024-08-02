@@ -18,7 +18,6 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@CrossOrigin
 public class QuizController {
 
     QuizServiceImpl qs;
