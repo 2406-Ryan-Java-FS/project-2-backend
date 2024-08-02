@@ -36,7 +36,6 @@ public class EnrollmentController {
      * Get all methods will be protected by Spring Security - if Implemented
      */
 
-    EnrollmentService enrollmentService;
 
     JwtService jwtService;
 
@@ -177,7 +176,7 @@ public class EnrollmentController {
             @PathVariable String thePaymentStatus) {
         try {
             PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
-            kafkaProducerService.sendRequestMessage("Getting enrollments with student id: " + theStudentId + " and payment status: " + status);
+            kafkaProducerService.sendRequestMessage("Getting enrollments with student id: " + theStudentId + " and payment status: " + thePaymentStatus);
 
             return ResponseEntity
                     .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus));
@@ -199,7 +198,7 @@ public class EnrollmentController {
         try {
 
             PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
-            kafkaProducerService.sendRequestMessage("Getting enrollments with payment status: " + status);
+            kafkaProducerService.sendRequestMessage("Getting enrollments with payment status: " + thePaymentStatus);
 
             return ResponseEntity.ok(enrollmentService.getEnrollmentsByPaymentStatus(payStatus));
         } catch (IllegalArgumentException e) {

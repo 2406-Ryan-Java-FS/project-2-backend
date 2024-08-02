@@ -90,11 +90,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public Enrollment getEnrollmentById(Integer theEnrollmentId, User user) {
         Integer userId = user.getUserId();
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
-                .orElseThrow(() ->{ 
+                .orElseThrow(() -> { 
                   kafkaProducerService.sendResponseMessage("Enrollment could not be found");
-                  new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found"
-                                                          }));
-
+                throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+                });
+                
         if (!userId.equals(enrollment.getStudentId())) {
             kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
             throw new UnauthorizedException("Invalid Authorization!");
@@ -216,8 +216,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
                 .orElseThrow(() -> {
                   kafkaProducerService.sendRequestMessage("Could not update Payment Status, enrollment does not exist");
-                  new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId
-                                        }));
+                throw  new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
+                });
+                                        
    
         if (!userId.equals(enrollment.getStudentId())) {
             kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
@@ -253,8 +254,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
                 .orElseThrow(() -> {
                               kafkaProducerService.sendRequestMessage("Cannot update. The requested enrollment does not exist:");
-                             new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId
-                                                   }));
+                             throw new NotFoundException("Cannot update. The requested enrollment does not exist: " + theEnrollmentId);
+                });
+                                                   
                   
         if (!userId.equals(enrollment.getStudentId())) {
             kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
@@ -293,7 +295,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 kafkaProducerService.sendRequestMessage("Invalid operation");
                 throw new BadRequestException("Invalid operation");
             }
-            kafkaProducerService.sendRequestMessage("Enrollment updated: " + dBEnrollment.toString());
+            kafkaProducerService.sendRequestMessage("Enrollment updated: " + enrollment.toString());
 
             return enrollmentRepository.save(enrollment);
 
@@ -303,7 +305,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
           
             throw new RuntimeException(String.format(
                     "Cannot update. Please check inputted values.\nEnrollment ID: %s\nCourse Rating: %s\nCourse Review: %s",
-                    theEnrollmentId, theReview.getCourseRating(), theReview.getCourseReview()), e);;
+                    theEnrollmentId, theReview.getCourseRating(), theReview.getCourseReview()), e);
         }
     }
 
@@ -324,8 +326,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(theEnrollmentId)
                 .orElseThrow(() -> {
                   kafkaProducerService.sendRequestMessage("Cannot delete. The requested enrollment does not exist:");
-                  new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found"
-                                        }));
+                  throw new NotFoundException("Enrollment Record with ID: " + theEnrollmentId + " could not be found");
+                });
+                                      
 
         if (!userId.equals(enrollment.getStudentId())) {
             kafkaProducerService.sendResponseMessage("Request Failed. User not authorized");
