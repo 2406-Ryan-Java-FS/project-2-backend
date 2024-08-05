@@ -1,5 +1,6 @@
 package com.revature.services;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,10 +59,26 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (!userId.equals(newEnrollment.getStudentId())) {
             throw new UnauthorizedException("Invalid Authorization!");
         }
+
+        // Set defaults
+        newEnrollment.setEnrollmentDate(new Timestamp(System.currentTimeMillis()));
+
+        newEnrollment.setCourseRating(null);
+
         if (newEnrollment.getPaymentStatus() == null) {
-            throw new BadRequestException(
-                    "Please enter either 'pending', 'completed', or 'cancelled' for payment status.");
+            newEnrollment.setPaymentStatus(PayStatus.pending);
         }
+
+        if (newEnrollment.getPaymentStatus() == PayStatus.completed) {
+            newEnrollment.setEnrolled(true);
+        } else {
+            newEnrollment.setEnrolled(false);
+        }
+
+        if (newEnrollment.getCourseReview() == null || newEnrollment.getCourseReview().isEmpty()) {
+            newEnrollment.setCourseReview("");
+        }
+
         return enrollmentRepository.save(newEnrollment);
     }
 
@@ -158,7 +175,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
      */
     @Override
     public List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId,
-            PayStatus thePaymentStatus) {
+            PayStatus thePaymentStatus, User user) {
+        Integer userId = user.getUserId();
+        if (userId != theStudentId) {
+            throw new UnauthorizedException("Invalid Authorization!");
+        }
         return enrollmentRepository.findByStudentIdAndPaymentStatus(theStudentId, thePaymentStatus);
     }
 

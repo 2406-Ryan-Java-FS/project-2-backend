@@ -27,12 +27,7 @@ import com.revature.exceptions.UnauthorizedException;
 @RestController
 public class EnrollmentController {
 
-    /**
-     * Get all methods will be protected by Spring Security - if Implemented
-     */
-
     EnrollmentService enrollmentService;
-
     JwtService jwtService;
 
     @Autowired
@@ -41,8 +36,10 @@ public class EnrollmentController {
         this.jwtService = jwtService;
     }
 
+    // GET Requests
+
     /**
-     * handler to get all enrollments.
+     * Handler to get all enrollments.
      * 
      * @return List<Enrollment> a list of enrollment objects wrapped in a
      *         ResponseEntity as the response body to the HTTP caller.
@@ -56,36 +53,6 @@ public class EnrollmentController {
             return ResponseEntity.ok(allEnrollments);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    /**
-     * Handler to update the review information for an existing enrollment in the
-     * database.
-     * 
-     * @param theEnrollmentId - the ID of the enrollment that we want to update in
-     *                        the database
-     * @param theReview       - the review data that will be updated in the database
-     * @param token           - the authorization token to identify the user making
-     *                        the request
-     * @return a ResponseEntity containing the updated enrollment or exception
-     *         messages upon failure
-     */
-    @PatchMapping("/enrollments/review/{theEnrollmentId}")
-    public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
-            @RequestBody Review theReview, @RequestHeader(name = "Authorization") String token) {
-        User user = jwtService.getUserFromToken(token);
-        try {
-            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview, user);
-            return ResponseEntity.ok(updatedEnrollment);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -123,8 +90,7 @@ public class EnrollmentController {
      */
     @GetMapping("enrollments/students/{theStudentId}/courses/{theCourseId}")
     public ResponseEntity<?> getEnrollmentByStudentIdAndCourseId(@PathVariable Integer theStudentId,
-            @PathVariable Integer theCourseId,
-            @RequestHeader(name = "Authorization") String token) {
+            @PathVariable Integer theCourseId, @RequestHeader(name = "Authorization") String token) {
         User user = jwtService.getUserFromToken(token);
         try {
             return ResponseEntity
@@ -138,7 +104,7 @@ public class EnrollmentController {
 
     /**
      * GET request handler method that will find all records in the database with
-     * the specified course id
+     * the specified course id.
      * 
      * @param theCourseId - course id value used as condition to query the database
      * @return A Response Entity with a list of all enrollments with the specified
@@ -151,33 +117,37 @@ public class EnrollmentController {
 
     /**
      * GET request handler method that will find all records in the database with
-     * the specified studentId and payment status
+     * the specified studentId and payment status.
      * 
-     * @param theStudentId - studentId value being used as a condition to query the
-     *                     database
-     * @param status       - payment status value used as condition to query the
-     *                     database
+     * @param theStudentId     - studentId value being used as a condition to query
+     *                         the
+     *                         database
+     * @param thePaymentStatus - payment status value used as condition to query the
+     *                         database
      * @return A response entity of either List<Enrollment> type if no exceptions
      *         are thrown or String type if the status is not valid
      */
     @GetMapping("/enrollments/students/{theStudentId}/{thePaymentStatus}")
     public ResponseEntity<?> getEnrollmentsForStudentWithStatus(@PathVariable Integer theStudentId,
-            @PathVariable String thePaymentStatus) {
+            @PathVariable String thePaymentStatus, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
         try {
             PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
-
             return ResponseEntity
-                    .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus));
+                    .ok(enrollmentService.getEnrollmentsByStudentIdAndPaymentStatus(theStudentId, payStatus, user));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid Status");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
     /**
      * GET request handler method that will find all records in the database with
-     * the specified payment status
+     * the specified payment status.
      * 
-     * @param status - payment status value used as condition to query the database
+     * @param thePaymentStatus - payment status value used as condition to query the
+     *                         database
      * @return A response entity of either List<Enrollment> type if no exceptions
      *         are thrown or String type if the status is not valid
      */
@@ -185,73 +155,9 @@ public class EnrollmentController {
     public ResponseEntity<?> getEnrollmentsWithPayStatus(@PathVariable String thePaymentStatus) {
         try {
             PayStatus payStatus = PayStatus.valueOf(thePaymentStatus);
-
             return ResponseEntity.ok(enrollmentService.getEnrollmentsByPaymentStatus(payStatus));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid Status");
-        }
-    }
-
-    /**
-     * Patch request handler that searches for the record with the passed
-     * enrollmentId and updates the pay status field.
-     * 
-     * @param theEnrollmentId - the primary key value to identify the enrollment to
-     *                        update
-     * @param payStatus       - a JSON string containing the pay status to be
-     *                        updated; must be 'PENDING', 'CANCELLED', or
-     *                        'COMPLETED'
-     * @param token           - the authorization token to identify the user making
-     *                        the request
-     * @return a ResponseEntity containing the updated enrollment record or an error
-     *         message
-     * @throws BadRequestException if the provided pay status is invalid or the
-     *                             update fails
-     */
-    @PatchMapping("/enrollments/payStatus/{theEnrollmentId}")
-    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable Integer theEnrollmentId,
-            @RequestBody String payStatus, @RequestHeader(name = "Authorization") String token) {
-        User user = jwtService.getUserFromToken(token);
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(payStatus);
-            String payStatusString = jsonNode.get("payStatus").asText();
-
-            PayStatus status = PayStatus.valueOf(payStatusString.toUpperCase());
-
-            return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status, user));
-
-        } catch (JsonProcessingException | NullPointerException e) {
-            return ResponseEntity.badRequest().body("Invalid JSON format for payment status");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Please enter 'PENDING', 'COMPLETED', or 'CANCELLED'");
-        } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    /**
-     * Adds a new enrollment and returns the newly created enrollment object.
-     * 
-     * @param newEnrollment - the enrollment object to be created
-     * @param token         - the authorization token to identify the user making
-     *                      the request
-     * @return a ResponseEntity containing the newly created enrollment object or an
-     *         error message
-     */
-    @PostMapping("/enrollments")
-    public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment,
-            @RequestHeader(name = "Authorization") String token) {
-        User user = jwtService.getUserFromToken(token);
-        try {
-            Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment, user);
-            return ResponseEntity.ok(enrollment);
-        } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (BadRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -279,6 +185,102 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
+    // POST Requests
+
+    /**
+     * Adds a new enrollment and returns the newly created enrollment object.
+     * 
+     * @param newEnrollment - the enrollment object to be created
+     * @param token         - the authorization token to identify the user making
+     *                      the request
+     * @return a ResponseEntity containing the newly created enrollment object or an
+     *         error message
+     */
+    @PostMapping("/enrollments")
+    public ResponseEntity<?> addEnrollment(@RequestBody Enrollment newEnrollment,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            Enrollment enrollment = enrollmentService.registerEnrollment(newEnrollment, user);
+            return ResponseEntity.ok(enrollment);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    // PATCH Requests
+
+    /**
+     * Handler to update the review information for an existing enrollment in the
+     * database.
+     * 
+     * @param theEnrollmentId - the ID of the enrollment that we want to update in
+     *                        the database
+     * @param theReview       - the review data that will be updated in the database
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity containing the updated enrollment or exception
+     *         messages upon failure
+     */
+    @PatchMapping("/enrollments/review/{theEnrollmentId}")
+    public ResponseEntity<?> updateEnrollmentById(@PathVariable Integer theEnrollmentId,
+            @RequestBody Review theReview, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            Enrollment updatedEnrollment = enrollmentService.updateEnrollmentById(theEnrollmentId, theReview, user);
+            return ResponseEntity.ok(updatedEnrollment);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Patch request handler that searches for the record with the passed
+     * enrollmentId and updates the pay status field.
+     * 
+     * @param theEnrollmentId - the primary key value to identify the enrollment to
+     *                        update
+     * @param payStatus       - a JSON string containing the pay status to be
+     *                        updated; must be 'PENDING', 'CANCELLED', or
+     *                        'COMPLETED'
+     * @param token           - the authorization token to identify the user making
+     *                        the request
+     * @return a ResponseEntity containing the updated enrollment record or an error
+     *         message
+     * @throws BadRequestException if the provided pay status is invalid or the
+     *                             update fails
+     */
+    @PatchMapping("/enrollments/payStatus/{theEnrollmentId}")
+    public ResponseEntity<?> updatePaymentStatusForEnrollment(@PathVariable Integer theEnrollmentId,
+            @RequestBody String payStatus, @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(payStatus);
+            String payStatusString = jsonNode.get("payStatus").asText();
+            PayStatus status = PayStatus.valueOf(payStatusString.toUpperCase());
+            return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status, user));
+        } catch (JsonProcessingException | NullPointerException e) {
+            return ResponseEntity.badRequest().body("Invalid JSON format for payment status");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Please enter 'PENDING', 'COMPLETED', or 'CANCELLED'");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    // DELETE Request
 
     /**
      * Deletes an enrollment by its ID.
