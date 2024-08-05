@@ -2,7 +2,6 @@ package com.revature.services;
 
 import java.util.List;
 
-import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -162,6 +161,7 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 		return 1;	
 	}
 	
+	@SuppressWarnings("deprecation")
 	public Integer deleteAllByQuizId(Integer quiz_id) {
 		try 
 		{
@@ -176,6 +176,7 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 		return 1;	
 	}
 	
+	@SuppressWarnings("deprecation")
 	public Integer deleteAllByStudentId(Integer student_id) {
 		try 
 		{
@@ -190,6 +191,7 @@ public class QuizAttemptsServiceImpl implements QuizAttemptsService{
 		return 1;	
 	}
 	
+	@SuppressWarnings("deprecation")
 	public Integer deleteAllByCourseId(Integer course_id) {
 		try 
 		{

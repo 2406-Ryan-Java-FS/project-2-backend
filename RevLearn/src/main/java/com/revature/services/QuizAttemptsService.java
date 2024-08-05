@@ -2,8 +2,6 @@ package com.revature.services;
 
 import java.util.List;
 
-import org.apache.commons.math3.util.Precision;
-
 import com.revature.exceptions.*;
 import com.revature.models.QuizAttempts;
 import com.revature.models.dtos.QuizAttemptsDTO;
