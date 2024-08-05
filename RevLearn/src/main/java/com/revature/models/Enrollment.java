@@ -51,7 +51,7 @@ public class Enrollment {
     @JsonProperty(value = "enrolled")
     private Boolean enrolled;
 
-    @Column(name = "course_rating")
+    @Column(name = "course_rating", nullable = true)
     @JsonProperty(value = "courseRating")
     private Integer courseRating;
 

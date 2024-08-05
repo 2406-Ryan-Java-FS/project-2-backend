@@ -37,7 +37,7 @@ public class QuizAttempts {
 	
 
 	// for DTO
-	public QuizAttempts(User student, Quiz quiz, Timestamp attempt_date, Double score) 
+	public QuizAttempts(User student, Quiz quiz, Timestamp attempt_date) 
 	{
 		super();
 		this.student = student;
@@ -50,7 +50,8 @@ public class QuizAttempts {
 		else if (attempt_date != null)
 			this.attempt_date = attempt_date;
 		
-		this.score = score;
+		// Score input is 0 at the start of a quiz.
+		this.score = 0.00;
 	}
 
 	
