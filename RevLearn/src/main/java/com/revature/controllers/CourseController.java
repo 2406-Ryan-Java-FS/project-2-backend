@@ -14,15 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 
 @RestController
@@ -38,6 +31,8 @@ public class CourseController {
         this.jwtService = jwtService;
     }
 
+    // GET Requests
+
     /**
      * Handler to get all courses.
      * 
@@ -47,29 +42,6 @@ public class CourseController {
     public ResponseEntity<List<Course>> getAllCourses() {
         List<Course> allCourses = courseService.getAllCourses();
         return ResponseEntity.ok(allCourses);
-    }
-
-    /**
-     * Handler to add a new course.
-     * 
-     * @param newCourse - course object that contains all fields
-     * @param token     - the authorization token to identify the user making the
-     *                  request
-     * @return ResponseEntity containing the new course or a Bad Request error
-     *         message if required fields are not filled out
-     */
-    @PostMapping("/courses")
-    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse,
-            @RequestHeader(name = "Authorization") String token) {
-        User user = jwtService.getUserFromToken(token);
-        try {
-            Course course = courseService.addCourse(newCourse, user);
-            return ResponseEntity.ok(course);
-        } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (BadRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     /**
@@ -134,30 +106,32 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCoursesByEducatorId(theEducatorId));
     }
 
+    // POST Request
+
     /**
-     * Handler to delete course data.
+     * Handler to add a new course.
      * 
-     * @param theCourseId - the ID of the course to delete from the database
-     * @param token       - the authorization token to identify the user making the
-     *                    request
-     * @return ResponseEntity containing the result of the deletion
+     * @param newCourse - course object that contains all fields
+     * @param token     - the authorization token to identify the user making the
+     *                  request
+     * @return ResponseEntity containing the new course or a Bad Request error
+     *         message if required fields are not filled out
      */
-    @DeleteMapping("/courses/{theCourseId}")
-    public ResponseEntity<?> deleteCourseById(@PathVariable Integer theCourseId,
+    @PostMapping("/courses")
+    public ResponseEntity<?> addNewCourse(@RequestBody Course newCourse,
             @RequestHeader(name = "Authorization") String token) {
         User user = jwtService.getUserFromToken(token);
         try {
-            Integer rowsAffected = courseService.deleteCourseById(theCourseId, user);
-            return ResponseEntity.ok(rowsAffected + " course deleted.");
+            Course course = courseService.addCourse(newCourse, user);
+            return ResponseEntity.ok(course);
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred while deleting the course.");
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    // PATCH Request
 
     /**
      * Handler to update a course by its course ID.
@@ -189,6 +163,33 @@ public class CourseController {
         } catch (Exception e) {
             System.err.println("Exception occurred while updating course: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // DELETE Request
+
+    /**
+     * Handler to delete course data.
+     * 
+     * @param theCourseId - the ID of the course to delete from the database
+     * @param token       - the authorization token to identify the user making the
+     *                    request
+     * @return ResponseEntity containing the result of the deletion
+     */
+    @DeleteMapping("/courses/{theCourseId}")
+    public ResponseEntity<?> deleteCourseById(@PathVariable Integer theCourseId,
+            @RequestHeader(name = "Authorization") String token) {
+        User user = jwtService.getUserFromToken(token);
+        try {
+            Integer rowsAffected = courseService.deleteCourseById(theCourseId, user);
+            return ResponseEntity.ok(rowsAffected + " course deleted.");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while deleting the course.");
         }
     }
 }

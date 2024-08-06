@@ -20,7 +20,7 @@ public interface EnrollmentService {
 
     List<Enrollment> getEnrollmentsByCourseId(Integer theCourseId);
 
-    List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId, PayStatus thePaymentStatus);
+    List<Enrollment> getEnrollmentsByStudentIdAndPaymentStatus(Integer theStudentId, PayStatus thePaymentStatus, User user);
 
     List<Enrollment> getEnrollmentsByPaymentStatus(PayStatus thePaymentStatus);
 
