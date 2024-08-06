@@ -1,24 +1,26 @@
 package com.revature.services;
 
-import com.revature.exceptions.BadRequestException;
-import com.revature.exceptions.ConflictException;
-import com.revature.exceptions.InternalServerErrorException;
-import com.revature.exceptions.UnauthorizedException;
+import com.revature.exceptions.*;
 import com.revature.models.Educator;
 import com.revature.models.User;
 import com.revature.models.dtos.UserEducator;
 import com.revature.models.enums.Role;
 import com.revature.repositories.UserRepository;
-import com.revature.services.passutil.PasswordEncrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -53,11 +55,11 @@ public class UserServiceImpl implements UserService {
 
         try {
             // Encrypt the password and save the user
-            String encryptedPassword = PasswordEncrypter.encryptPassword(user.getPassword());
-            user.setPassword(encryptedPassword);
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
             return userRepository.save(user);
-        } catch (NoSuchAlgorithmException e) {
-            throw new InternalServerErrorException("Password encryption error, please try again.");
+        } catch (Exception e) {
+            throw new RuntimeException("Internal error occurred during sign up", e);
         }
     }
 
@@ -99,14 +101,15 @@ public class UserServiceImpl implements UserService {
 
         try {
             User existingUser = userRepository.findByEmail(user.getEmail());
-            String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
 
-            if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
+            if (existingUser != null && existingUser.getPassword().equals(encodedPassword)) {
                 return existingUser.getUserId();
             }
             throw new UnauthorizedException("Invalid login credentials");
-        } catch (NoSuchAlgorithmException e) {
-            throw new InternalServerErrorException("Password encryption error, please try again.");
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Internal error occurred during sign in", e);
         }
     }
 
@@ -125,5 +128,38 @@ public class UserServiceImpl implements UserService {
         }
         dto.setEducator(educator);
         return dto;
+    }
+
+    /**
+     * Loads a User by their email.
+     *
+     * @param email the email of the User to load.
+     * @return a UserDetails object representing the User.
+     * @throws UsernameNotFoundException if the User is not found.
+     */
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getEmail())
+                    .password(user.getPassword())
+                    .roles(getRoles(user))
+                    .build();
+        } else {
+            throw new UsernameNotFoundException(email);
+        }
+    }
+
+    /**
+     * Retrieves the roles of a User.
+     *
+     * @param user the User to retrieve roles from.
+     * @return an array of roles as Strings.
+     */
+    public String[] getRoles(User user) {
+        if (user.getRole() == null) {
+            return new String[]{"STUDENT"};
+        }
+        return new String[]{"EDUCATOR"};
     }
 }

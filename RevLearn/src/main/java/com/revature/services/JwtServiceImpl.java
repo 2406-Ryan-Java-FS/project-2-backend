@@ -9,9 +9,11 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 
 @Service
@@ -98,6 +100,50 @@ public class JwtServiceImpl implements JwtService{
         }
 
         return Integer.parseInt(body.getSubject());
+    }
+
+    /**
+     * Extracts the username from the token
+     *
+     * @param token the jwt token from request
+     * @return username as String
+     */
+    public String extractUsername(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)); // create key from app.yml
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("email", String.class);
+    }
+
+//    /**
+//     * Validates the token
+//     *
+//     * @param token the jwt token from request
+//     * @param userDetails the user details from request
+//     * @return true if token is valid, false if not
+//     */
+//    public boolean validateToken(String token, UserDetails userDetails) {
+//        String username = extractUsername(token);
+//        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+//    }
+
+    /**
+     * Checks if the token is expired
+     *
+     * @param token the jwt token from request
+     * @return true if token is expired, false if not
+     */
+    public boolean isTokenValid(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)); // create key from app.yml
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.getExpiration().after(Date.from(Instant.now()));
     }
 
 }
