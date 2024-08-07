@@ -170,7 +170,7 @@ SET search_path TO project2;
 DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts CASCADE;
 
 -- Drop existing casts if they exist
-drop cast if exists (varchar AS user_role);
+DROP CAST IF EXISTS (varchar AS user_role);
 
 -- Drop existing types if they exist
 DROP TYPE IF EXISTS user_role;
@@ -178,7 +178,7 @@ DROP TYPE IF EXISTS pay_status;
 
 -- Create types
 CREATE TYPE user_role AS ENUM('student', 'educator');
-CREATE TYPE	pay_status AS ENUM('pending', 'completed', 'cancelled');
+CREATE TYPE pay_status AS ENUM('pending', 'completed', 'cancelled');
 
 -- Create cast for types
 CREATE CAST (varchar AS user_role) WITH INOUT AS implicit;
@@ -209,7 +209,7 @@ CREATE TABLE Courses (
     description TEXT,
     category VARCHAR(100),
     price NUMERIC(10, 2),
-    img_url text default 'https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg',
+    img_url text DEFAULT 'https://www.fourpaws.com/-/media/Project/OneWeb/FourPaws/Images/articles/cat-corner/cats-that-dont-shed/siamese-cat.jpg',
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (educator_id) REFERENCES Educators(educator_id) ON DELETE SET NULL
 );
@@ -221,7 +221,7 @@ CREATE TABLE Enrollments (
     enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_status VARCHAR(255) NOT NULL,
     enrollment_status BOOLEAN NOT NULL DEFAULT FALSE,
-    course_rating int default 3,
+    course_rating INT DEFAULT 3,
     course_review VARCHAR(255),
     FOREIGN KEY (student_id) REFERENCES Users(user_id) ON DELETE SET NULL,
     FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE SET NULL
@@ -233,7 +233,7 @@ CREATE TABLE Quizzes (
     title VARCHAR(255) NOT NULL,
     timer INT,
     attempts_allowed INT,
-    open bool,
+    open BOOL,
     FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
 );
 
@@ -247,7 +247,7 @@ CREATE TABLE QuizQuestions (
 CREATE TABLE QuestionChoices (
     choice_id SERIAL PRIMARY KEY,
     question_id  INT,
-    correct bool,
+    correct BOOL,
     text VARCHAR(255) NOT NULL,
     FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id) ON DELETE CASCADE
 );
@@ -263,9 +263,9 @@ CREATE TABLE QuizAttempts (
 );
 
 CREATE TABLE ChoiceSelections (
-        choice_id int REFERENCES QuestionChoices(choice_id) NOT NULL,
-        attempt_id int REFERENCES QuizAttempts (attempt_id) NOT NULL,
-        PRIMARY KEY(choice_id, attempt_id)
+    choice_id INT REFERENCES QuestionChoices(choice_id) NOT NULL,
+    attempt_id INT REFERENCES QuizAttempts(attempt_id) NOT NULL,
+    PRIMARY KEY(choice_id, attempt_id)
 );
 
 -- Sample Data
