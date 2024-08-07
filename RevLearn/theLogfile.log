@@ -1,0 +1,33 @@
+2024-08-07 16:14:54 INFO  m.revature.RevLearnApplication   50: Starting RevLearnApplication v0.0.1-SNAPSHOT using Java 17.0.11 with PID 7608 (C:\Users\rene\project-2-backend\RevLearn\target\RevLearn-0.0.1-SNAPSHOT.jar started by rene in C:\Users\rene\project-2-backend\RevLearn)
+2024-08-07 16:14:54 INFO  m.revature.RevLearnApplication  660: The following 1 profile is active: "h2"
+2024-08-07 16:14:56 INFO  epositoryConfigurationDelegate  143: Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-07 16:14:56 INFO  epositoryConfigurationDelegate  211: Finished Spring Data repository scanning in 143 ms. Found 9 JPA repository interfaces.
+2024-08-07 16:14:58 INFO  mbedded.tomcat.TomcatWebServer  111: Tomcat initialized with port 8080 (http)
+2024-08-07 16:14:58 INFO  oyote.http11.Http11NioProtocol  173: Initializing ProtocolHandler ["http-nio-8080"]
+2024-08-07 16:14:58 INFO  .catalina.core.StandardService  173: Starting service [Tomcat]
+2024-08-07 16:14:58 INFO  e.catalina.core.StandardEngine  173: Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-07 16:14:58 INFO  rBase.[Tomcat].[localhost].[/]  173: Initializing Spring embedded WebApplicationContext
+2024-08-07 16:14:58 INFO  letWebServerApplicationContext  296: Root WebApplicationContext: initialization completed in 3978 ms
+2024-08-07 16:14:58 INFO  zaxxer.hikari.HikariDataSource  109: HikariPool-1 - Starting...
+2024-08-07 16:14:59 INFO  .zaxxer.hikari.pool.HikariPool  554: HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2024-08-07 16:14:59 INFO  zaxxer.hikari.HikariDataSource  122: HikariPool-1 - Start completed.
+2024-08-07 16:14:59 INFO  te.jpa.internal.util.LogHelper   31: HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-07 16:14:59 INFO           org.hibernate.Version   44: HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-07 16:14:59 INFO  nternal.RegionFactoryInitiator   50: HHH000026: Second-level cache disabled
+2024-08-07 16:15:00 INFO  unit.SpringPersistenceUnitInfo   87: No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-07 16:15:00 WARN   org.hibernate.orm.deprecation  153: HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-08-07 16:15:01 INFO  .internal.JtaPlatformInitiator   59: HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-07 16:15:01 INFO  tainerEntityManagerFactoryBean  437: Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-07 16:15:01 INFO  m.revature.RevLearnApplication   35: JWT_TOKEN=null1
+2024-08-07 16:15:01 INFO  m.revature.RevLearnApplication   36: jwtSpringProfile length=684
+2024-08-07 16:15:01 INFO  m.revature.RevLearnApplication   37: jwtSpringProfile=HlS2Q3Dj2k6ekOUYkdmGPK30Rzdza1W8K (truncated)...
+2024-08-07 16:15:01 INFO  m.revature.RevLearnApplication   38: dataSource=sa
+2024-08-07 16:15:02 INFO  ory.query.QueryEnhancerFactory   49: Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-08-07 16:15:03 WARN  figuration$JpaWebConfiguration  236: spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-07 16:15:05 INFO  oint.web.EndpointLinksResolver   60: Exposing 1 endpoint beneath base path '/actuator'
+2024-08-07 16:15:05 INFO  oyote.http11.Http11NioProtocol  173: Starting ProtocolHandler ["http-nio-8080"]
+2024-08-07 16:15:05 INFO  mbedded.tomcat.TomcatWebServer  243: Tomcat started on port 8080 (http) with context path '/'
+2024-08-07 16:15:05 INFO  m.revature.RevLearnApplication   56: Started RevLearnApplication in 12.485 seconds (process running for 13.266)
+2024-08-07 16:15:11 INFO  tainerEntityManagerFactoryBean  650: Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-07 16:15:11 INFO  zaxxer.hikari.HikariDataSource  349: HikariPool-1 - Shutdown initiated...
+2024-08-07 16:15:11 INFO  zaxxer.hikari.HikariDataSource  351: HikariPool-1 - Shutdown completed.

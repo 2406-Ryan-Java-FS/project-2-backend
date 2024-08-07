@@ -35,7 +35,7 @@ ssh -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
 END
 
 echo "Shell script: Waiting for the jar to stop"
-sleep 6
+sleep 15
 
 ssh -i ~/project22.pem ec2-user@$AWS_EC2_IP << 'END'
   echo "Shell script: Starting the new jar"
