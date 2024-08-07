@@ -267,7 +267,7 @@ public class EnrollmentController {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(payStatus);
             String payStatusString = jsonNode.get("payStatus").asText();
-            PayStatus status = PayStatus.valueOf(payStatusString.toUpperCase());
+            PayStatus status = PayStatus.valueOf(payStatusString.toLowerCase());
             return ResponseEntity.ok(enrollmentService.updateEnrollmentById(theEnrollmentId, status, user));
         } catch (JsonProcessingException | NullPointerException e) {
             return ResponseEntity.badRequest().body("Invalid JSON format for payment status");
