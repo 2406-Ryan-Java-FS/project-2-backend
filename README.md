@@ -52,10 +52,10 @@ Register as an educator using email, password, and professional details.
 ## Technologies Used
 ### Backend
 - Java
+- Spring Framework
+- PostgreSQL
 - Spring Boot
-- Spring Data JPA
-- Spring Security
-- REST API
+- Kafka
 
 #### Models
 - ChoiceSelection
@@ -70,10 +70,18 @@ Register as an educator using email, password, and professional details.
 - User
 
 ### Frontend
+- HTML
+- CSS
 - JavaScript
 - React
 - Axios
-- Bootstrap (or another CSS framework, if used)
+- Material UI
+
+### DevOps
+- Docker
+- AWS RDS
+- AWS EC2
+- AWS S3
 
 ## Installation and Setup
 ### Backend
