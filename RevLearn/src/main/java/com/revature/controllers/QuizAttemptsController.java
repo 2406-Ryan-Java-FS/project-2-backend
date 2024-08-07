@@ -2,23 +2,35 @@
 
 package com.revature.controllers;
 
+import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.HashSet;
 //Core Libraries
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-
+import org.apache.commons.math3.util.Precision;
 //Spring
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import com.revature.models.ChoiceSelection;
+import com.revature.models.QuestionChoice;
 //Local
 import com.revature.models.QuizAttempts;
+import com.revature.models.QuizQuestion;
 import com.revature.models.User;
 import com.revature.models.dtos.QuizAttemptsDTO;
 import com.revature.models.dtos.QuizAttemptsEditDTO;
+import com.revature.services.ChoiceSelectionService;
+import com.revature.services.ChoiceSelectionServiceImpl;
 import com.revature.services.JwtServiceImpl;
+import com.revature.services.QuestionChoiceServiceImpl;
 import com.revature.services.QuizAttemptsServiceImpl;
+import com.revature.services.QuizQuestionServiceImpl;
 import com.revature.exceptions.*;
 
 
@@ -60,12 +72,22 @@ public class QuizAttemptsController {
 
 	QuizAttemptsServiceImpl attemptsServ;
 	JwtServiceImpl jwtServ;
+	ChoiceSelectionServiceImpl selectionServ;
+	QuestionChoiceServiceImpl optionServ;
+	QuizQuestionServiceImpl questionServ;
 	
 	@Autowired
-	QuizAttemptsController(QuizAttemptsServiceImpl attemptsServ, JwtServiceImpl jwtServ)
+	QuizAttemptsController(QuizAttemptsServiceImpl attemptsServ, 
+			JwtServiceImpl jwtServ, 
+			ChoiceSelectionServiceImpl selectionServ,  
+			QuestionChoiceServiceImpl optionServ,
+			QuizQuestionServiceImpl questionServ)
 	{
 		this.attemptsServ = attemptsServ;
 		this.jwtServ = jwtServ;
+		this.selectionServ = selectionServ;
+		this.optionServ = optionServ;
+		this.questionServ = questionServ;
 	}	
 	
 	////////////////////////////
@@ -390,7 +412,55 @@ public class QuizAttemptsController {
     
     // Business
 
-    
+	// Calculate score based on ChoiceSelection entries and the relevant question's correct fields.
+    // Since this is a command to process internal data, there isn't security danger to letting this be accessed
+    // aside from DDOS?
+    // - Essentially, JWT will not be relevant here.
+    @PutMapping(value = "/quizAttempts/{quizAttempt_id}/score") 
+    public @ResponseBody Double getScore(@PathVariable("quizAttempt_Id") Integer quizAttempt_id, @RequestHeader(name = "Authorization") String token)
+    {
+    	// return value to be sent later.
+    	Double score = 0.0;
+    	
+    	// keeps track of unique questions. if the size isn't the same as the choices,
+    	// then we have a unique situation.
+    	Set<QuizQuestion> uniqueQuestions = new HashSet<QuizQuestion>();
+    	
+    	// selections from quizAttempt
+    	List<ChoiceSelection> selections = selectionServ.getAttemptSelections(quizAttempt_id);
+    	  
+    	// to make the nested code more pretty.
+    	QuestionChoice currentChoice;
+    	
+    	// Go through all choices and increase score for each correct answer.
+    	// Also add to uniqueQuestions to be able to keep track of multiple answers for
+    	// later implementation.
+    	for(int i=0; i < selections.size(); i++)
+    	{
+    		currentChoice = optionServ.getChoice(selections.get(i).getChoiceId());
+    		uniqueQuestions.add(questionServ.getQuestion(currentChoice.getQuestionId()));
+    		if(optionServ.getChoice(selections.get(i).getChoiceId()).isCorrect())
+    			score++;
+    	}
+    	
+    	// no unique questions, no score! plus lets not divide by 0.
+    	if(uniqueQuestions.size() == 0)
+    	{
+    		return 0.0;
+    	}
+    	else
+    	{
+        	// Now we divide by the total unique questions
+        	score = score / uniqueQuestions.size();
+    	}
+
+    	// it is possible to account for an inconsistency between 
+    	//   number of selections vs unique questions, but we haven't set
+    	//   every rule yet.
+    	
+		return Precision.round(score, 2);
+    }
+
     
 	// For anything more past the comments above, Please Ask Steven Coronel
     // note: I need to study for the upcoming assessments.

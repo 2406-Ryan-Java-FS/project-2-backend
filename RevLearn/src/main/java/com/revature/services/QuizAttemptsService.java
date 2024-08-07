@@ -58,4 +58,5 @@ public interface QuizAttemptsService {
 	public QuizAttempts verifyFieldsNewEntry(QuizAttemptsDTO DTOtoEntity, Integer id);
 	
 	public boolean isQuizAttemptsAllowed(Integer quiz_id, Integer student_id);
+	
 }
