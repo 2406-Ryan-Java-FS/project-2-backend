@@ -1,4 +1,5 @@
 
+theLogfile.log
 application-awstest.properties
 application-aws.properties
 HELP.md

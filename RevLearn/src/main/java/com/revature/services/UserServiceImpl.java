@@ -102,17 +102,27 @@ public class UserServiceImpl implements UserService {
      * @throws UnauthorizedException if the email and/or password are invalid.
      * @throws InternalServerErrorException if the password encryption fails.
      */
-    public Integer verifyUser(User user) {
+    public Integer verifyUser(User user)
+    {
+        try
+        {
+            logger.info("given user="+user);
 
-        try {
             User existingUser = userRepository.findByEmail(user.getEmail());
+            logger.info("existingUser="+Help.json(existingUser,true,false));
+
             String encryptedPass = PasswordEncrypter.encryptPassword(user.getPassword());
 
-            if (existingUser != null && existingUser.getPassword().equals(encryptedPass)) {
+            if (existingUser != null && existingUser.getPassword().equals(encryptedPass))
+            {
+                logger.info("Returning existing user");
                 return existingUser.getUserId();
             }
+
             throw new UnauthorizedException("Invalid login credentials");
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e)
+        {
             throw new InternalServerErrorException("Password encryption error, please try again.");
         }
     }

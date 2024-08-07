@@ -47,7 +47,7 @@ public class UserController2 {
 
     @PostMapping("/users2/signin")
     public ResponseEntity<Object> signin(@RequestBody UserEducator dtoIn) {
-        logger.info("dtoIn="+ Help.json(dtoIn,true,true));
+        logger.info("dtoIn="+ Help.json(dtoIn,true,false));
 
         if(userRepository.findByEmail(dtoIn.getUser().getEmail())==null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -56,13 +56,15 @@ public class UserController2 {
         }
 
         Integer validUserId = userService.verifyUser(dtoIn.getUser());//dto only contains email and password
+        logger.info("found validUserId="+validUserId);
+
         String jwt = jwtService.generateJwt(validUserId);
 
         UserEducator dtoBack=new UserEducator(jwt,
             userService.getUser(validUserId),
             educatorService.getEducator(validUserId));//userId and educatorId are the same I guess
 
-        logger.info("dtoBack="+ Help.json(dtoBack,true,true));
+        logger.info("dtoBack="+ Help.json(dtoBack,true,false));
 
         return new ResponseEntity<>(dtoBack, HttpStatus.OK);
     }

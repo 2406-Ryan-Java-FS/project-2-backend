@@ -86,9 +86,14 @@ public class JwtServiceImpl implements JwtService{
      *         1+ = id of user
      */
     @Override
-    public int verifyJwt(String token) {
+    public int verifyJwt(String token)
+    {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));   // create key from app.yml
-        token = token.split(" ")[1].trim();                                      //remove "Bearer" from token header
+        logger.info("before split token="+token);
+
+        token = token.split(" ")[1].trim();                               //remove "Bearer" from token header
+        logger.info("after split token="+token);
+
         Claims body;
         try {
             body = Jwts.parser()
