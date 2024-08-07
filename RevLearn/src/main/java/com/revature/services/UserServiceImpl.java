@@ -2,6 +2,7 @@ package com.revature.services;
 
 import com.revature.exceptions.BadRequestException;
 import com.revature.exceptions.ConflictException;
+import com.revature.exceptions.InternalServerErrorException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.models.Educator;
 import com.revature.models.User;
@@ -23,16 +24,18 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-   
+
     /**
      * Persists a User to the repository.
      *
      * @param user The User to be added.
      * @return The persisted User including its newly assigned userId.
-     * @throws ConflictException if there's already a User with the given email.
+     * @throws ConflictException            if there's already a User with the given
+     *                                      email.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public User addUser(User user) {
-    	
+
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BadRequestException("Email is required.");
         }
@@ -51,11 +54,11 @@ public class UserServiceImpl implements UserService {
 
         try {
             // Encrypt the password and save the user
-        	String encodedPassword = passwordEncoder.encode(user.getPassword());
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
             return userRepository.save(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Internal error occurred during sign up", e);
+        } catch (RuntimeException e) {
+            throw new InternalServerErrorException("Password encryption error, please try again.");
         }
     }
 
@@ -90,30 +93,32 @@ public class UserServiceImpl implements UserService {
      *
      * @param user User object containing the email and password to verify.
      * @return The userId of the verified User.
-     * @throws UnauthorizedException if the email and/or password are invalid.
+     * @throws UnauthorizedException        if the email and/or password are
+     *                                      invalid.
+     * @throws InternalServerErrorException if the password encryption fails.
      */
     public Integer verifyUser(User user) {
 
-       try {  
-    	   User existingUser = userRepository.findByEmail(user.getEmail());
-    	   String encodedPassword = passwordEncoder.encode(user.getPassword());
-           
-        if (existingUser != null && existingUser.getPassword().equals(encodedPassword)) {
-            return existingUser.getUserId();
+        try {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+
+            if (existingUser != null && existingUser.getPassword().equals(encodedPassword)) {
+                return existingUser.getUserId();
+            }
+            throw new UnauthorizedException("Invalid login credentials");
+        } catch (Exception e) {
+            throw new RuntimeException("Internal error occurred during sign in", e);
         }
-        throw new UnauthorizedException("Invalid login credentials");
     }
-        catch (Exception e) {
-        throw new RuntimeException("Internal error occurred during sign in", e);
-}
-}
 
     /**
      * Merges data from User and Educator entities into a UserEducatorDTO.
      *
      * @param user     the User entity to be combined
      * @param educator the Educator entity to be combined
-     * @return a UserEducatorDTO that combines data from both the User and Educator entities
+     * @return a UserEducatorDTO that combines data from both the User and Educator
+     *         entities
      */
     public UserEducator combineUserAndEducator(User user, Educator educator) {
         UserEducator dto = new UserEducator();

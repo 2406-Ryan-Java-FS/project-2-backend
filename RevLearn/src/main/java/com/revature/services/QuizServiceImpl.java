@@ -38,6 +38,7 @@ public class QuizServiceImpl implements QuizService{
         newQuiz.setTitle(quizDTO.getTitle());
         newQuiz.setTimer(quizDTO.getTimer());
         newQuiz.setAttemptsAllowed(quizDTO.getAttempts_allowed());
+        newQuiz.setOpen(quizDTO.isOpen());
         return qr.save(newQuiz);
     }
 

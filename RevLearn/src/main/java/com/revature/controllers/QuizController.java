@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 public class QuizController {
 
@@ -33,17 +34,11 @@ public class QuizController {
     }
 
     @GetMapping("/quizzes")
-    public List<Quiz> getAllQuizzes(){
-        return qs.getAllQuizzes();
+    public ResponseEntity<List<Quiz>> getAllQuizzes(){
+        return ResponseEntity.ok(qs.getAllQuizzes());
     }
 
-//    get without DTO
-//    @GetMapping("/quizzes/{id}")
-//    public Quiz getQuizById(@PathVariable int id){
-//        return qs.getQuizById(id);
-//    }
-
-//    get with DTO
+//    get with combined Quiz DTO
     @GetMapping("/quizzes/{id}")
     public QuizDTO getQuizById(@PathVariable int id){
         Quiz myQuiz = qs.getQuizById(id);
@@ -85,15 +80,8 @@ public class QuizController {
         return qs.getAllQuizzesByCourse(courseId);
     }
 
-//    Post without DTO
-//    @PostMapping("/quizzes")
-//    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz q){
-//        Quiz createdQuiz = qs.addQuiz(q);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
-//    }
 
-
-//    alternate post with combined DTO QuizDTO, QuizQuestionDTO, QuestionChoiceDTO
+//    post with combined DTO QuizDTO, QuizQuestionDTO, QuestionChoiceDTO
     @PostMapping("/quizzes")
     public ResponseEntity<QuizDTO> createQuizAndQuestionsAndChoices(@RequestBody QuizDTO quizDTO){
         Quiz createdQuiz = qs.addQuiz(quizDTO);
