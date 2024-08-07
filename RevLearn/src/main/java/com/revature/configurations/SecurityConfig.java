@@ -34,16 +34,11 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtServiceImpl jwtServiceImpl;
-    private final UserServiceImpl userService;
-    private final UserRepository userRepository;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     public SecurityConfig(JwtServiceImpl jwtServiceImpl, UserServiceImpl userService, UserRepository userRepository, JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtServiceImpl = jwtServiceImpl;
-        this.userService = userService;
-        this.userRepository = userRepository;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -52,9 +47,9 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> {
-//                            registry.requestMatchers( "/public/**").permitAll();
-                            registry.requestMatchers( "/users","/courses", "/enrollments").hasRole("EDUCATOR");
-                            registry.requestMatchers( "/users","/courses").hasRole("STUDENT");
+                            registry.requestMatchers( "/users/**").permitAll();
+                            registry.requestMatchers(  "/enrollments/**", "/courses/**", "/quizzes").hasRole("EDUCATOR");
+                            registry.requestMatchers(  "/courses/**", "/quizzes").hasRole("STUDENT");
                             registry.anyRequest().authenticated();
                         })
                 .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
@@ -88,15 +83,15 @@ public class SecurityConfig {
         return provider;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(authenticationProvider());
-    }
-
 //    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
+//    public AuthenticationManager authenticationManager() {
+//        return new ProviderManager(authenticationProvider());
 //    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
