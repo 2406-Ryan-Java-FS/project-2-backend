@@ -272,7 +272,7 @@ public class EnrollmentController {
         } catch (JsonProcessingException | NullPointerException e) {
             return ResponseEntity.badRequest().body("Invalid JSON format for payment status");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Please enter 'PENDING', 'COMPLETED', or 'CANCELLED'");
+            return ResponseEntity.badRequest().body("Please enter 'pending', 'completed', or 'cancelled'");
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (NotFoundException e) {
