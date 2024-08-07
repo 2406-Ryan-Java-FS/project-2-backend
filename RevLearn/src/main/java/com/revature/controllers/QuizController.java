@@ -9,6 +9,9 @@ import com.revature.models.dtos.QuizQuestionDTO;
 import com.revature.services.QuestionChoiceServiceImpl;
 import com.revature.services.QuizQuestionServiceImpl;
 import com.revature.services.QuizServiceImpl;
+import com.revature.util.Help;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,8 @@ import java.util.List;
 @CrossOrigin
 @RestController
 public class QuizController {
+
+    private static final Logger logger= LoggerFactory.getLogger(QuizController.class);
 
     QuizServiceImpl qs;
 
@@ -84,6 +89,7 @@ public class QuizController {
 //    post with combined DTO QuizDTO, QuizQuestionDTO, QuestionChoiceDTO
     @PostMapping("/quizzes")
     public ResponseEntity<QuizDTO> createQuizAndQuestionsAndChoices(@RequestBody QuizDTO quizDTO){
+        logger.info("incoming quizDTO="+ Help.json(quizDTO,true,false));
         Quiz createdQuiz = qs.addQuiz(quizDTO);
         for( QuizQuestionDTO qqDTO : quizDTO.getQuestions()) {
             QuizQuestion createdQuizQuestion = qqs.addQuestionDTO(qqDTO, createdQuiz.getQuizId());
@@ -91,6 +97,8 @@ public class QuizController {
                 qcs.addChoiceDTO(qcDTO, createdQuizQuestion.getId());
             }
         }
+        logger.info("createdQuiz="+ Help.json(createdQuiz,true,false));
+        quizDTO.setQuiz_id(createdQuiz.getQuizId());
         return ResponseEntity.status(HttpStatus.CREATED).body(quizDTO);
     }
 

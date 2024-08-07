@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class QuizDTO {
     private int course_id;
+    private int quiz_id;
     private String title;
     private int timer;
     private int attempts_allowed;
