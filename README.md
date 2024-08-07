@@ -257,7 +257,7 @@ CREATE TABLE QuizAttempts (
     student_id INT,
     quiz_id INT,
     attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    score NUMERIC(5,2) check (score <= 100),
+    score NUMERIC(5,2) CHECK (score <= 100),
     FOREIGN KEY (student_id) REFERENCES Users(user_id),
     FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
 );
