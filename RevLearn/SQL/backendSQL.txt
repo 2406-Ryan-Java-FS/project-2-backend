@@ -69,7 +69,7 @@ CREATE TABLE Quizzes (
     timer INT,
     attempts_allowed INT,
     open bool,
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuizQuestions (
