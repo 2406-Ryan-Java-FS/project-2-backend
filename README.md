@@ -52,10 +52,10 @@ Register as an educator using email, password, and professional details.
 ## Technologies Used
 ### Backend
 - Java
+- Spring Framework
+- PostgreSQL
 - Spring Boot
-- Spring Data JPA
-- Spring Security
-- REST API
+- Kafka
 
 #### Models
 - ChoiceSelection
@@ -70,10 +70,18 @@ Register as an educator using email, password, and professional details.
 - User
 
 ### Frontend
+- HTML
+- CSS
 - JavaScript
 - React
 - Axios
-- Bootstrap (or another CSS framework, if used)
+- Material UI
+
+### DevOps
+- Docker
+- AWS RDS
+- AWS EC2
+- AWS S3
 
 ## Installation and Setup
 ### Backend
@@ -150,7 +158,6 @@ src/
 ├── App.js
 └── index.js
 ```
-
 ## SQL Schema
 - For Hibernate plase use validate
 - Schema name is project2
@@ -158,21 +165,21 @@ src/
 ```sql
 -- Set the schema for the current session
 SET search_path TO project2;
- 
+
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS Users, Educators, Quizzes, ChoiceSelections, QuizQuestions, QuestionChoices, Courses, Enrollments, QuizAttempts CASCADE;
- 
+
 -- Drop existing casts if they exist
 DROP CAST IF EXISTS (varchar AS user_role);
- 
+
 -- Drop existing types if they exist
 DROP TYPE IF EXISTS user_role;
 DROP TYPE IF EXISTS pay_status;
- 
+
 -- Create types
 CREATE TYPE user_role AS ENUM('student', 'educator');
 CREATE TYPE pay_status AS ENUM('pending', 'completed', 'cancelled');
- 
+
 -- Create cast for types
 CREATE CAST (varchar AS user_role) WITH INOUT AS implicit;
 
@@ -226,14 +233,15 @@ CREATE TABLE Quizzes (
     title VARCHAR(255) NOT NULL,
     timer INT,
     attempts_allowed INT,
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+    open BOOL,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuizQuestions (
     question_id SERIAL PRIMARY KEY,
     quiz_id INT,
     question_text TEXT NOT NULL,
-    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
+    FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuestionChoices (
@@ -241,7 +249,7 @@ CREATE TABLE QuestionChoices (
     question_id  INT,
     correct BOOL,
     text VARCHAR(255) NOT NULL,
-    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id)
+    FOREIGN KEY (question_id) REFERENCES QuizQuestions(question_id) ON DELETE CASCADE
 );
 
 CREATE TABLE QuizAttempts (
@@ -257,16 +265,16 @@ CREATE TABLE QuizAttempts (
 CREATE TABLE ChoiceSelections (
     choice_id INT REFERENCES QuestionChoices(choice_id) NOT NULL,
     attempt_id INT REFERENCES QuizAttempts(attempt_id) NOT NULL,
-    PRIMARY KEY (choice_id, attempt_id)
+    PRIMARY KEY(choice_id, attempt_id)
 );
 
 -- Sample Data
 
 INSERT INTO Users (email, password, first_name, last_name, role) VALUES
-('john.doe@example.com', 'password123', 'John', 'Doe', 'student'),
-('jane.smith@example.com', 'password123', 'Jane', 'Smith', 'student'),
-('alice.johnson@example.com', 'password123', 'Alice', 'Johnson', 'educator'),
-('bob.brown@example.com', 'password123', 'Bob', 'Brown', 'educator');
+('john.doe@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'John', 'Doe', 'student'),
+('jane.smith@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Jane', 'Smith', 'student'),
+('alice.johnson@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Alice', 'Johnson', 'educator'),
+('bob.brown@example.com', '482C811DA5D5B4BC6D497FFA98491E38', 'Bob', 'Brown', 'educator');
 
 INSERT INTO Educators (educator_id, degree_level, degree_major, alma_mater, year) VALUES
 ((SELECT user_id FROM Users WHERE email='alice.johnson@example.com'), 'PhD', 'Computer Science', 'MIT', '2015'),
@@ -283,4 +291,42 @@ INSERT INTO Enrollments (student_id, course_id, payment_status, enrollment_statu
 ((SELECT user_id FROM Users WHERE email='john.doe@example.com'), (SELECT course_id FROM Courses WHERE title='Calculus I'), 'completed', TRUE, 'Very informative.'),
 ((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Data Structures'), 'completed', TRUE, 'Challenging but rewarding.'),
 ((SELECT user_id FROM Users WHERE email='jane.smith@example.com'), (SELECT course_id FROM Courses WHERE title='Statistics'), 'pending', FALSE, NULL);
+
+INSERT INTO quizzes (course_id, title, timer, attempts_allowed, open)
+VALUES
+    ( 1, 'Programming JavaScript', 60, 2, 'true' );
+
+INSERT INTO quizzes (course_id, title, timer, attempts_allowed, open)
+VALUES
+    ( (SELECT course_id FROM courses WHERE title='Introduction to Programming'), 'Programming JavaScript', 60, 2, 'true' );
+
+INSERT INTO quizquestions (quiz_id, question_text)
+VALUES
+  ( 1, 'How do you create a function in JavaScript?' ),
+  ( 1, 'What is the result of typeof NaN?' );
+
+INSERT INTO QuestionChoices (question_id, text, correct)
+VALUES
+  ( (SELECT question_id FROM quizquestions where question_text='How do you create a function in JavaScript?'), 'def myFunction() {}', 'false' ),
+  ( (SELECT question_id FROM quizquestions where question_text='How do you create a function in JavaScript?'), 'create myFunction() {}', 'false'),
+  ( (SELECT question_id FROM quizquestions where question_text='How do you create a function in JavaScript?'), 'function myFunction() {}', 'true'),
+  ( (SELECT question_id FROM quizquestions where question_text='How do you create a function in JavaScript?'), 'function:myFunction() {}', 'false'),
+  ( (SELECT question_id FROM quizquestions where question_text='How do you create a function in JavaScript?'), 'myFunction function() {}', 'false');
+
+INSERT INTO QuestionChoices (question_id, text, correct)
+VALUES
+  ( (SELECT question_id FROM quizquestions where question_text='What is the result of typeof NaN?'), 'object ', 'false'),
+  ( (SELECT question_id FROM quizquestions where question_text='What is the result of typeof NaN?'), 'undefined', 'false' ),
+  ( (SELECT question_id FROM quizquestions where question_text='What is the result of typeof NaN?'), 'NaN', 'false'),
+  ( (SELECT question_id FROM quizquestions where question_text='What is the result of typeof NaN?'), 'null', 'false'),
+  ( (SELECT question_id FROM quizquestions where question_text='What is the result of typeof NaN?'), 'number', 'true');
+
+-- Select statements
+select * from users;
+select * from educators;
+select * from courses;
+select * from enrollments;
+select * from quizzes;
+select * from quizattempts;
+select * from quizquestions;
 ```
